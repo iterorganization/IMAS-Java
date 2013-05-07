@@ -1,0 +1,34 @@
+include ../Makefile.common
+
+SOURCES = ualmemory/javainterface/*.java 
+
+#-------- Options for cache monitoring ---------
+ifeq "$(strip $(MONITOR))" "yes"
+ SOURCES += CacheMonitor.java
+endif
+#-----------------------------------------------
+
+CLASSES = $(SOURCES:.java=.class) 
+
+all : ualjava.jar
+
+install: all
+	cp ualjava.jar $(INSTALL)/jar
+
+clean:
+	@ $(RM) $(CLASSES) 
+	@ $(RM) ualjava.jar
+
+clean-src: clean
+	@ $(RM) ualmemory/javainterface/UALAccess.java
+
+
+
+ualjava.jar : $(SOURCES) ualmemory/javainterface/UALAccess.java
+	javac $(SOURCES)
+	jar cf ualjava.jar $(CLASSES)
+
+ualmemory/javainterface/UALAccess.java : CPODef2Java.xsl
+	xsltproc CPODef2Java.xsl ../xml/CPODef.xml > ualmemory/javainterface/UALAccess.java
+
+
