@@ -1226,7 +1226,6 @@ public static class <xsl:value-of select="@name"/>
 <xsl:param name="variable_path"/>
 <xsl:param name="mds_path"/>
 <xsl:param name="ids_name"/>
-
 <xsl:choose>
         <!--========== Regular structures ==========-->
         <xsl:when test="@data_type='structure'">
@@ -1290,7 +1289,6 @@ public static class <xsl:value-of select="@name"/>
 	</xsl:when>
 
    	<xsl:when test="@type='SIGNAL'">
-// Get Slice <xsl:value-of select="@path"/>
 	<xsl:choose>
 		<xsl:when test="$variable_path">
    	if (ids.IDS_Properties.Homogeneous_Timebase == 0) {
@@ -1308,6 +1306,10 @@ public static class <xsl:value-of select="@name"/>
    	}   
    		</xsl:when>
  		<xsl:otherwise>
+		// line 1312 of IDS ===
+		// @path = <xsl:value-of select="@path"/>
+		// $variable_path = <xsl:value-of select="$variable_path"/>
+		// @data_type = <xsl:value-of select="@data_type"/>
    	if (ids.IDS_Properties.Homogeneous_Timebase == 0) {
        	  timebasepath="<xsl:call-template name="printTimebasepath"/>";
    	} else {
@@ -1341,6 +1343,7 @@ public static class <xsl:value-of select="@name"/>
 		</xsl:call-template>
          </xsl:when>
         <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
+// in sequence of test on data_type .... int
 		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
 		<xsl:with-param name="Function">Vect1DInt</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Int</xsl:with-param>
@@ -3397,7 +3400,7 @@ public static class <xsl:value-of select="@name"/>
 	    Vect1DInt obj = UALLowLevel.getDimension(expIdx, path, &quot;<xsl:value-of select="@name"/>&quot;);
 	    if (obj.getElementAt(0) > 0) {
               ids.<xsl:value-of select="@name"/> = new <xsl:value-of select="$Function"/>(<xsl:call-template name="printDimensions"><xsl:with-param name="number" select="$number"/></xsl:call-template>);
-              ids.<xsl:value-of select="@name"/>.setElementAt(0, UALLowLevel.get<xsl:value-of select="$SliceFunction"/>Slice(expIdx, path, &quot;/<xsl:value-of select="@name"/>&quot;, <xsl:call-template name="printPathofTimebase"/>, time, interpolMode));
+              ids.<xsl:value-of select="@name"/>.setElementAt(0, UALLowLevel.get<xsl:value-of select="$SliceFunction"/>Slice(expIdx, path, &quot;<xsl:value-of select="@name"/>&quot;, <xsl:call-template name="printPathofTimebase"/>, time, interpolMode));
 <!--          ids.<xsl:value-of select="@name"/> = UALLowLevel.get<xsl:value-of select="$Function"/>(expIdx, path, &quot;<xsl:value-of select="@name"/>&quot;);
 -->
             }
