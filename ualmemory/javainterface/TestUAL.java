@@ -9,11 +9,11 @@ import java.io.*;
 //Class IDS defines the following static methods:
 // - int open(String name, int shot, int run) to open a database instance. It returns the identifier to be ised in the subsequent calls.
 // - int create(String name, int shot, int run, int refShot, int refRun) to create a new database instance. It returns the identifier to be ised in the subsequent calls.
-//- close(int refIdx, String name, int shot, int run) to close the Current database
+//- close(int refIdx, String name, int shot, int run) to close the current database
 //
 //If the IDS is not time dependent, the corresponding class defines the following static methods:
 // - put(int expIdx, String path, <IDS class>  ids) to write the content of the passed IDS instance in the database
-// - <IDS  Class>get(int expIdx, String path) to read the IDS instance from the database. In the Current implementation
+// - <IDS  Class>get(int expIdx, String path) to read the IDS instance from the database. In the current implementation
 // the string argumeny path has the same name of the IDS class.
 //
 //If the IDS is time dependent, the corresponding class defines the following static methods:
@@ -56,57 +56,57 @@ class TestUAL
 /*        int run = imas.getRun(idx);
     	System.out.println("Run: " + run);
 */
-	imas.PF pfs = new imas.PF();
+	imas.pf_active pf_actives = new imas.pf_active();
 
         //Fill some fields
 	//Those fields are not time dependent. Even if in this example thei values are filled for all 
-        //the elements of the IDS array, only pfs[0] is considered in the put() method.
-        pfs.IDS_Properties.Comment_of = "Debugging phase";
+        //the elements of the IDS array, only pf_actives[0] is considered in the put() method.
+        pf_actives.ids_properties.comment_of = "Debugging phase";
         //A sample int
-        pfs.IDS_Properties.cocos = 1; 
+        pf_actives.ids_properties.cocos = 1; 
 
-	pfs.IDS_Properties.Homogeneous_Timebase = 0; // Mandatory to define this property
+	pf_actives.ids_properties.homogeneous_time = 0; // Mandatory to define this property
             
 	//A sample string array. A set of supporty vector classes is defined in the UAL java interface
 	//the naming convention for vector classes is vect<num dimensions>D<type>
-        pfs.Coils = new imas.PF.CoilsClass[2];
+        pf_actives.coil = new imas.pf_active.coilClass[2];
         for (int i=0;i<2;i++) {
-        	pfs.Coils[i] = new imas.PF.CoilsClass();
+        	pf_actives.coil[i] = new imas.pf_active.coilClass();
 	}
-       	pfs.Coils[0].Name = "SAMPLE 1";
-       	pfs.Coils[1].Name = "SAMPLE 2";
+       	pf_actives.coil[0].name = "SAMPLE 1";
+       	pf_actives.coil[1].name = "SAMPLE 2";
 
       	//The following field is time dependent. All the elements of the IDS array are considered
         //A sample time dependent 1D vector
-        pfs.Coils[0].Current.Data     = new Vect1DDouble(number);
+        pf_actives.coil[0].current.data     = new Vect1DDouble(number);
         //Never forget to write the time for time dependent IDS instances!!!!
-        pfs.Coils[0].Current.Timebase = new Vect1DDouble(number);
+        pf_actives.coil[0].current.time = new Vect1DDouble(number);
         for (int i=0;i<number;i++) {
-        	pfs.Coils[0].Current.Data.setElementAt(i, 2*i);
-        	pfs.Coils[0].Current.Timebase.setElementAt(i, i);
+        	pf_actives.coil[0].current.data.setElementAt(i, 2*i);
+        	pf_actives.coil[0].current.time.setElementAt(i, i);
 	}
 	
         number = number+2;
-        pfs.Coils[1].Current.Data     = new Vect1DDouble(number);
+        pf_actives.coil[1].current.data     = new Vect1DDouble(number);
         //Never forget to write the time for time dependent IDS instances!!!!
-        pfs.Coils[1].Current.Timebase = new Vect1DDouble(number);
+        pf_actives.coil[1].current.time = new Vect1DDouble(number);
         for (int i=0;i<number;i++) {
-        	pfs.Coils[1].Current.Data.setElementAt(i, 2*i+10);
-        	pfs.Coils[1].Current.Timebase.setElementAt(i, i+number);
+        	pf_actives.coil[1].current.data.setElementAt(i, 2*i+10);
+        	pf_actives.coil[1].current.time.setElementAt(i, i+number);
 	}
-	pfs.Coils[0].Voltage.Data = new Vect1DDouble(0); 
-	pfs.Coils[1].Voltage.Data = new Vect1DDouble(0); 
+	pf_actives.coil[0].voltage.data = new Vect1DDouble(0); 
+	pf_actives.coil[1].voltage.data = new Vect1DDouble(0); 
 /*    
-	pfs.Coils[0].Voltage.Timebase = new Vect1DDouble(0); 
-	pfs.Coils[1].Voltage.Timebase = new Vect1DDouble(0); 
+	pf_actives.coil[0].voltage.time = new Vect1DDouble(0); 
+	pf_actives.coil[1].voltage.time = new Vect1DDouble(0); 
 */    	
-// Put Vertical_Forces/Names   
+// Put Vertical_Forces/names   
 /*
-        pfs.Vertical_Forces = new imas.PF.Vertical_ForcesClass();
-        pfs.Vertical_Forces.Names = new Vect1DString(1);
-	pfs.Vertical_Forces.Names.setElementAt(0,"vertical 1");
+        pf_actives.Vertical_Forces = new imas.pf_active.Vertical_ForcesClass();
+        pf_actives.Vertical_Forces.names = new Vect1DString(1);
+	pf_actives.Vertical_Forces.names.setElementAt(0,"vertical 1");
 */
-	pfs.put(idx, "pf", pfs);
+	pf_actives.put(idx, "pf_active", pf_actives);
 
     	imas.close(idx);
     } catch(Exception exc) {
@@ -122,43 +122,43 @@ class TestUAL
 	int idxSlice = imas.create("ids",22, 1, 22, 0);
 	System.out.println("idx: " + idxSlice);
         
-	imas.PF pfsSlice = new imas.PF();
+	imas.pf_active pf_activesSlice = new imas.pf_active();
 
         //Fill some fields
 	//Those fields are not time dependent. Even if in this example thei values are filled for all 
-        //the elements of the IDS array, only pfs[0] is considered in the put() method.
-        pfsSlice.IDS_Properties.Comment_of = "Test of put slice";
+        //the elements of the IDS array, only pf_actives[0] is considered in the put() method.
+        pf_activesSlice.ids_properties.comment_of = "Test of put slice";
         //A sample int
-        pfsSlice.IDS_Properties.cocos = 1; 
+        pf_activesSlice.ids_properties.cocos = 1; 
 
-	pfsSlice.IDS_Properties.Homogeneous_Timebase = 1; // Mandatory to define this property
+	pf_activesSlice.ids_properties.homogeneous_time = 1; // Mandatory to define this property
             
 	//A sample string array. A set of supporty vector classes is defined in the UAL java interface
 	//the naming convention for vector classes is vect<num dimensions>D<type>
-        pfsSlice.Coils = new imas.PF.CoilsClass[2];
+        pf_activesSlice.coil = new imas.pf_active.coilClass[2];
         for (int i=0;i<2;i++) {
-        	pfsSlice.Coils[i] = new imas.PF.CoilsClass();
+        	pf_activesSlice.coil[i] = new imas.pf_active.coilClass();
 	}
-       	pfsSlice.Coils[0].Name = "Coil 1";
-       	pfsSlice.Coils[1].Name = "Coil 2";
+       	pf_activesSlice.coil[0].name = "Coil 1";
+       	pf_activesSlice.coil[1].name = "Coil 2";
 
-	pfsSlice.putNonTimed(idxSlice,"PF",pfsSlice);
+	pf_activesSlice.putNonTimed(idxSlice,"pf_active",pf_activesSlice);
 	System.out.println("After putnonTimed ");
 
       	//The following field is time dependent. All the elements of the IDS array are considered
         //A sample time dependent 1D vector
-        pfsSlice.Coils[0].Current.Data     = new Vect1DDouble(number);
-        pfsSlice.Coils[1].Current.Data     = new Vect1DDouble(number);
+        pf_activesSlice.coil[0].current.data     = new Vect1DDouble(number);
+        pf_activesSlice.coil[1].current.data     = new Vect1DDouble(number);
         //Never forget to write the general time!!!!
-        pfsSlice.Timebase = new Vect1DDouble(number);
+        pf_activesSlice.time = new Vect1DDouble(number);
 	
 	// write 7 slices for example
 	int numberofSlice = 7;
         for (int i=0;i<numberofSlice;i++) {
-        	pfsSlice.Coils[0].Current.Data.setElementAt(0, 2*i);
-        	pfsSlice.Coils[1].Current.Data.setElementAt(0, 2*i+10);
-                pfsSlice.Timebase.setElementAt(0, i);
-		pfsSlice.putSlice(idxSlice, "pf", pfsSlice);
+        	pf_activesSlice.coil[0].current.data.setElementAt(0, 2*i);
+        	pf_activesSlice.coil[1].current.data.setElementAt(0, 2*i+10);
+                pf_activesSlice.time.setElementAt(0, i);
+		pf_activesSlice.putSlice(idxSlice, "pf_active", pf_activesSlice);
 	}
 	
     	imas.close(idxSlice);
@@ -167,21 +167,21 @@ class TestUAL
     }
 
 // Test the "get" part
-    imas.PF pfsget;
+    imas.pf_active pf_activesget;
     try  {
 //	int idxget = imas.open("ids",20, 1); // 12, 1    String user, String tokamak, String version
 	int idxget = imas.openEnv("ids",12, 2, "guilleb", "test", "1.0"); // 12, 1    String user, String tokamak, String version
 	System.out.println("idx for get: " + idxget);
         
-	pfsget = imas.PF.get(idxget,"PF");
-        System.out.println("pfsget.IDS_Properties.Comment_of: "+ pfsget.IDS_Properties.Comment_of);
-	System.out.println("pfsget.IDS_Properties.Homogeneous_Timebase: " + pfsget.IDS_Properties.Homogeneous_Timebase);
-        System.out.println("number of coils: "+ pfsget.Coils.length);
-//        pfsget.dump();
-	for (int i=0;i<pfsget.Coils.length;i++) {
-          System.out.println("name of coils["+i+"]: "+ pfsget.Coils[i].Name);
-          System.out.println("Voltage: "+ pfsget.Coils[i].Current.Data);
-          System.out.println("Time   : "+ pfsget.Coils[i].Current.Timebase);
+	pf_activesget = imas.pf_active.get(idxget,"pf_active");
+        System.out.println("pf_activesget.ids_properties.comment_of: "+ pf_activesget.ids_properties.comment_of);
+	System.out.println("pf_activesget.ids_properties.homogeneous_time: " + pf_activesget.ids_properties.homogeneous_time);
+        System.out.println("number of coil: "+ pf_activesget.coil.length);
+//        pf_activesget.dump();
+	for (int i=0;i<pf_activesget.coil.length;i++) {
+          System.out.println("name of coil["+i+"]: "+ pf_activesget.coil[i].name);
+          System.out.println("voltage: "+ pf_activesget.coil[i].current.data);
+          System.out.println("Time   : "+ pf_activesget.coil[i].current.time);
         }
 
     	imas.close(idxget);
@@ -191,24 +191,24 @@ class TestUAL
     }
 
 // Test the "get slice" part
-    imas.PF pfsgetslice;
+    imas.pf_active pf_activesgetslice;
     try  {
 	int idxget = imas.open("ids",22, 1); // 12, 2 or 20, 1
 	System.out.println("idx for getslice: " + idxget);
         
 	double time=4.2;
 
-	pfsgetslice = imas.PF.getSlice(idxget,"PF",time, 2);
-        System.out.println("pfsget.IDS_Properties.Comment_of: "+ pfsgetslice.IDS_Properties.Comment_of);
-	System.out.println("pfsget.IDS_Properties.Homogeneous_Timebase: " + pfsgetslice.IDS_Properties.Homogeneous_Timebase);
-        System.out.println("number of coils: "+ pfsgetslice.Coils.length);
-//        pfsget.dump();
-	for (int i=0;i<pfsgetslice.Coils.length;i++) {
-          System.out.println("name of coils["+i+"]: "+ pfsgetslice.Coils[i].Name);
-          System.out.println("Voltage: "+ pfsgetslice.Coils[i].Current.Data);
-          System.out.println("Time   : "+ pfsgetslice.Coils[i].Current.Timebase);
+	pf_activesgetslice = imas.pf_active.getSlice(idxget,"pf_active",time, 2);
+        System.out.println("pf_activesget.ids_properties.comment_of: "+ pf_activesgetslice.ids_properties.comment_of);
+	System.out.println("pf_activesget.ids_properties.homogeneous_time: " + pf_activesgetslice.ids_properties.homogeneous_time);
+        System.out.println("number of coil: "+ pf_activesgetslice.coil.length);
+//        pf_activesget.dump();
+	for (int i=0;i<pf_activesgetslice.coil.length;i++) {
+          System.out.println("name of coil["+i+"]: "+ pf_activesgetslice.coil[i].name);
+          System.out.println("voltage: "+ pf_activesgetslice.coil[i].current.data);
+          System.out.println("Time   : "+ pf_activesgetslice.coil[i].current.time);
         }
-        System.out.println("Timebase: "+ pfsgetslice.Timebase);
+        System.out.println("time: "+ pf_activesgetslice.time);
 
     	imas.close(idxget);
 
@@ -217,39 +217,39 @@ class TestUAL
     }
 
 // Test the "copy" part
-    imas.PF pfssrc, pfsdst ;
+    imas.pf_active pf_activessrc, pf_activesdst ;
     try  {
 	int idxsrc = imas.open("ids",12, 2); // 12, 1    String user, String tokamak, String version
 	System.out.println("idx for get. src: " + idxsrc);
 
 	int idxdst = imas.create("ids",12, 998, 12, 0);
         
-	pfssrc = imas.PF.get(idxsrc,"PF");
+	pf_activessrc = imas.pf_active.get(idxsrc,"pf_active");
         System.out.println("**** SOURCE ******");
-        System.out.println("pfsget.IDS_Properties.Comment_of: "+ pfssrc.IDS_Properties.Comment_of);
-	System.out.println("pfsget.IDS_Properties.Homogeneous_Timebase: " + pfssrc.IDS_Properties.Homogeneous_Timebase);
-        System.out.println("number of coils: "+ pfssrc.Coils.length);
-//        pfsget.dump();
-	for (int i=0;i<pfssrc.Coils.length;i++) {
-          System.out.println("name of coils["+i+"]: "+ pfssrc.Coils[i].Name);
-          System.out.println("Voltage: "+ pfssrc.Coils[i].Current.Data);
-          System.out.println("Time   : "+ pfssrc.Coils[i].Current.Timebase);
+        System.out.println("pf_activesget.ids_properties.comment_of: "+ pf_activessrc.ids_properties.comment_of);
+	System.out.println("pf_activesget.ids_properties.homogeneous_time: " + pf_activessrc.ids_properties.homogeneous_time);
+        System.out.println("number of coil: "+ pf_activessrc.coil.length);
+//        pf_activesget.dump();
+	for (int i=0;i<pf_activessrc.coil.length;i++) {
+          System.out.println("name of coil["+i+"]: "+ pf_activessrc.coil[i].name);
+          System.out.println("voltage: "+ pf_activessrc.coil[i].current.data);
+          System.out.println("Time   : "+ pf_activessrc.coil[i].current.time);
         }
 
-        imas.PF.copy(idxsrc, 0, idxdst, 0);
+        imas.pf_active.copy(idxsrc, 0, idxdst, 0);
 
 /*
 */	
-	pfsdst = imas.PF.get(idxdst,"PF");
+	pf_activesdst = imas.pf_active.get(idxdst,"pf_active");
         System.out.println("**** DESTINATION ******");
-        System.out.println("pfsget.IDS_Properties.Comment_of: "+ pfsdst.IDS_Properties.Comment_of);
-	System.out.println("pfsget.IDS_Properties.Homogeneous_Timebase: " + pfsdst.IDS_Properties.Homogeneous_Timebase);
-        System.out.println("number of coils: "+ pfsdst.Coils.length);
-//        pfsget.dump();
-	for (int i=0;i<pfsdst.Coils.length;i++) {
-          System.out.println("name of coils["+i+"]: "+ pfsdst.Coils[i].Name);
-          System.out.println("Voltage: "+ pfsdst.Coils[i].Current.Data);
-          System.out.println("Time   : "+ pfsdst.Coils[i].Current.Timebase);
+        System.out.println("pf_activesget.ids_properties.comment_of: "+ pf_activesdst.ids_properties.comment_of);
+	System.out.println("pf_activesget.ids_properties.homogeneous_time: " + pf_activesdst.ids_properties.homogeneous_time);
+        System.out.println("number of coil: "+ pf_activesdst.coil.length);
+//        pf_activesget.dump();
+	for (int i=0;i<pf_activesdst.coil.length;i++) {
+          System.out.println("name of coil["+i+"]: "+ pf_activesdst.coil[i].name);
+          System.out.println("voltage: "+ pf_activesdst.coil[i].current.data);
+          System.out.println("Time   : "+ pf_activesdst.coil[i].current.time);
         }
     	imas.close(idxsrc);
     	imas.close(idxdst);
