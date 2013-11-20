@@ -264,6 +264,7 @@ public static class <xsl:value-of select="@name"/>
           String        timepath;
           String        ual_debug = System.getenv("ual_debug");
 
+          delete(expIdx, path);
           UALLowLevel.beginIDSPut(expIdx, path);
           <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/>
           UALLowLevel.endIDSPut(expIdx, path);
