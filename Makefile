@@ -31,4 +31,3 @@ ualjava.jar : $(SOURCES) ualmemory/javainterface/imas.java
 ualmemory/javainterface/imas.java : IDSDef2Java.xsl
 	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > ualmemory/javainterface/imas.java
 
-
