@@ -61,7 +61,7 @@ class TestUAL
         //Fill some fields
 	//Those fields are not time dependent. Even if in this example thei values are filled for all 
         //the elements of the IDS array, only pf_actives[0] is considered in the put() method.
-        pf_actives.ids_properties.comment_of = "Debugging phase";
+        pf_actives.ids_properties.comment = "Debugging phase";
         //A sample int
         pf_actives.ids_properties.cocos = 1; 
 
@@ -127,7 +127,7 @@ class TestUAL
         //Fill some fields
 	//Those fields are not time dependent. Even if in this example thei values are filled for all 
         //the elements of the IDS array, only pf_actives[0] is considered in the put() method.
-        pf_activesSlice.ids_properties.comment_of = "Test of put slice";
+        pf_activesSlice.ids_properties.comment = "Test of put slice";
         //A sample int
         pf_activesSlice.ids_properties.cocos = 1; 
 
@@ -174,7 +174,7 @@ class TestUAL
 	System.out.println("idx for get: " + idxget);
         
 	pf_activesget = imas.pf_active.get(idxget,"pf_active");
-        System.out.println("pf_activesget.ids_properties.comment_of: "+ pf_activesget.ids_properties.comment_of);
+        System.out.println("pf_activesget.ids_properties.comment: "+ pf_activesget.ids_properties.comment);
 	System.out.println("pf_activesget.ids_properties.homogeneous_time: " + pf_activesget.ids_properties.homogeneous_time);
         System.out.println("number of coil: "+ pf_activesget.coil.length);
 //        pf_activesget.dump();
@@ -199,7 +199,7 @@ class TestUAL
 	double time=4.2;
 
 	pf_activesgetslice = imas.pf_active.getSlice(idxget,"pf_active",time, 2);
-        System.out.println("pf_activesget.ids_properties.comment_of: "+ pf_activesgetslice.ids_properties.comment_of);
+        System.out.println("pf_activesget.ids_properties.comment: "+ pf_activesgetslice.ids_properties.comment);
 	System.out.println("pf_activesget.ids_properties.homogeneous_time: " + pf_activesgetslice.ids_properties.homogeneous_time);
         System.out.println("number of coil: "+ pf_activesgetslice.coil.length);
 //        pf_activesget.dump();
@@ -226,7 +226,7 @@ class TestUAL
         
 	pf_activessrc = imas.pf_active.get(idxsrc,"pf_active");
         System.out.println("**** SOURCE ******");
-        System.out.println("pf_activesget.ids_properties.comment_of: "+ pf_activessrc.ids_properties.comment_of);
+        System.out.println("pf_activesget.ids_properties.comment: "+ pf_activessrc.ids_properties.comment);
 	System.out.println("pf_activesget.ids_properties.homogeneous_time: " + pf_activessrc.ids_properties.homogeneous_time);
         System.out.println("number of coil: "+ pf_activessrc.coil.length);
 //        pf_activesget.dump();
@@ -242,7 +242,7 @@ class TestUAL
 */	
 	pf_activesdst = imas.pf_active.get(idxdst,"pf_active");
         System.out.println("**** DESTINATION ******");
-        System.out.println("pf_activesget.ids_properties.comment_of: "+ pf_activesdst.ids_properties.comment_of);
+        System.out.println("pf_activesget.ids_properties.comment: "+ pf_activesdst.ids_properties.comment);
 	System.out.println("pf_activesget.ids_properties.homogeneous_time: " + pf_activesdst.ids_properties.homogeneous_time);
         System.out.println("number of coil: "+ pf_activesdst.coil.length);
 //        pf_activesget.dump();
