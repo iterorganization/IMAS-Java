@@ -525,6 +525,7 @@ public static class <xsl:value-of select="@name"/>
  **/
     public static <xsl:value-of select="@name"/>  getSlice(int expIdx, String path, double time, int interpolMode) throws UALException
     {
+      int           obj1, obj2, obj3, obj4, obj5, obj6, obj7;
       String        timepath;
       String        ual_debug = System.getenv("ual_debug");
       double        retTime;
@@ -1314,65 +1315,112 @@ endif
 <xsl:param name="variable_path"/>
 <xsl:param name="mds_path"/>
 <xsl:param name="ids_name"/>
+<xsl:variable name="fulltypepath">
+	<xsl:call-template name="BUILD_TYPENAME">
+	<xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
+	</xsl:call-template>
+</xsl:variable>
 <xsl:choose>
         <!--========== Regular structures ==========-->
         <xsl:when test="@data_type='structure'">
 <!--          <xsl:apply-templates select = "field" mode = "GET_SLICE"/> -->
 		<xsl:choose>
-		<xsl:when test="$variable_path">
-			<xsl:apply-templates select="field" mode="GET_SLICE">
-			<xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name)"/>
-			<xsl:with-param name ="mds_path" select="concat($mds_path,' + &quot;/',@name,'&quot;')"/>
-			<xsl:with-param name ="ids_name" select="$ids_name"/>
-			</xsl:apply-templates>
-		</xsl:when>
-		<xsl:otherwise>
-			<xsl:apply-templates select="field" mode="GET_SLICE">
-			<xsl:with-param name ="variable_path" select="@name"/>
-			<xsl:with-param name ="mds_path" select="concat('&quot;',@name,'&quot;')"/>
-			<xsl:with-param name ="ids_name" select="$ids_name"/>
-			</xsl:apply-templates>
-		</xsl:otherwise>
+			<xsl:when test="$variable_path">
+			  <xsl:apply-templates select="field" mode="GET_SLICE">
+			    <xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name)"/>
+			    <xsl:with-param name ="mds_path" select="concat($mds_path,' + &quot;/',@name,'&quot;')"/>
+			    <xsl:with-param name ="ids_name" select="$ids_name"/>
+			  </xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+			  <xsl:apply-templates select="field" mode="GET_SLICE">
+			    <xsl:with-param name ="variable_path" select="@name"/>
+			    <xsl:with-param name ="mds_path" select="concat('&quot;',@name,'&quot;')"/>
+			    <xsl:with-param name ="ids_name" select="$ids_name"/>
+			  </xsl:apply-templates>
+			</xsl:otherwise>
 		</xsl:choose>
         </xsl:when>
 
         <!--========== Arrays of structures ==========-->
-        <xsl:when test="@data_type='struct_array'">
-          	<!-- Generate the full name of the subclass from the field path -->
-		<xsl:variable name="fulltypepath">
-			<xsl:call-template name="BUILD_TYPENAME">
-		        <xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
-		        </xsl:call-template>
-		</xsl:variable>
-// Get Array of Structures <xsl:value-of select="@path"/>
+        <!-- Generate the full name of the subclass from the field path -->
+
+         <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
+<!-- Type 1 arrays of structure, with potentially multiple time bases -->// Get_slice <xsl:value-of select="@path"/>
 		<xsl:choose>
-		<xsl:when test="$variable_path">
+			<xsl:when test="$variable_path">
           try {
             ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[UALLowLevel.getInt(expIdx,path, <xsl:value-of select="$mds_path"/>+&quot;/<xsl:value-of select="@name"/>/Shape_of&quot;)];
             for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/>&lt;ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i<xsl:value-of select = "@name"/>++){
               ids.<xsl:value-of select="concat($variable_path,'.',@name,'[i',@name,']')"/> = new <xsl:value-of select="$fulltypepath"/>();
-			<xsl:apply-templates select = "field" mode = "GET_SLICE">
-			<xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name,'[i',@name,']')"/>
-			<xsl:with-param name="mds_path" select="concat($mds_path,'+&quot;/',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
-			<xsl:with-param name ="ids_name" select="$ids_name"/>
-			</xsl:apply-templates>
+	      <xsl:apply-templates select = "field" mode = "GET_SLICE">
+		<xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name,'[i',@name,']')"/>
+		<xsl:with-param name="mds_path" select="concat($mds_path,'+&quot;/',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
+		<xsl:with-param name ="ids_name" select="$ids_name"/>
+	      </xsl:apply-templates>
             }
           } catch(Exception exc){ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = null;}
-		</xsl:when>
-
-		<xsl:otherwise>
+			</xsl:when>
+			<xsl:otherwise>
           try {
             ids.<xsl:value-of select="@name"/> = new <xsl:value-of select="$fulltypepath"/>[UALLowLevel.getInt(expIdx,path, &quot;<xsl:value-of select="@name"/>/Shape_of&quot;)];
             for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/>&lt;ids.<xsl:value-of select = "@name"/>.length; i<xsl:value-of select = "@name"/>++){
               ids.<xsl:value-of select="concat(@name,'[i',@name,']')"/> = new <xsl:value-of select="$fulltypepath"/>();
-			<xsl:apply-templates select = "field" mode = "GET_SLICE">
-			<xsl:with-param name ="variable_path" select="concat(@name,'[i',@name,']')"/>
-			<xsl:with-param name="mds_path" select="concat('&quot;',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
-			<xsl:with-param name ="ids_name" select="$ids_name"/>
-			</xsl:apply-templates>
+	      <xsl:apply-templates select = "field" mode = "GET_SLICE">
+		<xsl:with-param name ="variable_path" select="concat(@name,'[i',@name,']')"/>
+		<xsl:with-param name ="mds_path" select="concat('&quot;',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
+		<xsl:with-param name ="ids_name" select="$ids_name"/>
+	      </xsl:apply-templates>
             }
           } catch(Exception exc){ids.<xsl:value-of select="@name"/> = null;}
-		</xsl:otherwise>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:when>
+	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
+<!-- Type 3 arrays of structure, with a unique time base -->
+		<xsl:choose>
+			<xsl:when test="$variable_path">
+	// Structure array of type 3 nested below a Type 1 : <xsl:value-of select = "concat($variable_path,'.',@name)"/>
+//          try {
+            int obj_single_time = UALLowLevel.getObjectSlice(expIdx, path, <xsl:value-of select = "concat($mds_path,' + &quot;/',@name,'&quot;')"/>, time); //read the whole timed block containing a single slice
+//          try {
+              obj1 = UALLowLevel.getObjectFromObject(expIdx, obj_single_time,"ALLTIMES", 0);
+              //UALLowLevel.getObjectDim(expIdx, obj1, dimObj1);
+//===
+              ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[1];
+              ids.<xsl:value-of select="concat($variable_path,'.',@name,'[0]')"/> = new <xsl:value-of select="$fulltypepath"/>();
+//===
+              <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
+                <xsl:with-param name="level" select="1"/>
+                <xsl:with-param name="objpath" select="@name"/>
+                <xsl:with-param name="idxpath" select="concat('ids.',$variable_path,'.',@name,'[0]')"/>
+                <xsl:with-param name="timed" select="'yes'"/>
+              </xsl:apply-templates>
+//          } catch(Exception exc){<xsl:value-of select="concat('ids.',$variable_path,'.',@name,'[0]')"/> = null;}
+            UALLowLevel.releaseObject(expIdx,obj_single_time);
+//          } catch(Exception exc){<xsl:value-of select="concat('ids.',$variable_path,'.',@name)"/> = null;}
+			</xsl:when>
+			<xsl:otherwise>
+	// Structure array of type 3 : <xsl:value-of select = "@path"/>
+//        try {
+            int obj_single_time = UALLowLevel.getObjectSlice(expIdx, path, "<xsl:value-of select = "@path"/>", time); //read the whole timed block containing a single slice
+//          try {
+              obj1 = UALLowLevel.getObjectFromObject(expIdx, obj_single_time,"ALLTIMES", 0);
+              //UALLowLevel.getObjectDim(expIdx, obj1, dimObj1);
+//===
+              <xsl:value-of select="concat('ids.',translate(@path,'/','.'))"/> = new <xsl:value-of select="$fulltypepath"/>[1];
+              <xsl:value-of select="concat('ids.',translate(@path,'/','.'),'[0]')"/> = new <xsl:value-of select="$fulltypepath"/>();
+//===
+              <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
+                <xsl:with-param name="level" select="1"/>
+                <xsl:with-param name="objpath" select="@name"/>
+                <xsl:with-param name="idxpath" select="concat('ids.',translate(@path,'/','.'),'[0]')"/>
+                <xsl:with-param name="timed" select="'yes'"/>
+              </xsl:apply-templates>
+//          } catch(Exception exc){<xsl:value-of select="concat('ids.',translate(@path,'/','.'),'[0]')"/> = null;}
+            UALLowLevel.releaseObject(expIdx,obj_single_time);
+//        } catch(Exception exc){<xsl:value-of select="concat('ids.',translate(@path,'/','.'))"/> = null;}
+			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:when>
 
@@ -2491,7 +2539,8 @@ endif
 <xsl:param name="variable_path"/>
 <xsl:param name="mds_path"/>
 <xsl:param name="non_timed"/>
-<xsl:if test="$non_timed !='yes' or @type !='dynamic' or not(@type) or @data_type='structure' or @data_type='struct_array'"> <!-- This skips the routine for timed fields when using this template in PUT_NON_TIMED mode -->
+
+<xsl:if test="$non_timed !='yes' or @type !='dynamic' or not(@type) or @data_type='structure' or (@data_type='struct_array' and @type !='dynamic')"> <!-- This skips the routine for timed fields when using this template in PUT_NON_TIMED mode -->
       <xsl:choose>
         <!--========== Regular structures ==========-->
         <xsl:when test="@data_type='structure'">
@@ -2861,35 +2910,119 @@ endif
         </xsl:when>
 
         <!--========== Arrays of structures ==========-->
-        <xsl:when test="@data_type='struct_array'">
+        <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
 // Put <xsl:value-of select="@path"/>
-<xsl:choose>
-<xsl:when test="$variable_path">
+	<xsl:choose>
+		<xsl:when test="$variable_path">
           if (ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/> != null) {
             UALLowLevel.putInt(expIdx,path, <xsl:value-of select="$mds_path"/>+&quot;/<xsl:value-of select="@name"/>/Shape_of&quot;,
        		ids.<xsl:value-of select="concat($variable_path,'.',@name)"/>.length);
              for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/>&lt;ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i<xsl:value-of select = "@name"/>++){
-      <xsl:apply-templates select = "field" mode = "PUT_SLICE">
-<xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name,'[i',@name,']')"/>
-<xsl:with-param name="mds_path" select="concat($mds_path,'+&quot;/',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
-</xsl:apply-templates>
+      		<xsl:apply-templates select = "field" mode = "PUT_SLICE">
+		  <xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name,'[i',@name,']')"/>
+		  <xsl:with-param name="mds_path" select="concat($mds_path,'+&quot;/',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
+		</xsl:apply-templates>
              }
           }
-</xsl:when>
-<xsl:otherwise>
+		</xsl:when>
+		<xsl:otherwise>
           if (ids.<xsl:value-of select = "translate(@path,'/','.')"/> != null) {
             UALLowLevel.putInt(expIdx,path, &quot;<xsl:value-of select="@name"/>/Shape_of&quot;,
        		ids.<xsl:value-of select="@name"/>.length);
             for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/>&lt;ids.<xsl:value-of select = "@name"/>.length; i<xsl:value-of select = "@name"/>++){
-      <xsl:apply-templates select = "field" mode = "PUT_SLICE">
-<xsl:with-param name ="variable_path" select="concat(@name,'[i',@name,']')"/>
-<xsl:with-param name="mds_path" select="concat('&quot;',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
-</xsl:apply-templates>
+      		<xsl:apply-templates select = "field" mode = "PUT_SLICE">
+		  <xsl:with-param name ="variable_path" select="concat(@name,'[i',@name,']')"/>
+		  <xsl:with-param name="mds_path" select="concat('&quot;',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
+		</xsl:apply-templates>
             }
           }
-</xsl:otherwise>
-</xsl:choose>
+		</xsl:otherwise>
+	</xsl:choose>
         </xsl:when>
+
+	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
+<!-- Type 3 arrays of structure, with a unique time base -->
+	<xsl:choose>
+		<xsl:when test="$variable_path">
+	  // Structure array of type 3 nested below a Type 1 : <xsl:value-of select = "concat($variable_path,'.',@name)"/>
+          if (ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/> != null) {
+            int obj_single_time = UALLowLevel.beginObject(expIdx,-1,0,path + <xsl:value-of select = "concat('&quot;','/',substring($mds_path,2),' + &quot;/',@name,'&quot;')"/>,TIMED);
+            int obj1 = UALLowLevel.beginObject(expIdx,obj_single_time,0,"ALLTIMES",TIMED);
+            <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT">
+              <xsl:with-param name="level" select="1"/>
+              <xsl:with-param name="objpath" select="@name"/>
+              <xsl:with-param name="idxpath" select="concat('ids.',$variable_path,'.',@name,'[0]')"/>
+              <xsl:with-param name="child_index" select="0"/>
+            </xsl:apply-templates>
+            UALLowLevel.putObjectInObject(expIdx,obj_single_time,"ALLTIMES", 0, obj1);
+            UALLowLevel.putObjectSlice(expIdx, path, <xsl:value-of select = "concat($mds_path, ' + &quot;/', @name)"/>" , ids.time.getElementAt(0), obj_single_time);
+
+            // Store time of the array of structure (hidden variable for the user, but used by the UAL for future get_slice operations)
+            // A temporary "time" vector is filled then put as a regular variable (outside of the object) as AoS%time
+            Vect1DDouble time = new Vect1DDouble(1);
+            if (ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>[0].time == EMPTY_DOUBLE) { // Check the presence of a time vector at the root of the AoS (on the first index only)
+              if (ids.ids_properties.homogeneous_time == 1) {
+                time = ids.time; // Use the general time vector of the IDS to fill time
+<!--then  ! For an homogeneous IDS, force the time of the AoS to be equal to the general one
+                for ( i1 = 1; i1< ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i1++){
+                  ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>[i1].time = ids.time[i1]
+                  time(
+                } -->
+              } 
+              else {
+                System.out.println("ERROR : the time vector of the type 3 array of structure <xsl:value-of select = "translate(@path,'/','.')"/> must be filled");
+                return;
+              }
+            }
+            else {
+              for (int i1 = 0; i1 &lt; ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i1++){ // the AoS time vector is there, fill time with it
+                time.setElementAt(i1,ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>[i1].time);
+              }
+            }
+            timepath=<xsl:value-of select="concat($mds_path,' + &quot;/',@name,'/time')"/>"; // Start to put time
+            UALLowLevel.putDoubleSlice(expIdx, path, timepath.trim(), timepath.trim(), time.getElementAt(0), time.getElementAt(0));
+            //if (ual_debug.equals("yes")) System.out.println("Put " + <xsl:value-of select="concat($mds_path,' + &quot;/',@name,'/time')"/>");
+          }
+		</xsl:when>
+		<xsl:otherwise>
+// Structure array of type 3 : <xsl:value-of select = "@path"/>
+          if (ids.<xsl:value-of select = "translate(@path,'/','.')"/> != null) {
+            int obj_single_time = UALLowLevel.beginObject(expIdx,-1,0,path + "/<xsl:value-of select = "@path"/>",TIMED);
+            int obj1 = UALLowLevel.beginObject(expIdx,obj_single_time,0,"ALLTIMES",TIMED);
+            <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT">
+              <xsl:with-param name="level" select="1"/>
+              <xsl:with-param name="objpath" select="@name"/>
+              <xsl:with-param name="idxpath" select="concat('ids.',translate(@path,'/','.'),'[0]')"/>
+              <xsl:with-param name="child_index" select="0"/>
+            </xsl:apply-templates>
+            UALLowLevel.putObjectInObject(expIdx,obj_single_time,"ALLTIMES", 0, obj1);
+            UALLowLevel.putObjectSlice(expIdx, path, "<xsl:value-of select = "@path"/>", ids.time.getElementAt(0), obj_single_time);
+
+            // Store time of the array of structure (hidden variable for the user, but used by the UAL for future get_slice operations)
+            Vect1DDouble time = new Vect1DDouble(1);
+            if (ids.<xsl:value-of select = "translate(@path,'/','.')"/>[0].time == EMPTY_DOUBLE) { // Check the presence of a time vector at the root of the AoS (on the first index only)
+
+              if (ids.ids_properties.homogeneous_time == 1) {
+                time = ids.time; // Use the general time vector of the IDS to fill time
+              } 
+              else {
+                System.out.println("ERROR : the time vector of the type 3 array of structure <xsl:value-of select = "translate(@path,'/','.')"/> must be filled");
+                return;
+              }
+            }
+            else {
+              for (int i1 = 0; i1 &lt; ids.<xsl:value-of select = "translate(@path,'/','.')"/>.length; i1++){ // the AoS time vector is there, fill time with it
+                time.setElementAt(i1,ids.<xsl:value-of select = "translate(@path,'/','.')"/>[i1].time);
+               }
+            }
+
+            timepath=&quot;<xsl:call-template name="printtimepath"/>&quot;;
+            UALLowLevel.putDoubleSlice(expIdx, path, timepath.trim(), timepath.trim(), time.getElementAt(0), time.getElementAt(0));
+            //if (ual_debug.equals("yes")) System.out.println("Put <xsl:call-template name="printtimepath"/> ");
+          }
+		</xsl:otherwise>
+	</xsl:choose>
+	</xsl:when>
 
         <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">
 <!--      UALLowLevel.putStringSlice(expIdx, path, "<xsl:value-of select = "@path"/>", ids.<xsl:value-of select = "translate(@path,'/','.')"/>, ids.time); -->
