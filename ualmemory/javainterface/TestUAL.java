@@ -63,7 +63,6 @@ class TestUAL
         //the elements of the IDS array, only pf_actives[0] is considered in the put() method.
         pf_actives.ids_properties.comment = "Debugging phase";
         //A sample int
-        pf_actives.ids_properties.cocos = 1; 
 
 	pf_actives.ids_properties.homogeneous_time = 0; // Mandatory to define this property
             
@@ -129,7 +128,6 @@ class TestUAL
         //the elements of the IDS array, only pf_actives[0] is considered in the put() method.
         pf_activesSlice.ids_properties.comment = "Test of put slice";
         //A sample int
-        pf_activesSlice.ids_properties.cocos = 1; 
 
 	pf_activesSlice.ids_properties.homogeneous_time = 1; // Mandatory to define this property
             
