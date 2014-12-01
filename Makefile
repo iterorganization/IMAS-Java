@@ -13,6 +13,7 @@ CLASSES = $(SOURCES:.java=.class)
 all : ualjava.jar
 
 install: all
+	mkdir -p $(INSTALL)/jar
 	cp ualjava.jar $(INSTALL)/jar
 
 clean:
