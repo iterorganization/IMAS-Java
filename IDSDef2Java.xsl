@@ -500,6 +500,7 @@ public static class <xsl:value-of select="@name"/>
     public static <xsl:value-of select="@name"/>  get(int expIdx, String path)  throws UALException
     {
       int           obj1, obj2, obj3, obj4, obj5, obj6, obj7;
+      int           obj_all_times, lentime;
       String        ual_debug = System.getenv("ual_debug");
 
       <xsl:value-of select="@name"/> ids = new <xsl:value-of select="@name"/> (); 
@@ -526,6 +527,7 @@ public static class <xsl:value-of select="@name"/>
     public static <xsl:value-of select="@name"/>  getSlice(int expIdx, String path, double time, int interpolMode) throws UALException
     {
       int           obj1, obj2, obj3, obj4, obj5, obj6, obj7;
+      int           obj_single_time;
       String        timepath;
       String        ual_debug = System.getenv("ual_debug");
       double        retTime;
@@ -593,7 +595,8 @@ public static class <xsl:value-of select="@name"/>
 </xsl:when>
 
         <!--========== Arrays of structures ==========-->
-<xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">   <xsl:choose>
+<xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
+   <xsl:choose>
    <xsl:when test="$mds_path">
       for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/>&lt;<xsl:value-of select = "@maxoccur"/>; i<xsl:value-of select = "@name"/>++){
        <xsl:apply-templates select = "field" mode = "DELETE">
@@ -1075,8 +1078,8 @@ public static class <xsl:value-of select="@name"/>
 <xsl:when test="$variable_path">
 // Structure array of type 3 nested below a Type 1 : <xsl:value-of select = "concat($variable_path,'.',@name)"/>
 //          try {
-            int obj_all_times = UALLowLevel.getObject(expIdx, path, <xsl:value-of select = "concat($mds_path,' + &quot;/',@name,'&quot;')"/>, TIMED); //read the whole timed block
-            int lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
+            obj_all_times = UALLowLevel.getObject(expIdx, path, <xsl:value-of select = "concat($mds_path,' + &quot;/',@name,'&quot;')"/>, TIMED); //read the whole timed block
+            lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
             ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[lentime];
 //          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select = "concat($variable_path,'.',@name)"/> + lentime =" + lentime");
             for (int i1 = 0; i1 &lt; lentime; i1++) { // fill every time slice
@@ -1099,8 +1102,8 @@ public static class <xsl:value-of select="@name"/>
 <xsl:otherwise>
 // Structure array of type 3 : <xsl:value-of select = "@path"/>
 //          try {
-            int obj_all_times = UALLowLevel.getObject(expIdx, path, "<xsl:value-of select = "@path"/>", TIMED); //read the whole timed block
-            int lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
+            obj_all_times = UALLowLevel.getObject(expIdx, path, "<xsl:value-of select = "@path"/>", TIMED); //read the whole timed block
+            lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
             ids.<xsl:value-of select = "translate(@path,'/','.')"/> = new <xsl:value-of select="$fulltypepath"/>[lentime];
 //          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select="translate(@path,'/','.')"/> + lentime =" + lentime");
             for (int i1 = 0; i1 &lt; lentime; i1++) {
@@ -1382,7 +1385,7 @@ endif
 			<xsl:when test="$variable_path">
 	// Structure array of type 3 nested below a Type 1 : <xsl:value-of select = "concat($variable_path,'.',@name)"/>
 //          try {
-            int obj_single_time = UALLowLevel.getObjectSlice(expIdx, path, <xsl:value-of select = "concat($mds_path,' + &quot;/',@name,'&quot;')"/>, time); //read the whole timed block containing a single slice
+            obj_single_time = UALLowLevel.getObjectSlice(expIdx, path, <xsl:value-of select = "concat($mds_path,' + &quot;/',@name,'&quot;')"/>, time); //read the whole timed block containing a single slice
 //          try {
               obj1 = UALLowLevel.getObjectFromObject(expIdx, obj_single_time,"ALLTIMES", 0);
               //UALLowLevel.getObjectDim(expIdx, obj1, dimObj1);
@@ -1403,7 +1406,7 @@ endif
 			<xsl:otherwise>
 	// Structure array of type 3 : <xsl:value-of select = "@path"/>
 //        try {
-            int obj_single_time = UALLowLevel.getObjectSlice(expIdx, path, "<xsl:value-of select = "@path"/>", time); //read the whole timed block containing a single slice
+            obj_single_time = UALLowLevel.getObjectSlice(expIdx, path, "<xsl:value-of select = "@path"/>", time); //read the whole timed block containing a single slice
 //          try {
               obj1 = UALLowLevel.getObjectFromObject(expIdx, obj_single_time,"ALLTIMES", 0);
               //UALLowLevel.getObjectDim(expIdx, obj1, dimObj1);
