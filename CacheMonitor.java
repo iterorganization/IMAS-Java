@@ -6,7 +6,7 @@ import javax.swing.*;
 
 class CacheMonitor extends JFrame
 {
-    static final int ITEM_HEIGHT = 30; 
+    static final int ITEM_HEIGHT = 30;
 
 
 
@@ -104,7 +104,7 @@ class CacheMonitorViewer extends Component
     {
 	setPreferredSize(new Dimension(500, 2000));
     }
-    public void paint(Graphics g) 
+    public void paint(Graphics g)
     {
         Graphics2D g2 = (Graphics2D) g;
         Dimension size = getSize();
@@ -121,13 +121,13 @@ class CacheMonitorViewer extends Component
 	        g2.drawString(itmDescr.cpoPathName+": "+itmDescr.pathName+"("+itmDescr.dataSize+")", 0, i * ITEM_HEIGHT + 10);
 	    if(i == 0)
 	    {
-	    	g2.fillRect(size.width / 2, (i*1) * ITEM_HEIGHT - 1, size.width / 2, ITEM_HEIGHT - 2); 
+	    	g2.fillRect(size.width / 2, (i*1) * ITEM_HEIGHT - 1, size.width / 2, ITEM_HEIGHT - 2);
 		maxDim = itmDescr.dataSize;
 	    }
 	    else
 	    {
 		double sizeFract = itmDescr.dataSize/(double)maxDim;
-	    	g2.fillRect(size.width / 2, (i*1) * ITEM_HEIGHT - 1, (int)((size.width / 2)*sizeFract), ITEM_HEIGHT - 2); 
+	    	g2.fillRect(size.width / 2, (i*1) * ITEM_HEIGHT - 1, (int)((size.width / 2)*sizeFract), ITEM_HEIGHT - 2);
 	    }
 	    totDataSize += itmDescr.dataSize;
 	}
@@ -185,4 +185,4 @@ class CacheMonitorViewer extends Component
 	CacheMonitor cm = new CacheMonitor();
 	cm.startServer();
     }
-}	
+}

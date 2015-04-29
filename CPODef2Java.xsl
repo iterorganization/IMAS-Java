@@ -12,11 +12,11 @@
   <!-- MODE can be set to get or put in the 2 transformations for generating the subroutines, this reduced editing requirements
   it could also be done with 2 xslt operations on a single file, but this might be overkill ??
   PUT HERE "get" OR "put"-->
-  
+
 <!--=================================================-->
 <!--                 General section                 -->
 <!--=================================================-->
-  
+
 <xsl:template match = "/CPOs">
 package ualmemory.javainterface;
      public class UALAccess {
@@ -31,7 +31,7 @@ package ualmemory.javainterface;
     }
  public static final int EMPTY_INT = -999999999;
  public static final double EMPTY_DOUBLE = -9.0E40;
-    
+
  public static final int INTERPOLATION = 3, CLOSEST_SAMPLE = 1, PREVIOUS_SAMPLE = 2;
 
  public static final int NON_TIMED = 0, TIMED = 1, TIMED_CLEAR = 2;
@@ -55,7 +55,7 @@ package ualmemory.javainterface;
  **/
  static public native int open(String name, int shot, int run)  throws UALException;
  /**
- *Creates a new database instance. 
+ *Creates a new database instance.
  * @param name Name of the database (by convention euitm).
  * @param shot Shot number.
  * @param run Run Number.
@@ -67,7 +67,7 @@ package ualmemory.javainterface;
  static public native int create(String name, int shot, int run, int refShot, int refRun) throws UALException;
  static public native int openEnv(String name, int shot, int run, String user, String tokamak, String version)  throws UALException;
  /**
- *Creates a new database instance. 
+ *Creates a new database instance.
  * @param name Name of the database (by convention euitm).
  * @param shot Shot number.
  * @param run Run Number.
@@ -82,7 +82,7 @@ package ualmemory.javainterface;
  static public int createdb(String user, String machine, int shot, String dataVersion) throws UALException
  {
      return createdb(user, machine, shot, dataVersion, null, null, 0, 0);
- } 
+ }
  static public int createdb(String user, String machine, int shot, String dataVersion, String parentUser,
      String parentMachine, int parentShot, int parentRun) throws UALException
  {
@@ -91,7 +91,7 @@ package ualmemory.javainterface;
      	run = UALLowLevel.createNewRunDb(user, machine, shot, dataVersion);
      else
     	run = UALLowLevel.createNewRunParentDb(user, machine, shot, dataVersion, parentUser, parentMachine, parentShot, parentRun);
-     
+
      if(run <xsl:text disable-output-escaping = "yes"> &lt; </xsl:text> 0)
 	throw new UALException("Cannot create Catalogue Entry");
      return createEnv("euitm", shot, run, shot, run, user, machine, dataVersion);
@@ -101,7 +101,7 @@ package ualmemory.javainterface;
 static public int createdb(String user, String machine, int shot, int run, String dataVersion) throws UALException
 {
 	return createdb(user, machine, shot, run, dataVersion, null, null, 0, 0);
-} 
+}
 static public int createdb(String user, String machine, int shot, int run, String dataVersion, String parentUser,
 	String parentMachine, int parentShot, int parentRun) throws UALException
 {
@@ -109,15 +109,15 @@ static public int createdb(String user, String machine, int shot, int run, Strin
 		UALLowLevel.createSpecifiedRunDb(user, machine, shot, run, dataVersion);
 	else
 		UALLowLevel.createSpecifiedRunParentDb(user, machine, shot, run, dataVersion, parentUser, parentMachine, parentShot, parentRun);
-	
+
 	return createEnv("euitm", shot, run, shot, run, user, machine, dataVersion);
 }
 
- 
- 
+
+
  static public native int openHdf5(String name, int shot, int run)  throws UALException;
  /**
- *Creates a new database instance. 
+ *Creates a new database instance.
  * @param name Name of the database (by convention euitm).
  * @param shot Shot number.
  * @param run Run Number.
@@ -127,8 +127,8 @@ static public int createdb(String user, String machine, int shot, int run, Strin
  * @exception UALException is thrown if the database cannot be open.
  **/
  static public native int createHdf5(String name, int shot, int run, int refShot, int refRun) throws UALException;
- 
-  
+
+
 
  /**
  * Connect to a remote database
@@ -160,10 +160,10 @@ static public int createdb(String user, String machine, int shot, int run, Strin
  * @param run Run Number.
  **/
  static public native int close(int refIdx);
- 
+
  static int getShot(int idx){return UALLowLevel.getShot(idx);}
  static int getRun(int idx){return UALLowLevel.getRun(idx);}
- 
+
  static public int close(int refIdx, String name, int shot, int run){return close(refIdx);}
 
  /**
@@ -194,7 +194,7 @@ static public int createdb(String user, String machine, int shot, int run, Strin
 public static class <xsl:value-of select="@type"/>
 {
     <xsl:apply-templates select = "field" mode = "DECLARE"/>
-  
+
 
 <xsl:choose>
   <!--============ Define time-dependent CPOs ============-->
@@ -207,8 +207,8 @@ public static class <xsl:value-of select="@type"/>
  * Method get retrieves the whole set of <xsl:value-of select="@type"/> CPOs in the open database.
  * @param expIdx The index to the database, returned by UALAccess.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
- * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are 
- * missing CPO fields. 
+ * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
+ * missing CPO fields.
  * @return the array of stored <xsl:value-of select="@type"/> CPO items. Missing fields are represented by zero sized vectors if not scalars,
  * by EMPTY_INT if integer, EMPTY_DOUBLE if float or double and empty String is string.
  **/
@@ -231,8 +231,8 @@ public static class <xsl:value-of select="@type"/>
       Vect5DDouble vect5DDouble;
       Vect6DDouble vect6DDouble;
       Vect7DDouble vect7DDouble;
-    
-  
+
+
        numSamples = UALLowLevel.beginCPOGet(expIdx, path, true);
        <xsl:value-of select="@type"/> []cpos = new <xsl:value-of select="@type"/> [numSamples];
            for(int i = 0; i <xsl:text disable-output-escaping = "yes"> &lt; </xsl:text>  numSamples; i++)
@@ -249,22 +249,22 @@ public static class <xsl:value-of select="@type"/>
  * @param time The retrieval time.
  * @param interpolMode Defines the selected interpolation. Allowed values are UALAccess.INTERPOLATION, UALAccess.CLOSEST_SAMPLE,
  * UALAccess.PREVIOUS_SAMPLE
- * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are 
- * missing CPO fields. 
+ * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
+ * missing CPO fields.
  * @return the selected <xsl:value-of select="@type"/> CPO. Missing fields are represented by zero sized vectors if not scalars,
  * by EMPTY_INT if integer, EMPTY_DOUBLE if double and empty String is string.
  **/
     public static <xsl:value-of select="@type"/>  getSlice(int expIdx, String path, double time, int interpolMode) throws UALException
     {
         double retTime;
-        <xsl:value-of select="@type"/> cpo = new <xsl:value-of select="@type"/> (); 
+        <xsl:value-of select="@type"/> cpo = new <xsl:value-of select="@type"/> ();
         retTime = UALLowLevel.beginCPOGetSlice(expIdx, path, time);
         cpo.time = retTime;
 <xsl:apply-templates select = "field" mode = "GET_SLICE" />
         UALLowLevel.endCPOGetSlice(expIdx, path);
         return cpo;
     }
-    
+
 
  /**
  * Method put stores an array of (timed) <xsl:value-of select="@type"/> CPOs in the open database. Each CPO instance will bring the associated
@@ -272,7 +272,7 @@ public static class <xsl:value-of select="@type"/>
  * @param expIdx The index to the database, returned by UALAccess.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
  * @param cpos The array of timed <xsl:value-of select="@type"/> CPOs
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
     public static void put(int expIdx, String path, <xsl:value-of select="@type"/> cpos[]) throws UALException
     {
@@ -289,13 +289,13 @@ public static class <xsl:value-of select="@type"/>
 	  Vect6DDouble vect6DDouble;
       	  Vect7DDouble vect7DDouble;
           Vect1DDouble times;
-          
+
           times = new Vect1DDouble(cpos.length);
           for(int i = 0; i <xsl:text disable-output-escaping = "yes"> &lt; </xsl:text>  cpos.length; i++)
               times.setElementAt(i, (double)cpos[i].time);
           deleteAll(expIdx, path);
           UALLowLevel.beginCPOPutTimed(expIdx, path, times);
-          
+
       <xsl:apply-templates select = "field" mode = "PUT_TIMED"/>
           UALLowLevel.endCPOPutTimed(expIdx, path);
     }
@@ -309,8 +309,8 @@ public static class <xsl:value-of select="@type"/>
  * @param run The current run
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
  * @param occurrence The occurence of the selected cpo.
- * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are 
- * missing CPO fields. 
+ * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
+ * missing CPO fields.
  * @return the array of stored <xsl:value-of select="@type"/> CPO items. Missing fields are represented by zero sized vectors if not scalars,
  * by EMPTY_INT if integer, EMPTY_DOUBLE if float or double and empty String is string.
  **/
@@ -342,9 +342,9 @@ public static class <xsl:value-of select="@type"/>
  * @param path The path name to the selected cpo. By convention, only a single tree level is defined for CPO objects in the database.
  * @param occurrence The occurence of the selected cpo.
  * @param cpos The array of timed <xsl:value-of select="@type"/> CPOs
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
-    public static void putdb(int expIdx, String user, String machine, int shot, int run, 
+    public static void putdb(int expIdx, String user, String machine, int shot, int run,
     	String path, int occurrence, <xsl:value-of select="@type"/> cpos[]) throws UALException
     {
     	String actPath;
@@ -355,18 +355,18 @@ public static class <xsl:value-of select="@type"/>
 	if(cpos[0].datainfo.isref == 1)
 	{
 	    put(expIdx, actPath, cpos);
-	    UALLowLevel.putCpoDb(user, machine, shot, run, path, occurrence, 
+	    UALLowLevel.putCpoDb(user, machine, shot, run, path, occurrence,
 	    	1, user, machine, shot, run, occurrence);
 	}
 	else //isref == 2
 	{
-	    UALLowLevel.putCpoDb(user, machine, shot, run, path, occurrence, 2, 
+	    UALLowLevel.putCpoDb(user, machine, shot, run, path, occurrence, 2,
 	    	(cpos[0].datainfo.whatref.user != null)?cpos[0].datainfo.whatref.user:"",
 		(cpos[0].datainfo.whatref.machine != null)?cpos[0].datainfo.whatref.machine:"",
-		cpos[0].datainfo.whatref.shot, 
-		cpos[0].datainfo.whatref.run, 
+		cpos[0].datainfo.whatref.shot,
+		cpos[0].datainfo.whatref.run,
 		cpos[0].datainfo.whatref.occurrence);
-	
+
 	}
     }
 
@@ -376,33 +376,33 @@ public static class <xsl:value-of select="@type"/>
         cpos[0].datainfo.isref = isRef;
 	if(isRef != 1)
 	{
-	    cpos[0].datainfo.whatref.user = refUser; 
-    	    cpos[0].datainfo.whatref.machine = refMachine; 
-    	    cpos[0].datainfo.whatref.shot = refShot; 
-    	    cpos[0].datainfo.whatref.run = refRun; 
+	    cpos[0].datainfo.whatref.user = refUser;
+    	    cpos[0].datainfo.whatref.machine = refMachine;
+    	    cpos[0].datainfo.whatref.shot = refShot;
+    	    cpos[0].datainfo.whatref.run = refRun;
     	    cpos[0].datainfo.whatref.occurrence = refOccurrence;
 	}
-    } 
+    }
 
 
  /**
  * Method delete removes all the data associated with a <xsl:value-of select="@type"/> CPO in the open database.
  * @param expIdx The index to the database, returned by UALAccess.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
     public static void deleteAll(int expIdx, String path) throws UALException
     {
       <xsl:apply-templates select = "field" mode = "DELETE"/>
     }
-    
+
 /**
  * Method putSlice appends a (timed) <xsl:value-of select="@type"/> CPO in the open database. The CPO instance will bring the associated
  * time value in the time field.
  * @param expIdx The index to the database, returned by UALAccess.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
  * @param cpo The timed <xsl:value-of select="@type"/> CPO
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
     public static void putSlice(int expIdx, String path, <xsl:value-of select="@type"/> cpo) throws UALException
     {
@@ -418,12 +418,12 @@ public static class <xsl:value-of select="@type"/>
 	  Vect5DDouble vect5DDouble;
 	  Vect6DDouble vect6DDouble;
           Vect7DDouble vect7DDouble;
-          
+
           UALLowLevel.beginCPOPutSlice(expIdx, path);
       <xsl:apply-templates select = "field" mode = "PUT_SLICE"/>
           UALLowLevel.endCPOPutSlice(expIdx, path);
     }
-    
+
 
  /**
  * Method putNonTimed stores the non time dependent fields of a (timed) <xsl:value-of select="@type"/> CPO in the open database. The CPO instance will bring the associated
@@ -431,7 +431,7 @@ public static class <xsl:value-of select="@type"/>
  * @param expIdx The index to the database, returned by UALAccess.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
  * @param cpos The timed <xsl:value-of select="@type"/> CPO
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
     public static void putNonTimed(int expIdx, String path, <xsl:value-of select="@type"/> cpo) throws UALException
     {
@@ -447,7 +447,7 @@ public static class <xsl:value-of select="@type"/>
       Vect5DDouble vect5DDouble;
       Vect6DDouble vect6DDouble;
       Vect7DDouble vect7DDouble;
-          
+
           deleteAll(expIdx, path);
           UALLowLevel.beginCPOPutNonTimed(expIdx, path);
       <xsl:apply-templates select = "field" mode = "PUT_NON_TIMED"/>
@@ -455,11 +455,11 @@ public static class <xsl:value-of select="@type"/>
     }
 
 /**
- * Method replaceLastSlice replaces the last stored (timed) <xsl:value-of select="@type"/> CPO in the open database. 
+ * Method replaceLastSlice replaces the last stored (timed) <xsl:value-of select="@type"/> CPO in the open database.
  * @param expIdx The index to the database, returned by UALAccess.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
  * @param cpo The timed <xsl:value-of select="@type"/> CPO
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
     public static void replaceLastSlice(int expIdx, String path, <xsl:value-of select="@type"/> cpo) throws UALException
     {
@@ -480,15 +480,15 @@ public static class <xsl:value-of select="@type"/>
       <xsl:apply-templates select = "field" mode = "REPLACE_LAST_SLICE"/>
           UALLowLevel.endCPOReplaceLastSlice(expIdx, path);
     }
-    
 
- 
+
+
  /**
- * Method deleteTimed removes all timed fields for  <xsl:value-of select="@type"/> CPO in the open database. 
+ * Method deleteTimed removes all timed fields for  <xsl:value-of select="@type"/> CPO in the open database.
  * This corresponds to removing all the instances for that CPO, and only time-independent fields will be preserved
  * @param expIdx The index to the database, returned by UALAccess.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
- * @exception UALException Issued when data cannot be deleted for any reason. 
+ * @exception UALException Issued when data cannot be deleted for any reason.
  **/
     public static void deleteTimed(int expIdx, String path) throws UALException
     {
@@ -543,7 +543,7 @@ public static class <xsl:value-of select="@type"/>
         String srcPathOccur = "<xsl:value-of select="@type"/>";
         if (srcOccur != 0) srcPathOccur += "/" + srcOccur;
         <xsl:value-of select="@type"/> slice = getSlice(srcIdx,srcPathOccur,time,CLOSEST_SAMPLE);
-        
+
         String destPathOccur = "<xsl:value-of select="@type"/>";
         if (destOccur != 0) destPathOccur += "/" + destOccur;
 
@@ -586,7 +586,7 @@ public static class <xsl:value-of select="@type"/>
         int srcIdx = openEnv("euitm",srcShot,srcRun,srcUser,srcTokamak,srcVersion);
         <xsl:value-of select="@type"/> slice = getSlice(srcIdx,srcPathOccur,time,CLOSEST_SAMPLE);
         close(srcIdx);
-        
+
         String destPathOccur = "<xsl:value-of select="@type"/>";
         if (destOccur != 0) destPathOccur += "/" + destOccur;
         int destIdx = openEnv("euitm",destShot,destRun,destUser,destTokamak,destVersion);
@@ -608,7 +608,7 @@ public static class <xsl:value-of select="@type"/>
     }
 
   </xsl:when>
-  
+
   <!--============ Define time-independent CPOs ============-->
   <xsl:otherwise>
 
@@ -647,11 +647,11 @@ public static class <xsl:value-of select="@type"/>
     }
 
 /**
- * Method put stores a non timed <xsl:value-of select="@type"/> CPOs in the open database. 
+ * Method put stores a non timed <xsl:value-of select="@type"/> CPOs in the open database.
  * @param expIdx The index to the database, returned by UALAccess.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
  * @param cpos The passed <xsl:value-of select="@type"/> CPO.
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
     public static void put(int expIdx, String path, <xsl:value-of select="@type"/> cpo)  throws UALException
     {
@@ -687,9 +687,9 @@ public static class <xsl:value-of select="@type"/>
  * @param path The path name to the selected cpo. By convention, only a single tree level is defined for CPO objects in the database.
  * @param occurrence The occurence of the selected cpo.
  * @param cpo The  <xsl:value-of select="@type"/> CPOs
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
-    public static void putdb(int expIdx, String user, String machine, int shot, int run, 
+    public static void putdb(int expIdx, String user, String machine, int shot, int run,
     	String path, int occurrence, <xsl:value-of select="@type"/> cpo) throws UALException
     {
     	String actPath;
@@ -707,9 +707,9 @@ public static class <xsl:value-of select="@type"/>
 	{
 	    UALLowLevel.putCpoDb(user, machine, shot, run, path, occurrence, 2,
 	    	cpo.datainfo.whatref.user,  cpo.datainfo.whatref.machine,
-		cpo.datainfo.whatref.shot, cpo.datainfo.whatref.run, 
+		cpo.datainfo.whatref.shot, cpo.datainfo.whatref.run,
 		cpo.datainfo.whatref.occurrence);
-	
+
 	}
     }
 
@@ -722,8 +722,8 @@ public static class <xsl:value-of select="@type"/>
  * @param run The current run
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
  * @param occurrence The occurence of the selected cpo.
- * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are 
- * missing CPO fields. 
+ * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
+ * missing CPO fields.
  * @return the <xsl:value-of select="@type"/> CPO . Missing fields are represented by zero sized vectors if not scalars,
  * by EMPTY_INT if integer, EMPTY_DOUBLE if float or double and empty String is string.
  **/
@@ -755,7 +755,7 @@ public static class <xsl:value-of select="@type"/>
                 cpo.datainfo.whatref.run = refRun;
                 cpo.datainfo.whatref.occurrence = refOccurrence;
         }
-    } 
+    }
 
         </xsl:when>
         <!--============ Special case: topinfo ============-->
@@ -770,7 +770,7 @@ public static class <xsl:value-of select="@type"/>
  * @param path The path name to the selected cpo. By convention, only a single tree level is defined for CPO objects in the database.
  * @param occurrence The occurence of the selected cpo.
  * @param cpo The topinfo CPO
- * @exception UALException Issued when data cannot be stored for any reason. 
+ * @exception UALException Issued when data cannot be stored for any reason.
  **/
 	public static void putdb(int expIdx, String user, String machine, int shot, int run,
 		String path, int occurrence, <xsl:value-of select="@type"/> cpo) throws UALException
@@ -793,8 +793,8 @@ public static class <xsl:value-of select="@type"/>
  * @param run The current run
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for CPO objects in the database.
  * @param occurrence The occurence of the selected cpo.
- * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are 
- * missing CPO fields. 
+ * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
+ * missing CPO fields.
  * @return the topinfo CPO. Missing fields are represented by zero sized vectors if not scalars,
  * by EMPTY_INT if integer, EMPTY_DOUBLE if float or double and empty String is string.
  **/
@@ -822,11 +822,11 @@ public static class <xsl:value-of select="@type"/>
 	}
 
         </xsl:otherwise>
-   </xsl:choose>    
+   </xsl:choose>
 
     public static <xsl:value-of select="@type"/>  get(int expIdx, String path)  throws UALException
     {
-      <xsl:value-of select="@type"/> cpo = new <xsl:value-of select="@type"/> (); 
+      <xsl:value-of select="@type"/> cpo = new <xsl:value-of select="@type"/> ();
       UALLowLevel.beginCPOGet(expIdx, path, false);
       <xsl:apply-templates select = "field" mode = "GET_SINGLE"/>
       UALLowLevel.endCPOGet(expIdx, path);
@@ -910,171 +910,171 @@ public static class <xsl:value-of select="@type"/>
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='xs:integer'">
         if(<xsl:value-of select = "$currentidxpath"/> != EMPTY_INT)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='xs:boolean'">
          System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-         System.out.println("");    
+         System.out.println("");
     </xsl:when>
     <xsl:when test="@type='xs:double'">
         if(<xsl:value-of select = "$currentidxpath"/> != EMPTY_DOUBLE)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='xs:float'">
          if(<xsl:value-of select = "$currentidxpath"/> != EMPTY_DOUBLE)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
-    
+
     <xsl:when test="@type='vecstring_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='vecflt_type'">
          if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
    </xsl:when>
     <xsl:when test="@type='vecdbl_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='vecint_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
-    
+
     <xsl:when test="@type='matflt_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='matdbl_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='matint_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
-    
+
     <xsl:when test="@type='array3dflt_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='array3dint_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='array3ddbl_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
-    
+
     <xsl:when test="@type='array4ddbl_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='array4dflt_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='array4dint_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
-    
+
     <xsl:when test="@type='array5ddbl_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='array5dflt_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='array5dint_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
-    
+
     <xsl:when test="@type='array6ddbl_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='array6dflt_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
     <xsl:when test="@type='array6dint_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
-        System.out.println("");    
+        System.out.println("");
     </xsl:when>
 
     <xsl:when test="@type='struct_array'">
@@ -1119,7 +1119,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='xs:float'">
       public double <xsl:value-of select = "@name"/> = EMPTY_DOUBLE;
     </xsl:when>
-    
+
     <xsl:when test="@type='vecstring_type'">
       public Vect1DString <xsl:value-of select = "@name"/>;
     </xsl:when>
@@ -1132,7 +1132,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='vecint_type'">
       public Vect1DInt <xsl:value-of select = "@name"/>;
     </xsl:when>
-    
+
     <xsl:when test="@type='matflt_type'">
       public Vect2DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
@@ -1142,7 +1142,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='matint_type'">
       public Vect2DInt <xsl:value-of select = "@name"/>;
     </xsl:when>
-    
+
     <xsl:when test="@type='array3dflt_type'">
       public Vect3DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
@@ -1152,7 +1152,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='array3ddbl_type'">
       public Vect3DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
-    
+
     <xsl:when test="@type='array4dflt_type'">
       public Vect4DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
@@ -1162,7 +1162,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='array4ddbl_type'">
       public Vect4DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
-    
+
     <xsl:when test="@type='array5dflt_type'">
       public Vect5DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
@@ -1182,7 +1182,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='array6ddbl_type'">
       public Vect6DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
-    
+
     <xsl:when test="@type='array7dflt_type'">
       public Vect7DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
@@ -1267,7 +1267,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getDouble(expIdx, path, "<xsl:value-of select="@path"/>");
            } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = EMPTY_DOUBLE;}
        </xsl:when>
-       
+
         <xsl:when test="@type='vecflt_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect1DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1288,7 +1288,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect1DInt(expIdx, path, "<xsl:value-of select="@path"/>");
            } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
          </xsl:when>
-         
+
         <xsl:when test="@type='matflt_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect2DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1304,7 +1304,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect2DInt(expIdx, path, "<xsl:value-of select="@path"/>");
            } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
        </xsl:when>
-       
+
         <xsl:when test="@type='array3dflt_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect3DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1320,7 +1320,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect3DInt(expIdx, path, "<xsl:value-of select="@path"/>");
            } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
        </xsl:when>
-       
+
         <xsl:when test="@type='array4dflt_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect4DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1336,7 +1336,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect4DInt(expIdx, path, "<xsl:value-of select="@path"/>");
            } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
        </xsl:when>
-       
+
         <xsl:when test="@type='array5dflt_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect5DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1397,7 +1397,7 @@ public static class <xsl:value-of select="@type"/>
             } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
           }
         </xsl:when>
-        
+
         <!--========== Regular structures ==========-->
         <xsl:when test="@type='structure'">
           <xsl:apply-templates select = "field" mode = "GET_SINGLE"/>
@@ -1413,7 +1413,7 @@ public static class <xsl:value-of select="@type"/>
 
 <xsl:template match = "field" mode = "GET_SLICE">
   <xsl:choose>
-    
+
     <!-- Time-dependent field -->
 <xsl:when test = "@timed = 'yes'">
       <xsl:choose>
@@ -1442,7 +1442,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getDoubleSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = EMPTY_DOUBLE;}
         </xsl:when>
-        
+
         <xsl:when test="@type='vecflt_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect1DDoubleSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
@@ -1458,7 +1458,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect1DDoubleSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
         </xsl:when>
-        
+
         <xsl:when test="@type='matflt_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/>= UALLowLevel.getVect2DDoubleSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
@@ -1474,7 +1474,7 @@ public static class <xsl:value-of select="@type"/>
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect2DIntSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
         </xsl:when>
-        
+
         <xsl:when test="@type='array3ddbl_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect3DDoubleSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
@@ -1490,7 +1490,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect3DIntSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
         </xsl:when>
-        
+
          <xsl:when test="@type='array4ddbl_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect4DDoubleSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
@@ -1506,7 +1506,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect4DIntSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
         </xsl:when>
-        
+
         <xsl:when test="@type='array5ddbl_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect5DDoubleSlice(expIdx, path, "<xsl:value-of select="@path"/>",time, interpolMode);
@@ -1577,14 +1577,14 @@ public static class <xsl:value-of select="@type"/>
             }
           }
         </xsl:when>
-        
+
         <!--========== Regular structure ==========-->
       <xsl:when test="@type='structure'">
           <xsl:apply-templates select = "field" mode = "GET_SLICE"/>
         </xsl:when>
       </xsl:choose>
     </xsl:when>
-    
+
     <!-- Time-independent field -->
     <xsl:otherwise>
       <xsl:choose>
@@ -1613,7 +1613,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getDouble(expIdx, path, "<xsl:value-of select="@path"/>");
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = EMPTY_DOUBLE;}
         </xsl:when>
-        
+
         <xsl:when test="@type='vecstring_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect1DString(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1634,7 +1634,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect1DInt(expIdx, path, "<xsl:value-of select="@path"/>");
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
         </xsl:when>
-        
+
         <xsl:when test="@type='matflt_type'">
           try {
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect2DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1650,7 +1650,7 @@ public static class <xsl:value-of select="@type"/>
           cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect2DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
         </xsl:when>
-        
+
         <xsl:when test="@type='array3dflt_type'">
            try {
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect3DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1666,7 +1666,7 @@ public static class <xsl:value-of select="@type"/>
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect3DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
        </xsl:when>
-       
+
         <xsl:when test="@type='array4dflt_type'">
            try {
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect4DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1682,7 +1682,7 @@ public static class <xsl:value-of select="@type"/>
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect4DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
        </xsl:when>
-       
+
         <xsl:when test="@type='array5dflt_type'">
            try {
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect5DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1698,7 +1698,7 @@ public static class <xsl:value-of select="@type"/>
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect5DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
        </xsl:when>
- 
+
          <xsl:when test="@type='array6dflt_type'">
            try {
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect6DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1714,7 +1714,7 @@ public static class <xsl:value-of select="@type"/>
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect6DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
           } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
        </xsl:when>
-       
+
         <xsl:when test="@type='array7dflt_type'">
            try {
          cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = UALLowLevel.getVect7DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1759,7 +1759,7 @@ public static class <xsl:value-of select="@type"/>
             } catch(Exception exc){cpo.<xsl:value-of select = "translate(@path,'/','.')"/> = null;}
           }
         </xsl:when>
-        
+
         <!--========== Regular structures ==========-->
         <xsl:when test="@type='structure'">
           <xsl:apply-templates select = "field" mode = "GET_SLICE"/>
@@ -1798,7 +1798,7 @@ public static class <xsl:value-of select="@type"/>
             </xsl:apply-templates>
           }
        }
- 
+
       static void get_nontimed_<xsl:value-of select = "translate(@path,'/','_')"/>(int expIdx,<xsl:value-of select = "$fulltypepath"/>[] field, int obj1) throws UALException
       {
           for (int i1 = 0; i1 &lt; UALLowLevel.getObjectDim(expIdx,obj1); i1++) {     // process array elements
@@ -1882,7 +1882,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
         </xsl:when>
-        
+
         <xsl:when test="@type='vecflt_type'">
           try {
            vect2DDouble = UALLowLevel.getVect2DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1890,7 +1890,7 @@ public static class <xsl:value-of select="@type"/>
                 throw new UALException("Wrong returned array dimension for <xsl:value-of select = "translate(@path,'/','.')"/> ");
            for(int i = 0; i <xsl:text disable-output-escaping = "yes"> &lt; </xsl:text>  numSamples; i++)
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = vect2DDouble.getElementAt(i);
-           } catch(Exception exc)           
+           } catch(Exception exc)
            {   for(int i = 0; i <xsl:text disable-output-escaping = "yes"> &lt; </xsl:text>  numSamples; i++)
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
@@ -1919,7 +1919,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
        </xsl:when>
-       
+
         <xsl:when test="@type='matflt_type'">
           try {
            vect3DDouble = UALLowLevel.getVect3DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1956,7 +1956,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
        </xsl:when>
-       
+
         <xsl:when test="@type='array3ddbl_type'">
           try {
            vect4DDouble = UALLowLevel.getVect4DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -1993,7 +1993,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
       </xsl:when>
-      
+
         <xsl:when test="@type='array4ddbl_type'">
           try {
            vect5DDouble = UALLowLevel.getVect5DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -2030,7 +2030,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
       </xsl:when>
-      
+
         <xsl:when test="@type='array5ddbl_type'">
           try {
            vect6DDouble = UALLowLevel.getVect6DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -2113,7 +2113,7 @@ public static class <xsl:value-of select="@type"/>
               <xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
             </xsl:call-template>
           </xsl:variable>
-          
+
           {/*     Timed array of structure     */
             /*    Read timed content     */
             int obj_all_times;
@@ -2133,7 +2133,7 @@ public static class <xsl:value-of select="@type"/>
             } catch(UALException exc) {
               throw new UALException("Error in get: for <xsl:value-of select = "translate(@path,'/','.')"/> " + exc);
             }
-            
+
             <!--  The following is not very efficient because we re-parse the object to fill every time slice.
                   However, this is the same as for timed content. Moreover it is not the most common case -->
             /*    Read non-timed content    */
@@ -2154,14 +2154,14 @@ public static class <xsl:value-of select="@type"/>
             }
           }
         </xsl:when>
-          
+
         <!--========== Regular structures ==========-->
         <xsl:when test="@type='structure'">
           <xsl:apply-templates select = "field" mode = "GET_FULL"/>
         </xsl:when>
       </xsl:choose>
     </xsl:when>
-    
+
     <!-- Time-independent field -->
     <xsl:otherwise>
       <xsl:choose>
@@ -2212,7 +2212,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = EMPTY_DOUBLE;
             }
        </xsl:when>
-       
+
         <xsl:when test="@type='vecstring_type'">
           try {
           vect1DString = UALLowLevel.getVect1DString(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -2253,7 +2253,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
        </xsl:when>
-       
+
         <xsl:when test="@type='matflt_type'">
           try {
           vect2DDouble = UALLowLevel.getVect2DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -2284,7 +2284,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
        </xsl:when>
-       
+
         <xsl:when test="@type='array3dflt_type'">
           try {
           vect3DDouble = UALLowLevel.getVect3DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -2315,7 +2315,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
        </xsl:when>
-       
+
        <xsl:when test="@type='array4dflt_type'">
           try {
           vect4DDouble = UALLowLevel.getVect4DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -2346,7 +2346,7 @@ public static class <xsl:value-of select="@type"/>
               cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/> = null;
             }
         </xsl:when>
-        
+
         <xsl:when test="@type='array5dflt_type'">
           try {
           vect5DDouble = UALLowLevel.getVect5DDouble(expIdx, path, "<xsl:value-of select="@path"/>");
@@ -2417,7 +2417,7 @@ public static class <xsl:value-of select="@type"/>
               <xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
             </xsl:call-template>
           </xsl:variable>
-          
+
           <!--  The following is not very efficient because we re-parse the object to fill every time slice.
                 However, this is the same as for timed content. Moreover it is not the most common case -->
           {/*    Non-timed array of structure    */
@@ -2444,7 +2444,7 @@ public static class <xsl:value-of select="@type"/>
             }
           }
         </xsl:when>
-        
+
         <!--========== Regular structures ==========-->
         <xsl:when test="@type='structure'">
           <xsl:apply-templates select = "field" mode = "GET_FULL"/>
@@ -2463,13 +2463,13 @@ public static class <xsl:value-of select="@type"/>
   <xsl:param name="objpath"/>   <!-- path inside the object -->
   <xsl:param name="idxpath"/>   <!-- full java path including indices -->
   <xsl:param name="timed"/>     <!-- are we looking for timed or non-timed fields? -->
-  
+
   <!-- build the path of the current field inside the object -->
   <xsl:param name="currentobjpath"><xsl:value-of select="$objpath"/>/<xsl:value-of select="@name"/></xsl:param>
-  
+
   <!-- build the complete path of the current field -->
   <xsl:param name="currentidxpath"><xsl:value-of select="$idxpath"/>.<xsl:value-of select="@name"/></xsl:param>
-  
+
   <!-- Generate the full name of the subclass from the field path -->
   <xsl:param name="fulltypepath">
     <xsl:call-template name="BUILD_TYPENAME">
@@ -2510,7 +2510,7 @@ public static class <xsl:value-of select="@type"/>
         }
       </xsl:if>
     </xsl:when>
-        
+
     <!--========== Regular structure ==========-->
     <xsl:when test="@type='structure'">
       <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
@@ -2520,7 +2520,7 @@ public static class <xsl:value-of select="@type"/>
         <xsl:with-param name="timed"><xsl:value-of select="$timed"/></xsl:with-param>
       </xsl:apply-templates>
     </xsl:when>
-    
+
     <xsl:otherwise>
       <!--========== select either timed or non-timed fields ==========-->
       <xsl:if test="@timed=$timed">
@@ -2550,7 +2550,7 @@ public static class <xsl:value-of select="@type"/>
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
 //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = EMPTY_DOUBLE;}
           </xsl:when>
-        
+
           <xsl:when test="@type='vecflt_type'">
 //GABRIELE MARCH 2011              try {
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
@@ -2571,7 +2571,7 @@ public static class <xsl:value-of select="@type"/>
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
 //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
           </xsl:when>
-          
+
           <xsl:when test="@type='matflt_type'">
 //GABRIELE MARCH 2011              try {
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect2DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
@@ -2587,7 +2587,7 @@ public static class <xsl:value-of select="@type"/>
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect2DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
 //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
         </xsl:when>
-        
+
           <xsl:when test="@type='array3dflt_type'">
 //GABRIELE MARCH 2011              try {
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect3DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
@@ -2603,7 +2603,7 @@ public static class <xsl:value-of select="@type"/>
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect3DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
 //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
         </xsl:when>
-        
+
           <xsl:when test="@type='array4dflt_type'">
 //GABRIELE MARCH 2011              try {
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect4DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
@@ -2619,7 +2619,7 @@ public static class <xsl:value-of select="@type"/>
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect4DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
 //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
         </xsl:when>
-        
+
           <xsl:when test="@type='array5dflt_type'">
 //GABRIELE MARCH 2011              try {
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect5DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
@@ -2635,7 +2635,7 @@ public static class <xsl:value-of select="@type"/>
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect5DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
 //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
         </xsl:when>
-  
+
           <xsl:when test="@type='array6dflt_type'">
 //GABRIELE MARCH 2011              try {
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect6DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
@@ -2651,12 +2651,12 @@ public static class <xsl:value-of select="@type"/>
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect6DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>);
 //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
         </xsl:when>
-  
+
         </xsl:choose>
       </xsl:if>
     </xsl:otherwise>
   </xsl:choose>
-  
+
 </xsl:template>
 
 <!--=================================================-->
@@ -2698,7 +2698,7 @@ public static class <xsl:value-of select="@type"/>
               vect1DDouble.setElementAt(i, cpos[i].<xsl:value-of select = "translate(@path,'/','.')"/>);
           UALLowLevel.putVect1DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", vect1DDouble, true);
         </xsl:when>
-        
+
         <xsl:when test="@type='vecflt_type'">
           if(cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/> == null)
             vect2DDouble = null;
@@ -2732,7 +2732,7 @@ public static class <xsl:value-of select="@type"/>
           }
           UALLowLevel.putVect2DInt(expIdx, path, "<xsl:value-of select = "@path"/>", vect2DInt, true);
         </xsl:when>
-        
+
         <xsl:when test="@type='matflt_type'">
           if(cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/> == null)
             vect3DDouble = null;
@@ -2766,7 +2766,7 @@ public static class <xsl:value-of select="@type"/>
           }
           UALLowLevel.putVect3DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", vect3DDouble, true);
         </xsl:when>
-        
+
         <xsl:when test="@type='array3dflt_type'">
           if(cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/> == null)
             vect4DDouble = null;
@@ -2800,7 +2800,7 @@ public static class <xsl:value-of select="@type"/>
           }
           UALLowLevel.putVect4DInt(expIdx, path, "<xsl:value-of select = "@path"/>", vect4Dint, true);
         </xsl:when>
- 
+
         <xsl:when test="@type='array4dflt_type'">
           if(cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/> == null)
             vect5DDouble = null;
@@ -2834,7 +2834,7 @@ public static class <xsl:value-of select="@type"/>
           }
           UALLowLevel.putVect5DInt(expIdx, path, "<xsl:value-of select = "@path"/>", vect5DInt, true);
         </xsl:when>
-        
+
         <xsl:when test="@type='array5dflt_type'">
           if(cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/> == null)
             vect6DDouble = null;
@@ -2923,7 +2923,7 @@ public static class <xsl:value-of select="@type"/>
               UALLowLevel.putObjectInObject(expIdx, obj_all_times, "ALLTIMES", i0, obj1);
             }
             UALLowLevel.putObject(expIdx, path, "<xsl:value-of select = "@path"/>", obj_all_times, 1);
-  
+
             /*     Write non-timed fields    */
             int obj1 = UALLowLevel.beginObject(expIdx,-1,0,path+"/<xsl:value-of select = "@path"/>",NON_TIMED);
             if (cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/> != null) {
@@ -2946,7 +2946,7 @@ public static class <xsl:value-of select="@type"/>
         </xsl:when>
       </xsl:choose>
     </xsl:when>
-    
+
     <!-- Time-independent field -->
     <xsl:otherwise>
       <xsl:choose>
@@ -2965,7 +2965,7 @@ public static class <xsl:value-of select="@type"/>
         <xsl:when test="@type='xs:float'">
           UALLowLevel.putDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>);
         </xsl:when>
-        
+
         <xsl:when test="@type='vecflt_type'">
           UALLowLevel.putVect1DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
@@ -2978,7 +2978,7 @@ public static class <xsl:value-of select="@type"/>
         <xsl:when test="@type='vecstring_type'">
           UALLowLevel.putVect1DString(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
-        
+
         <xsl:when test="@type='matflt_type'">
           UALLowLevel.putVect2DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
@@ -2988,7 +2988,7 @@ public static class <xsl:value-of select="@type"/>
         <xsl:when test="@type='matdbl_type'">
           UALLowLevel.putVect2DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
-        
+
         <xsl:when test="@type='array3dflt_type'">
           UALLowLevel.putVect3DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
@@ -2998,7 +2998,7 @@ public static class <xsl:value-of select="@type"/>
         <xsl:when test="@type='array3ddbl_type'">
           UALLowLevel.putVect3DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
-        
+
         <xsl:when test="@type='array4dflt_type'">
           UALLowLevel.putVect4DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
@@ -3008,7 +3008,7 @@ public static class <xsl:value-of select="@type"/>
         <xsl:when test="@type='array4ddbl_type'">
           UALLowLevel.putVect4DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
-        
+
         <xsl:when test="@type='array5dflt_type'">
           UALLowLevel.putVect5DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpos[0].<xsl:value-of select = "translate(@path,'/','.')"/>, false);
         </xsl:when>
@@ -3063,7 +3063,7 @@ public static class <xsl:value-of select="@type"/>
 
 <xsl:template match = "field" mode = "PUT_NON_TIMED">
   <xsl:choose>
-    
+
     <!--========== Arrays of structures ==========-->
     <xsl:when test="@type='struct_array'">
       { /*     Array of structure     */
@@ -3081,12 +3081,12 @@ public static class <xsl:value-of select="@type"/>
         UALLowLevel.putObject(expIdx, path, "<xsl:value-of select = "@path"/>", obj1, 0);
       }
     </xsl:when>
-    
+
     <!--========== Regular structures ==========-->
     <xsl:when test="@type='structure'">
       <xsl:apply-templates select = "field" mode = "PUT_NON_TIMED"/>
     </xsl:when>
-    
+
     <xsl:otherwise>
       <xsl:if test = "@timed = 'no'">
         <xsl:choose>
@@ -3105,7 +3105,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='xs:float'">
             UALLowLevel.putDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='vecflt_type'">
             UALLowLevel.putVect1DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
@@ -3118,7 +3118,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='vecstring_type'">
             UALLowLevel.putVect1DString(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
-          
+
           <xsl:when test="@type='matflt_type'">
             UALLowLevel.putVect2DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
@@ -3128,7 +3128,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='matdbl_type'">
             UALLowLevel.putVect2DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
-          
+
           <xsl:when test="@type='array3dflt_type'">
             UALLowLevel.putVect3DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
@@ -3138,7 +3138,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array3ddbl_type'">
             UALLowLevel.putVect3DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
-          
+
           <xsl:when test="@type='array4dflt_type'">
             UALLowLevel.putVect4DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
@@ -3148,7 +3148,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array4ddbl_type'">
             UALLowLevel.putVect4DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
-          
+
           <xsl:when test="@type='array5dflt_type'">
             UALLowLevel.putVect5DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
@@ -3158,7 +3158,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array5ddbl_type'">
             UALLowLevel.putVect5DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
-          
+
           <xsl:when test="@type='array6dflt_type'">
             UALLowLevel.putVect6DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
@@ -3168,7 +3168,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array6ddbl_type'">
             UALLowLevel.putVect6DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
           </xsl:when>
-          
+
         </xsl:choose>
       </xsl:if>
     </xsl:otherwise>
@@ -3181,16 +3181,16 @@ public static class <xsl:value-of select="@type"/>
 
 <xsl:template match = "field" mode = "PUT_SLICE">
   <xsl:choose>
-    
+
     <!--========== Regular structures ==========-->
     <xsl:when test="@type='structure'">
       <xsl:apply-templates select = "field" mode = "PUT_SLICE"/>
     </xsl:when>
-    
+
     <xsl:otherwise>
       <xsl:if test = "@timed = 'yes'">
         <xsl:choose>
-          
+
           <!--========== Arrays of structures ==========-->
           <xsl:when test="@type='struct_array'">
             { /*     Array of structure    */
@@ -3211,7 +3211,7 @@ public static class <xsl:value-of select="@type"/>
               UALLowLevel.putObjectSlice(expIdx, path, "<xsl:value-of select = "@path"/>", (double)cpo.time, obj_single_time);
             }
           </xsl:when>
-          
+
           <xsl:when test="@type='xs:string'">
             UALLowLevel.putStringSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
@@ -3231,7 +3231,7 @@ public static class <xsl:value-of select="@type"/>
               if(cpo.<xsl:value-of select = "translate(@path,'/','.')"/> != EMPTY_DOUBLE)
                   UALLowLevel.putDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
-          
+
           <xsl:when test="@type='vecflt_type'">
             UALLowLevel.putVect1DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
@@ -3241,7 +3241,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='vecint_type'">
             UALLowLevel.putVect1DIntSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
-          
+
           <xsl:when test="@type='matflt_type'">
             UALLowLevel.putVect2DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
@@ -3251,7 +3251,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='matdbl_type'">
             UALLowLevel.putVect2DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
-          
+
           <xsl:when test="@type='array3dflt_type'">
             UALLowLevel.putVect3DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
@@ -3261,7 +3261,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array3ddbl_type'">
             UALLowLevel.putVect3DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
-          
+
           <xsl:when test="@type='array4dflt_type'">
             UALLowLevel.putVect4DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
@@ -3271,7 +3271,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array4ddbl_type'">
             UALLowLevel.putVect4DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
-          
+
           <xsl:when test="@type='array5dflt_type'">
             UALLowLevel.putVect5DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
@@ -3281,7 +3281,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array5ddbl_type'">
             UALLowLevel.putVect5DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
-          
+
           <xsl:when test="@type='array6dflt_type'">
             UALLowLevel.putVect6DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
@@ -3291,7 +3291,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array6ddbl_type'">
             UALLowLevel.putVect6DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, cpo.time);
           </xsl:when>
-          
+
         </xsl:choose>
 
       </xsl:if>
@@ -3305,12 +3305,12 @@ public static class <xsl:value-of select="@type"/>
 
 <xsl:template match = "field" mode = "REPLACE_LAST_SLICE">
   <xsl:choose>
-    
+
     <!--========== Regular structures ==========-->
     <xsl:when test="@type='structure'">
       <xsl:apply-templates select = "field" mode = "REPLACE_LAST_SLICE"/>
     </xsl:when>
-    
+
     <xsl:otherwise>
       <xsl:if test = "@timed = 'yes'">
         <xsl:choose>
@@ -3329,7 +3329,7 @@ public static class <xsl:value-of select="@type"/>
               UALLowLevel.replaceLastObjectSlice(expIdx, path, "<xsl:value-of select = "@path"/>", obj1);
             }
           </xsl:when>
-          
+
           <xsl:when test="@type='xs:string'">
             UALLowLevel.replaceLastStringSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
@@ -3349,7 +3349,7 @@ public static class <xsl:value-of select="@type"/>
               if(cpo.<xsl:value-of select = "translate(@path,'/','.')"/> != EMPTY_DOUBLE)
                   UALLowLevel.replaceLastDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='vecflt_type'">
             UALLowLevel.replaceLastVect1DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
@@ -3359,7 +3359,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='vecint_type'">
             UALLowLevel.replaceLastVect1DIntSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='matflt_type'">
             UALLowLevel.replaceLastVect2DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
@@ -3369,7 +3369,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='matdbl_type'">
             UALLowLevel.replaceLastVect2DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='array3dflt_type'">
             UALLowLevel.replaceLastVect3DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
@@ -3379,7 +3379,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array3ddbl_type'">
             UALLowLevel.replaceLastVect3DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='array4dflt_type'">
             UALLowLevel.replaceLastVect4DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
@@ -3389,7 +3389,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array4ddbl_type'">
             UALLowLevel.replaceLastVect4DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='array5dflt_type'">
             UALLowLevel.replaceLastVect5DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
@@ -3399,7 +3399,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array5ddbl_type'">
             UALLowLevel.replaceLastVect5DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='array6dflt_type'">
             UALLowLevel.replaceLastVect6DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
@@ -3409,9 +3409,9 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array6ddbl_type'">
             UALLowLevel.replaceLastVect6DDoubleSlice(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
           </xsl:when>
-          
+
         </xsl:choose>
-  
+
       </xsl:if>
     </xsl:otherwise>
   </xsl:choose>
@@ -3438,7 +3438,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='xs:float'">
       UALLowLevel.putDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>);
     </xsl:when>
-    
+
     <xsl:when test="@type='vecstring_type'">
       UALLowLevel.putVect1DString(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
@@ -3451,7 +3451,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='vecint_type'">
       UALLowLevel.putVect1DInt(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
-    
+
     <xsl:when test="@type='matflt_type'">
       UALLowLevel.putVect2DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
@@ -3461,7 +3461,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='matint_type'">
       UALLowLevel.putVect2DInt(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
-    
+
     <xsl:when test="@type='array3dflt_type'">
       UALLowLevel.putVect3DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
@@ -3471,7 +3471,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='array3dint_type'">
       UALLowLevel.putVect3DInt(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
-    
+
     <xsl:when test="@type='array4dflt_type'">
       UALLowLevel.putVect4DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
@@ -3481,7 +3481,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='array4dint_type'">
       UALLowLevel.putVect4DInt(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
-    
+
     <xsl:when test="@type='array5dflt_type'">
       UALLowLevel.putVect5DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
@@ -3491,7 +3491,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='array5dint_type'">
       UALLowLevel.putVect5DInt(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
-    
+
    <xsl:when test="@type='array6dflt_type'">
       UALLowLevel.putVect6DDouble(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
@@ -3501,7 +3501,7 @@ public static class <xsl:value-of select="@type"/>
     <xsl:when test="@type='array6dint_type'">
       UALLowLevel.putVect6DInt(expIdx, path, "<xsl:value-of select = "@path"/>", cpo.<xsl:value-of select = "translate(@path,'/','.')"/>, false);
     </xsl:when>
-    
+
     <!--========== Arrays of structures ==========-->
     <xsl:when test="@type='struct_array'">
       { /*     Array of structure     */
@@ -3519,7 +3519,7 @@ public static class <xsl:value-of select="@type"/>
         UALLowLevel.putObject(expIdx, path, "<xsl:value-of select = "@path"/>", obj1, 0);
       }
     </xsl:when>
-    
+
     <!--========== Regular structures ==========-->
     <xsl:when test="@type='structure'">
       <xsl:apply-templates select = "field" mode = "PUT"/>
@@ -3536,12 +3536,12 @@ public static class <xsl:value-of select="@type"/>
   <xsl:param name="objpath"/>   <!-- path inside the object -->
   <xsl:param name="idxpath"/>   <!-- full java path including indices -->
   <xsl:param name="timed"/>     <!-- are we looking for timed or non-timed fields? -->
-  
+
   <!-- build the path of the current field inside the object -->
   <xsl:param name="currentobjpath"><xsl:value-of select="$objpath"/>/<xsl:value-of select="@name"/></xsl:param>
   <!-- build the complete path of the current field -->
   <xsl:param name="currentidxpath"><xsl:value-of select="$idxpath"/>.<xsl:value-of select="@name"/></xsl:param>
-  
+
   <xsl:choose>
     <!--========== Array of structures ==========-->
     <xsl:when test="@type='struct_array'">
@@ -3550,7 +3550,7 @@ public static class <xsl:value-of select="@type"/>
       <!-- OH fix -->
       <xsl:choose>
         <xsl:when test="$timed='yes'">
-          int obj<xsl:value-of select="$level + 1"/> = UALLowLevel.beginObject(expIdx,obj<xsl:value-of select="$level"/>,i<xsl:value-of select="$level"/>,"<xsl:value-of select="$currentobjpath"/>",TIMED);          
+          int obj<xsl:value-of select="$level + 1"/> = UALLowLevel.beginObject(expIdx,obj<xsl:value-of select="$level"/>,i<xsl:value-of select="$level"/>,"<xsl:value-of select="$currentobjpath"/>",TIMED);
         </xsl:when>
         <xsl:otherwise>
           int obj<xsl:value-of select="$level + 1"/> = UALLowLevel.beginObject(expIdx,obj<xsl:value-of select="$level"/>,i<xsl:value-of select="$level"/>,"<xsl:value-of select="$currentobjpath"/>",NON_TIMED);
@@ -3570,7 +3570,7 @@ public static class <xsl:value-of select="@type"/>
         }
       </xsl:if>
     </xsl:when>
-    
+
     <!--========== Regular structure ==========-->
     <xsl:when test="@type='structure'">
       <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT">
@@ -3580,7 +3580,7 @@ public static class <xsl:value-of select="@type"/>
         <xsl:with-param name="timed"><xsl:value-of select="$timed"/></xsl:with-param>
       </xsl:apply-templates>
     </xsl:when>
-    
+
     <!--========== select either timed or non-timed fields ==========-->
     <xsl:otherwise>
       <xsl:if test="@timed=$timed">
@@ -3600,7 +3600,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='xs:float'">
             UALLowLevel.putDoubleInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='vecstring_type'">
             UALLowLevel.putVect1DStringInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
@@ -3613,7 +3613,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='vecint_type'">
             UALLowLevel.putVect1DIntInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='matflt_type'">
             UALLowLevel.putVect2DDoubleInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
@@ -3623,7 +3623,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='matint_type'">
             UALLowLevel.putVect2DIntInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='array3dflt_type'">
             UALLowLevel.putVect3DDoubleInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
@@ -3633,7 +3633,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array3dint_type'">
             UALLowLevel.putVect3DIntInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='array4dflt_type'">
             UALLowLevel.putVect4DDoubleInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
@@ -3643,7 +3643,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array4dint_type'">
             UALLowLevel.putVect4DIntInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='array5dflt_type'">
             UALLowLevel.putVect5DDoubleInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
@@ -3653,7 +3653,7 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array5dint_type'">
             UALLowLevel.putVect5DIntInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
-          
+
         <xsl:when test="@type='array6dflt_type'">
             UALLowLevel.putVect6DDoubleInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
@@ -3663,13 +3663,13 @@ public static class <xsl:value-of select="@type"/>
           <xsl:when test="@type='array6dint_type'">
             UALLowLevel.putVect6DIntInObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", i<xsl:value-of select="$level"/>, <xsl:value-of select="$currentidxpath"/>);
           </xsl:when>
-          
+
           <xsl:when test="@type='structure'">
             <xsl:apply-templates select = "field" mode = "PUT"/>
           </xsl:when>
         </xsl:choose>
       </xsl:if>
-      
+
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
