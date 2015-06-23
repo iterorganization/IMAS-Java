@@ -3,7 +3,7 @@ public class UALLowLevel {
     
     static {
         try {
-            System.loadLibrary("UALLowLevel");
+            System.loadLibrary("imas");
         }catch(Throwable exc)
         {
             System.err.println("Cannot link to JNI library: " + exc);

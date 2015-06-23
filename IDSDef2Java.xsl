@@ -19,15 +19,18 @@
 <xsl:template match = "/IDSs">
 package ualmemory.javainterface;
      public class imas {
-     static {
+        static {
         try {
-            System.loadLibrary("UALLowLevel");
-        }catch(Throwable exc)
-        {
-            System.err.println("Cannot link to JNI library: " + exc);
-            System.exit(0);
+            System.loadLibrary("imas");
         }
-    }
+        catch(UnsatisfiedLinkError exc) {
+        System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
+        }
+        catch(Throwable exc) {
+          System.err.println("Cannot link to JNI library: " + exc);
+          System.exit(0);
+        }
+        }
  public static final int EMPTY_INT = -999999999;
  public static final double EMPTY_DOUBLE = -9.0E40;
 
