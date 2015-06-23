@@ -1,4 +1,4 @@
-package ualmemory.javainterface;
+package imasjava;
 
 public class Vect7DDouble
 {

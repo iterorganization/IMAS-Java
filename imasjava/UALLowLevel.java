@@ -1,17 +1,6 @@
-package ualmemory.javainterface;
+package imasjava;
 public class UALLowLevel {
-    
-    static {
-        try {
-            System.loadLibrary("imas");
-        }catch(Throwable exc)
-        {
-            System.err.println("Cannot link to JNI library: " + exc);
-            System.exit(0);
-        }
-    }
-
-	/* returns a vector containing all the dimensions of an array) */
+	  /* returns a vector containing all the dimensions of an array) */
     public static native Vect1DInt getDimension(int expIdx, String path, String subPath) throws UALException;
 
     /* OH not defined here, use directly lowlevel ual_jni

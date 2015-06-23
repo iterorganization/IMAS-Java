@@ -1,22 +1,22 @@
-package ualmemory.javainterface;
-public class Vect1DBoolean
+package imasjava;
+public class Vect1DDouble
 {
-    boolean array[];
+    double array[];
     
-    public Vect1DBoolean(int dim)
+    public Vect1DDouble(int dim)
     {
-        array = new boolean[dim];
+        array = new double[dim];
     }
-    public Vect1DBoolean(boolean array[])
+    public Vect1DDouble(double array[])
     {
         this.array = array;
     }
     
     
     public int getDim() {return array.length;}
-    public boolean getElementAt(int idx) {return array[idx];}
-    public void setElementAt(int idx, boolean element) {array[idx] = element;}
-    public boolean[] getArray() {return array;}
+    public double getElementAt(int idx) {return array[idx];}
+    public void setElementAt(int idx, double element) {array[idx] = element;}
+    public double[] getArray() {return array;}
     public String toString()
     {
         String retStr = "[";

@@ -17,18 +17,43 @@
 <!--=================================================-->
 
 <xsl:template match = "/IDSs">
-package ualmemory.javainterface;
-     public class imas {
+package imasjava;
+import java.io.File;
+
+public class imas {
         static {
+        String libpath = System.getenv("IMAS_HOME");
+        String imasversion = System.getenv("IMAS_VERSION");
+        String ualversion = System.getenv("UAL_VERSION");
+        if ( libpath == null ) {
+            System.err.println("IMAS library not set up in the environment. (IMAS_HOME missing)");
+            System.exit(0);
+        }
+        if ( imasversion == null ) {
+            System.err.println("IMAS library not set up in the environment. (IMAS_VERSION missing)");
+            System.exit(0);
+        }
+        if ( ualversion == null ) {
+            System.err.println("IMAS library not set up in the environment. (UAL_VERSION missing)");
+            System.exit(0);
+        }
+        libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
+        String imas_library = libpath + "/libimas.so";
+        File f = new File(imas_library);
+        if (! f.exists() ) {
+            System.err.println("IMAS library not set up in the environment. (libimas.so missing)");
+        }
+
         try {
-            System.loadLibrary("imas");
+            System.load(imas_library);
         }
         catch(UnsatisfiedLinkError exc) {
-        System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
+          System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
         }
-        catch(Throwable exc) {
-          System.err.println("Cannot link to JNI library: " + exc);
-          System.exit(0);
+        catch(Throwable exc)
+        {
+            System.err.println("Cannot link to JNI library: " + exc);
+            System.exit(0);
         }
         }
  public static final int EMPTY_INT = -999999999;

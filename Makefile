@@ -1,6 +1,6 @@
 include ../Makefile.common
 
-SOURCES = ualmemory/javainterface/*.java
+SOURCES = imasjava/*.java
 
 #-------- Options for cache monitoring ---------
 ifeq (yes,$(strip $(MONITOR)))
@@ -17,18 +17,16 @@ install: all
 	cp imas.jar $(INSTALL)/jar
 
 clean:
-	@ $(RM) $(CLASSES)
-	@ $(RM) imas.jar
+	$(RM) $(CLASSES)
+	$(RM) imas.jar
 
 clean-src: clean
-	@ $(RM) ualmemory/javainterface/imas.java
+	$(RM) imasjava/imas.java
 
-
-
-imas.jar : $(SOURCES) ualmemory/javainterface/imas.java
+imas.jar : $(SOURCES) imasjava/imas.java
 	javac $(SOURCES)
 	jar cf imas.jar $(CLASSES)
 
-ualmemory/javainterface/imas.java : IDSDef2Java.xsl
-	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > ualmemory/javainterface/imas.java
+imasjava/imas.java : IDSDef2Java.xsl
+	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
 

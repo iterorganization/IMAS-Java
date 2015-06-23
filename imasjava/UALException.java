@@ -1,4 +1,4 @@
-package ualmemory.javainterface;
+package imasjava;
 
 public class UALException extends Exception
 {
