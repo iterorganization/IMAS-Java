@@ -1106,31 +1106,34 @@ public static class <xsl:value-of select="@name"/>
 <xsl:when test="$variable_path">
 // Structure array of type 3 nested below a Type 1 : <xsl:value-of select = "concat($variable_path,'.',@name)"/>
 //          try {
-            obj_all_times = UALLowLevel.getObject(expIdx, path, <xsl:value-of select = "concat($mds_path,' + &quot;/',@name,'&quot;')"/>, TIMED); //read the whole timed block
-            lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
-            ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[lentime];
-//          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select = "concat($variable_path,'.',@name)"/> + lentime =" + lentime");
-            for (int i1 = 0; i1 &lt; lentime; i1++) { // fill every time slice
-              ids.<xsl:value-of select="concat($variable_path,'.',@name,'[i1]')"/> = new <xsl:value-of select="$fulltypepath"/>();
-//              try {
-                obj1 = UALLowLevel.getObjectFromObject(expIdx, obj_all_times,"ALLTIMES", i1);
-                //UALLowLevel.getObjectDim(expIdx, obj1, dimObj1);
-               <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
-                  <xsl:with-param name="level" select="1"/>
-                  <xsl:with-param name="objpath" select="@name"/>
-                  <xsl:with-param name="idxpath" select="concat('ids.',$variable_path,'.',@name,'[i1]')"/>
-                  <xsl:with-param name="timed" select="'yes'"/>
-               </xsl:apply-templates>
+            obj_all_times = UALLowLevel.getObject(expIdx, path, <xsl:value-of select = "concat($mds_path,' + &quot;/',@name,'&quot;')"/>, TIMED); //read the whole timed block, returns -1 if Aos is empty
+            if (obj_all_times > -1) {
+              lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
+              ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[lentime];
+//            if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select = "concat($variable_path,'.',@name)"/> + lentime =" + lentime");
+              for (int i1 = 0; i1 &lt; lentime; i1++) { // fill every time slice
+                ids.<xsl:value-of select="concat($variable_path,'.',@name,'[i1]')"/> = new <xsl:value-of select="$fulltypepath"/>();
+//                try {
+                  obj1 = UALLowLevel.getObjectFromObject(expIdx, obj_all_times,"ALLTIMES", i1);
+                  //UALLowLevel.getObjectDim(expIdx, obj1, dimObj1);
+                  <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
+                    <xsl:with-param name="level" select="1"/>
+                    <xsl:with-param name="objpath" select="@name"/>
+                    <xsl:with-param name="idxpath" select="concat('ids.',$variable_path,'.',@name,'[i1]')"/>
+                    <xsl:with-param name="timed" select="'yes'"/>
+                  </xsl:apply-templates>
 //              } catch(Exception exc){<xsl:value-of select="concat('ids.',$variable_path,'.',@name,'[i1]')"/> = null;}
             }
             UALLowLevel.releaseObject(expIdx,obj_all_times);
+            } // close of "if (obj_all_times > -1)"
 //          } catch(Exception exc){<xsl:value-of select="concat('ids.',$variable_path,'.',@name)"/> = null;}
 </xsl:when>
 
 <xsl:otherwise>
 // Structure array of type 3 : <xsl:value-of select = "@path"/>
 //          try {
-            obj_all_times = UALLowLevel.getObject(expIdx, path, "<xsl:value-of select = "@path"/>", TIMED); //read the whole timed block
+            obj_all_times = UALLowLevel.getObject(expIdx, path, "<xsl:value-of select = "@path"/>", TIMED); //read the whole timed block, returns -1 if Aos is empty
+            if (obj_all_times > -1) {
             lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
             ids.<xsl:value-of select = "translate(@path,'/','.')"/> = new <xsl:value-of select="$fulltypepath"/>[lentime];
 //          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select="translate(@path,'/','.')"/> + lentime =" + lentime");
@@ -1148,6 +1151,7 @@ public static class <xsl:value-of select="@name"/>
 //              } catch(Exception exc){<xsl:value-of select="concat('ids.',translate(@path,'/','.'),'[i1]')"/> = null;}
             }
             UALLowLevel.releaseObject(expIdx,obj_all_times);
+            } // close of "if (obj_all_times > -1)"
 //          } catch(Exception exc){<xsl:value-of select="concat('ids.',translate(@path,'/','.'))"/> = null;}
 </xsl:otherwise>
 </xsl:choose>
