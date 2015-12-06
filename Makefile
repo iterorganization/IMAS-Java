@@ -28,5 +28,6 @@ imas.jar : $(SOURCES) imasjava/imas.java
 	jar cf imas.jar $(CLASSES)
 
 imasjava/imas.java : IDSDef2Java.xsl
-	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
+	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl -o:imasjava/imas.java
+#	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
 
