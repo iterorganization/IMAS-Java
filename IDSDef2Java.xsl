@@ -1465,7 +1465,7 @@ endif
    	if (ids.ids_properties.homogeneous_time == 0) {
        <!--XSLtest whether this is a data/time structure, otherwise assume that the timepath attribute from IDSDef is correct-->
        		<xsl:choose>
-       			<xsl:when test="(@name='data' and ../field[@name='time']) or (@name='time' and ../field[@name='data'])">
+       			<xsl:when test="(@name='data' and ../field[@name='time']) or (@name='time' and ../field[@name='data']) or @name='data_error_upper' or @name='data_error_lower'">
        	  timepath=<xsl:value-of select="$mds_path"/> + &quot;/time&quot; ;
        			</xsl:when>
        			<xsl:otherwise>
@@ -2433,130 +2433,85 @@ endif
       <!--<xsl:if test="@timed=$timed">-->
         <xsl:choose>
           <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">
-//GABRIELE MARCH 2011            try {
+<!--xsl//GABRIELE MARCH 2011            try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getStringFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
           </xsl:when>
           <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = EMPTY_INT;}
+<!--xsl //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = EMPTY_INT;} -->
           </xsl:when>
           <xsl:when test="@name='xs:boolean'">
-//GABRIELE MARCH 2011              try {
+<!--xsl//GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getBooleanFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){}
+<!--xsl//            } catch(Exception exc){} -->
           </xsl:when>
           <xsl:when test="@name='xs:double'">
-//GABRIELE MARCH 2011              try {
+<!--xsl//GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = EMPTY_DOUBLE;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = EMPTY_DOUBLE;} -->
           </xsl:when>
           <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = EMPTY_DOUBLE;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = EMPTY_DOUBLE;} -->
           </xsl:when>
 
           <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
           </xsl:when>
           <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DStringFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
           </xsl:when>
-          <xsl:when test="@name='vecdbl_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-//          </xsl:when>
+
           <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
           </xsl:when>
 
           <xsl:when test="@data_type='FLT_2D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl//GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect2DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-        </xsl:when>
-          <xsl:when test="@name='matdbl_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect2DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
         </xsl:when>
           <xsl:when test="@data_type='INT_2D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect2DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
         </xsl:when>
 
           <xsl:when test="@data_type='FLT_3D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect3DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-        </xsl:when>
-        <xsl:when test="@name='array3ddbl_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect3DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
         </xsl:when>
         <xsl:when test="@data_type='INT_3D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try { -->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect3DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
         </xsl:when>
 
           <xsl:when test="@data_type='FLT_4D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl //GABRIELE MARCH 2011              try {-->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect4DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}-->
         </xsl:when>
-        <xsl:when test="@name='array4ddbl_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect4DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-        </xsl:when>
-        <xsl:when test="@name='array4dint_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect4DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-        </xsl:when>
-
           <xsl:when test="@data_type='FLT_5D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl//GABRIELE MARCH 2011              try {-->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect5DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-        </xsl:when>
-        <xsl:when test="@name='array5ddbl_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect5DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-        </xsl:when>
-        <xsl:when test="@name='array5dint_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect5DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}-->
         </xsl:when>
 
           <xsl:when test="@data_type='FLT_6D'">
-//GABRIELE MARCH 2011              try {
+<!--xsl//GABRIELE MARCH 2011              try {-->
               <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect6DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-        </xsl:when>
-        <xsl:when test="@name='array6ddbl_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect6DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
-        </xsl:when>
-        <xsl:when test="@name='array6dint_type'">
-//GABRIELE MARCH 2011              try {
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect6DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}
+<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}-->
         </xsl:when>
 
         </xsl:choose>
@@ -3636,7 +3591,7 @@ endif
    	if (ids.ids_properties.homogeneous_time == 0) {
        <!--XSLtest whether this is a data/time structure, otherwise assume that the timepath attribute from IDSDef is correct-->
        			<xsl:choose>
-       				<xsl:when test="(@name='data' and ../field[@name='time']) or (@name='time' and ../field[@name='data'])">
+       				<xsl:when test="(@name='data' and ../field[@name='time']) or (@name='time' and ../field[@name='data']) or @name='data_error_upper' or @name='data_error_lower'">
        	  timepath=<xsl:value-of select="$mds_path"/> + &quot;/time&quot; ;
        	  UALLowLevel.beginIDSPutTimed(expIdx, path, ids.<xsl:value-of select="concat($variable_path,'.time')"/>);
        				</xsl:when>
