@@ -1068,7 +1068,7 @@ public static class <xsl:value-of select="@name"/>
 // Get <xsl:value-of select="@path"/>
 <xsl:choose>
 <xsl:when test="$variable_path">
-          try {
+        //06/12/2015: avoid large try blocks  try {
             ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[UALLowLevel.getInt(expIdx,path, <xsl:value-of select="$mds_path"/>+&quot;/<xsl:value-of select="@name"/>/Shape_of&quot;)];
             for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/> &lt; ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i<xsl:value-of select = "@name"/>++) {
               ids.<xsl:value-of select="concat($variable_path,'.',@name,'[i',@name,']')"/> = new <xsl:value-of select="$fulltypepath"/>();
@@ -1077,10 +1077,10 @@ public static class <xsl:value-of select="@name"/>
                 <xsl:with-param name="mds_path" select="concat($mds_path,' + ','&quot;/',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
               </xsl:apply-templates>
             }
-          } catch(Exception exc){ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = null;}
+     //06/12/2015: avoid large try blocks     } catch(Exception exc){ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = null;}
 </xsl:when>
 <xsl:otherwise>
-          try {
+         //06/12/2015: avoid large try blocks try {
             ids.<xsl:value-of select="@name"/> = new <xsl:value-of select="$fulltypepath"/>[UALLowLevel.getInt(expIdx,path, &quot;<xsl:value-of select="@name"/>/Shape_of&quot;)];
 //   allocate(ids.<xsl:value-of select = "@name"/>(int0d))
             for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/> &lt; ids.<xsl:value-of select = "@name"/>.length; i<xsl:value-of select = "@name"/>++) {
@@ -1090,7 +1090,7 @@ public static class <xsl:value-of select="@name"/>
                 <xsl:with-param name="mds_path" select="concat('&quot;',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
               </xsl:apply-templates>
             }
-          } catch(Exception exc){ids.<xsl:value-of select="@name"/> = null;}
+     // 06/12/2015: avoid large try blocks     } catch(Exception exc){ids.<xsl:value-of select="@name"/> = null;}
 </xsl:otherwise>
 </xsl:choose>
 </xsl:when>
@@ -1384,7 +1384,7 @@ endif
 <!-- Type 1 arrays of structure, with potentially multiple time bases -->// Get_slice <xsl:value-of select="@path"/>
 		<xsl:choose>
 			<xsl:when test="$variable_path">
-          try {
+        //06/12/2015: avoid large try blocks  try {
             ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[UALLowLevel.getInt(expIdx,path, <xsl:value-of select="$mds_path"/>+&quot;/<xsl:value-of select="@name"/>/Shape_of&quot;)];
             for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/>&lt;ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i<xsl:value-of select = "@name"/>++){
               ids.<xsl:value-of select="concat($variable_path,'.',@name,'[i',@name,']')"/> = new <xsl:value-of select="$fulltypepath"/>();
@@ -1394,10 +1394,10 @@ endif
 		<xsl:with-param name ="ids_name" select="$ids_name"/>
 	      </xsl:apply-templates>
             }
-          } catch(Exception exc){ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = null;}
+        // 06/12/2015: avoid large try blocks  } catch(Exception exc){ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = null;}
 			</xsl:when>
 			<xsl:otherwise>
-          try {
+          // 06/12/2015: avoid large try blocks try {
             ids.<xsl:value-of select="@name"/> = new <xsl:value-of select="$fulltypepath"/>[UALLowLevel.getInt(expIdx,path, &quot;<xsl:value-of select="@name"/>/Shape_of&quot;)];
             for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/>&lt;ids.<xsl:value-of select = "@name"/>.length; i<xsl:value-of select = "@name"/>++){
               ids.<xsl:value-of select="concat(@name,'[i',@name,']')"/> = new <xsl:value-of select="$fulltypepath"/>();
@@ -1407,7 +1407,7 @@ endif
 		<xsl:with-param name ="ids_name" select="$ids_name"/>
 	      </xsl:apply-templates>
             }
-          } catch(Exception exc){ids.<xsl:value-of select="@name"/> = null;}
+          //06/12/2015: avoid large try blocks } catch(Exception exc){ids.<xsl:value-of select="@name"/> = null;}
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:when>
@@ -2381,13 +2381,13 @@ endif
     <xsl:choose>
       <xsl:when test="$timed = 'yes'">
       <!-- We are scanning the children of a Type 3 AoS, so we extract the child object at index 0 of the parent object -->
-          try {
+          //try { 06/12/2015: avoid large try blocks
             obj<xsl:value-of select="$level + 1"/> = UALLowLevel.getObjectFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select = "$currentobjpath"/>", 0);
 //            int obj<xsl:value-of select="$level + 1"/> = UALLowLevel.getObjectFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select = "$currentobjpath"/>", 0);
       </xsl:when>
       <xsl:otherwise>
 <!-- Otherwise we assume it is a Type 2 AoS, so we extract the child object at index iobject -->
-          try {
+          //try { 06/12/2015: avoid large try blocks
             obj<xsl:value-of select="$level + 1"/> = UALLowLevel.getObjectFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select = "$currentobjpath"/>", i<xsl:value-of select="$level"/>);
       </xsl:otherwise>
     </xsl:choose>
@@ -2412,9 +2412,9 @@ endif
               </xsl:apply-templates>
             }
 
-          } catch(UALException exc) {
+// 06/12/2015: avoid large try blocks         } catch(UALException exc) {
 //                throw new UALException("Error in get: for <xsl:value-of select = "translate(@path,'/','.')"/> " + exc);
-          }
+// 06/12/2015: avoid large try blocks         }
   <!--    </xsl:if> -->
     </xsl:when>
 
