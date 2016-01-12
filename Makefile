@@ -1,6 +1,6 @@
 include ../Makefile.common
 
-SOURCES = imasjava/*.java
+SOURCES = src/imasjava/*.java
 
 #-------- Options for cache monitoring ---------
 ifeq (yes,$(strip $(MONITOR)))
@@ -12,22 +12,34 @@ CLASSES = $(SOURCES:.java=.class)
 
 all : imas.jar
 
+gen : IDSDef2Java.xsl
+	 java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl 
+
+comp: 
+	javac ./src/imasjava/*.java -sourcepath ./src  -d ./build 
+
 install: all
 	mkdir -p $(INSTALL)/jar
-	cp imas.jar $(INSTALL)/jar
+	cp ./lib/imas.jar $(INSTALL)/jar
 
 clean:
-	$(RM) $(CLASSES)
-	$(RM) imas.jar
+	$(RM) -rf ./build/ 
+	$(RM) -rf ./lib/
 
 clean-src: clean
-	$(RM) imasjava/imas.java
+	$(RM) -rf ./src/imasjava/imas.java
+	$(RM) -rf ./src/imasjava/ids
 
 imas.jar : $(SOURCES) imasjava/imas.java
-	javac $(SOURCES)
-	jar cf imas.jar $(CLASSES)
+#	javac $(SOURCES)
+#	jar cf imas.jar $(CLASSES)
+	mkdir -p ./build/
+	javac ./src/imasjava/*.java -sourcepath ./src  -d ./build
+	mkdir -p ./lib/
+	jar cvf ./lib/imas.jar -C ./build . 
 
 imasjava/imas.java : IDSDef2Java.xsl
-	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl -o:imasjava/imas.java
+	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl 
+#	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl -o:imasjava/imas.java
 #	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
 
