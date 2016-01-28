@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?modxslt-stylesheet type="text/xsl" media="fuffa, screen and $GET[stylesheet]" href="./%24GET%5Bstylesheet%5D" alternate="no" title="Translation using provided stylesheet" charset="ISO-8859-1" ?>
-<?modxslt-stylesheet type="text/xsl" media="screen" alternate="no" title="Show raw source of the XML file" charset="ISO-8859-1" ?>
+<?modxslt-stylesheet make gentype="text/xsl" media="screen" alternate="no" title="Show raw source of the XML file" charset="ISO-8859-1" ?>
 
 
 <xsl:stylesheet xmlns:yaslt="http://www.mod-xslt2.com/ns/1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -259,6 +259,7 @@ import imasjava.*;
 public class <xsl:value-of select="@name"/>_IDSBase
 {
     static private boolean isHomogeneous = false;
+    static private Vect1DDouble idsTime = null;
     
     
     static private void setHomogeneous(boolean isHomogeneous)
@@ -270,8 +271,18 @@ public class <xsl:value-of select="@name"/>_IDSBase
     {
         return <xsl:value-of select="@name"/>_IDSBase.isHomogeneous;
     }
-       
-         
+    
+    
+    static private void setIdsTime(Vect1DDouble idsTime )
+    {
+         <xsl:value-of select="@name"/>_IDSBase.idsTime = idsTime;
+    }
+    
+    static private Vect1DDouble getIdsTime()
+    {
+         return <xsl:value-of select="@name"/>_IDSBase.idsTime;
+    }
+  
     <xsl:apply-templates select = "field" mode = "DECLARE"/>
 
 
@@ -331,13 +342,17 @@ public class <xsl:value-of select="@name"/>_IDSBase
  **/
     public static void put(int expIdx, String path, imas.<xsl:value-of select="@name"/> ids)  throws UALException
     {
-    	 <xsl:value-of select="@name"/>_IDSBase.setHomogeneous(ids.ids_properties.homogeneous_time == 1);
+    	<xsl:value-of select="@name"/>_IDSBase.setHomogeneous(ids.ids_properties.homogeneous_time == 1);
+	
+	<xsl:value-of select="@name"/>_IDSBase.setIdsTime(ids.time);
+	
 	ids.put(expIdx, path);
     }
 
     public void put(int expIdx, String path)  throws UALException
     {
-          String        timepath;
+          String        timepath = null;
+	  Vect1DDouble  time = null; 
           String        ual_debug = System.getenv("ual_debug");
 	  String strNodePath = "/";
 
@@ -693,7 +708,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ------------------------------------------------------------------------------------------------------------ */
   	public void put(int expIdx, String path, String strParentPath)  throws UALException
     {
-          String        timepath;
+          String        timepath = null;
+	  Vect1DDouble  time = null;
+	  
           String        ual_debug = System.getenv("ual_debug");
 	  
 	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
@@ -706,12 +723,14 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ------------------------------------------------------------------------------------------------------------ */
    /* -----------------------------------        PUT IN OBJECT   ------------------------------------------------- */  
    /* ------------------------------------------------------------------------------------------------------------ */
-    	public void putInObject(int expIdx,  String objPath, int i)  throws UALException
+    	public void putInObject(int expIdx, int idObj, String strParentObjPath, int objIdx)  throws UALException
     {
-          String        timepath;
+          String        timepath = null;
+	  Vect1DDouble  time = null;
+	  
           String        ual_debug = System.getenv("ual_debug");
 	  
-	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
+	  String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
     
           <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/>
     }          
@@ -789,7 +808,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
    
     	public void putInObject(int expIdx, int idObj, String strParentObjPath, int objIdx)  throws UALException
     {
-          String        timepath;
+          String        timepath = null;
+	  Vect1DDouble  time = null;
+	  
           String        ual_debug = System.getenv("ual_debug");
 	  
 	 String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
@@ -806,8 +827,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ------------------------------------------------------------------------------------------------------------ */
   	public void put(int expIdx, String path, String strParentPath, int objIdx)   throws UALException
     {
-          String        timepath;
-          String        ual_debug = System.getenv("ual_debug");
+          String        timepath = null;
+	  Vect1DDouble  time = null;
+	  
+          String       ual_debug = System.getenv("ual_debug");
 	  
 	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
     
@@ -2834,11 +2857,10 @@ endif
               UALLowLevel.putObjectInObject(expIdx, idxObjAllTimes, "ALLTIMES", i, idxObj);
             }
             // Store time of the array of structure (hidden variable for the user, but used by the UAL for future get_slice operations)
-            Vect1DDouble time = null;
-	    
+          	    
 	    if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous()) 
 	    {
-                time = ids.time; // Use the general time vector of the IDS to fill time
+                time = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime(); // Use the general time vector of the IDS to fill time
              }
             else 
 	    {   time = new Vect1DDouble(this.<xsl:value-of select = "@name"/>.length);
@@ -3109,7 +3131,7 @@ endif
             Vect1DDouble time = new Vect1DDouble(1);
             if (ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>[0].time == imas.EMPTY_DOUBLE) { // Check the presence of a time vector at the root of the AoS (on the first index only)
               if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous()) {
-                time = ids.time; // Use the general time vector of the IDS to fill time
+                time = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime(); // Use the general time vector of the IDS to fill time
 <!--then  ! For an homogeneous IDS, force the time of the AoS to be equal to the general one
                 for ( i1 = 1; i1< ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i1++){
                   ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>[i1].time = ids.time[i1]
@@ -3151,7 +3173,7 @@ endif
 
 
               if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous()) {
-                time = ids.time; // Use the general time vector of the IDS to fill time
+                time = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime(); // Use the general time vector of the IDS to fill time
               }
               else {
                 System.out.println("ERROR : the time vector of the type 3 array of structure <xsl:value-of select = "translate(@path,'/','.')"/> must be filled");
@@ -3576,7 +3598,7 @@ endif
   
       <!--====================== Regular structure ==================================-->
     <xsl:when test="@data_type='structure'">
-  		this.<xsl:value-of select = "@name"/>.putInObject(expIdx, idObj, <xsl:value-of select = "@name"/>);
+  		this.<xsl:value-of select = "@name"/>.putInObject(expIdx, idObj, "<xsl:value-of select = "../@name"/>", objIdx);
     </xsl:when>
     
        <!-- ====================== AoS type 1  ============================= -->
@@ -3589,7 +3611,7 @@ endif
           if (this.<xsl:value-of select = "@name"/>  != null) {
             int idAoS2Obj = UALLowLevel.beginObject(expIdx, idObj, 0, strObjPath + "<xsl:value-of select="@name"/>", imas.NON_TIMED);
             for (int i = 0; i  &lt; this.<xsl:value-of select="@name"/>.length; i++) {
-              this.<xsl:value-of select = "@name"/>.putInObject(expIdx, idAoS2Obj, "", i);
+              this.<xsl:value-of select = "@name"/>[i].putInObject(expIdx, idAoS2Obj, "", i);
             }
             UALLowLevel.putObjectInObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx, idAoS2Obj);
           }
@@ -3720,16 +3742,16 @@ endif
 <xsl:template name ="printtimevariable">
 <xsl:if test="@type = 'dynamic'">
 <xsl:choose>
-<xsl:when test="contains(@coordinate7,'time')"> ids.<xsl:value-of select="translate(@coordinate7,'/','.')"/></xsl:when>
-<xsl:when test="contains(@coordinate6,'time')"> ids.<xsl:value-of select="translate(@coordinate6,'/','.')"/></xsl:when>
-<xsl:when test="contains(@coordinate5,'time')"> ids.<xsl:value-of select="translate(@coordinate5,'/','.')"/></xsl:when>
-<xsl:when test="contains(@coordinate4,'time')"> ids.<xsl:value-of select="translate(@coordinate4,'/','.')"/></xsl:when>
-<xsl:when test="contains(@coordinate3,'time')"> ids.<xsl:value-of select="translate(@coordinate3,'/','.')"/></xsl:when>
-<xsl:when test="contains(@coordinate2,'time')"> ids.<xsl:value-of select="translate(@coordinate2,'/','.')"/></xsl:when>
-<xsl:when test="contains(@coordinate1,'time')"> ids.<xsl:value-of select="translate(@coordinate1,'/','.')"/></xsl:when>
+<xsl:when test="contains(@coordinate7,'time')"> this.<xsl:value-of select="translate(@coordinate7,'/','.')"/></xsl:when>
+<xsl:when test="contains(@coordinate6,'time')"> this.<xsl:value-of select="translate(@coordinate6,'/','.')"/></xsl:when>
+<xsl:when test="contains(@coordinate5,'time')"> this.<xsl:value-of select="translate(@coordinate5,'/','.')"/></xsl:when>
+<xsl:when test="contains(@coordinate4,'time')"> this.<xsl:value-of select="translate(@coordinate4,'/','.')"/></xsl:when>
+<xsl:when test="contains(@coordinate3,'time')"> this.<xsl:value-of select="translate(@coordinate3,'/','.')"/></xsl:when>
+<xsl:when test="contains(@coordinate2,'time')"> this.<xsl:value-of select="translate(@coordinate2,'/','.')"/></xsl:when>
+<xsl:when test="contains(@coordinate1,'time')"> this.<xsl:value-of select="translate(@coordinate1,'/','.')"/></xsl:when>
 </xsl:choose>
 </xsl:if>
-<xsl:if test="@name='time'">ids.<xsl:value-of select="translate(@path,'/','.')"/></xsl:if>  <!-- If the field itself IS time, then it is its own time coordinate -->
+<xsl:if test="@name='time'">this.time</xsl:if>  <!-- If the field itself IS time, then it is its own time coordinate -->
 </xsl:template>
 
 <xsl:template name ="printIsTimed">
@@ -3747,24 +3769,32 @@ endif
 <!--  ================================================ -->
    		<xsl:choose>
    			<xsl:when test="@type='dynamic'">
-   	if ( !<xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous()) {
-	  	<xsl:choose>
-       				<xsl:when test="(@name='data' and ../field[@name='time']) or (@name='time' and ../field[@name='data']) or @name='data_error_upper' or @name='data_error_lower'">
-       	  timepath = strNodePath + "time" ;
-       	  UALLowLevel.beginIDSPutTimed(expIdx, path, this.time);
-       				</xsl:when>
-       				<xsl:otherwise>
-       	  timepath=&quot;<xsl:call-template name="printtimepath"/>&quot; ;
-          UALLowLevel.beginIDSPutTimed(expIdx, path, <xsl:call-template name="printtimevariable"/>);
-       				</xsl:otherwise>
-       			</xsl:choose>
-			
-   	} else {
-          timepath="time";
-       	  UALLowLevel.beginIDSPutTimed(expIdx, path, ids.time);
-   	}
-   			</xsl:when>
-   		</xsl:choose>
+			<xsl:variable name = "NodeTimePath">
+			<xsl:call-template name="printtimepath"/>
+			</xsl:variable>		
+	<xsl:choose>
+		<xsl:when test="$NodeTimePath='time'">
+	//time coordinate point to IDSRoot/time so no difference between homo- and heterogeneous mode
+	timepath = "time" ;
+	time = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
+	      </xsl:when>
+	      <xsl:otherwise>  
+   	if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous())
+	{
+	  timepath = "time" ;
+	  time = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
+	}
+	else 
+	{
+	  timepath = strNodePath + "time" ;
+	  time = this.time;
+	}
+	 </xsl:otherwise>
+   	</xsl:choose>
+	
+   	</xsl:when>
+   	</xsl:choose>		
+	  UALLowLevel.beginIDSPutTimed(expIdx, path, time);
           UALLowLevel.put<xsl:value-of select="$Function"/>(expIdx,path, strNodePath + "<xsl:value-of select="@name"/>", <xsl:call-template name="printPathoftime"/>, this.<xsl:value-of select="@name"/>, <xsl:call-template name="printIsTimed"/>);
    		<xsl:if test="@type='dynamic'">
           UALLowLevel.endIDSPutTimed(expIdx, path);
@@ -3774,7 +3804,6 @@ endif
             System.out.println("Put ids.<xsl:value-of select="translate(@path,'/','.')"/> " + ids.<xsl:value-of select="translate(@path,'/','.')"/>.toString());
           }
 -->
-		
 </xsl:template>
 
 <xsl:template name ="putScalar">
