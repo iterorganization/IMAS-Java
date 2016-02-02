@@ -590,19 +590,29 @@ public class <xsl:value-of select="@name"/>_IDSBase
         </xsl:otherwise>
    </xsl:choose>
 
+
+   /* ------------------------------------------------------------------------------------------------------------ */
+   /* -----------------------------------       GET       ------------------------------------------------------- */  
+   /* ------------------------------------------------------------------------------------------------------------ */
     public static imas.<xsl:value-of select="@name"/>  get(int expIdx, String path)  throws UALException
     {
-      int           obj1, obj2, obj3, obj4, obj5, obj6, obj7;
-      int           obj_all_times, lentime;
       String        ual_debug = System.getenv("ual_debug");
 
       imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
-      UALLowLevel.beginIDSGet(expIdx, path, false);
-  <!--    <xsl:apply-templates select = "field" mode = "GET_SINGLE">
-        <xsl:with-param name="ids_name" select="@name"/>
-      </xsl:apply-templates>
-   -->   UALLowLevel.endIDSGet(expIdx, path);
+      ids.doGet(expIdx, path);
       return ids;
+    }
+    
+    
+    public void doGet(int expIdx, String path)  throws UALException
+    {
+      String        ual_debug = System.getenv("ual_debug");
+        String strNodePath = "/";
+
+      UALLowLevel.beginIDSGet(expIdx, path, false);
+     <xsl:apply-templates select = "field" mode = "GET_SINGLE"/>
+
+    UALLowLevel.endIDSGet(expIdx, path);
     }
 
  /**
