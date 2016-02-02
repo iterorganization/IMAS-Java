@@ -358,7 +358,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
           delete(expIdx, path);
           UALLowLevel.beginIDSPut(expIdx, path);
-          <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/>
+  <!--        <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> -->
           UALLowLevel.endIDSPut(expIdx, path);
     }
 
@@ -689,14 +689,18 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <!-- ======================================================================================================================================================================= -->
 
   <xsl:template match="field[@data_type='structure']" mode="CLASS">
-
+	  <xsl:variable name="class_name">
+	<xsl:call-template name="BUILD_CLASS_NAME">
+<!--	<xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param > -->
+	</xsl:call-template>
+</xsl:variable>
 /* ------------------------------------------------------------------------------------------------------------------------ */  
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* ---------           CLASS: <xsl:value-of select="translate(@path,'/','_')"/>__structure                      ----------- */
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------------------------------------------------------ */
     
-    public static class  <xsl:value-of select="translate(@path,'/','_')"/>__structure_Class 
+    public static class  <xsl:value-of select="$class_name"/> 
     {
     
  	 <xsl:apply-templates select = "field" mode = "DECLARE"/> 
@@ -715,7 +719,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	  
 	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
     
-          <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/>
+       <!--   <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> -->
     }          
  </xsl:when> 
    <xsl:otherwise>
@@ -732,11 +736,48 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	  
 	  String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
     
-          <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/>
+    <!--      <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/> -->
     }          
      </xsl:otherwise>
    </xsl:choose>
         
+   <xsl:choose>
+    <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
+   /* ------------------------------------------------------------------------------------------------------------ */
+   /* -----------------------------------       GET       ------------------------------------------------------- */  
+   /* ------------------------------------------------------------------------------------------------------------ */
+  	public void get(int expIdx, String path, String strParentPath)   throws UALException
+    {
+          String        timepath = null;
+	  Vect1DDouble  time = null;
+	  
+          String       ual_debug = System.getenv("ual_debug");
+	  
+	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
+    
+          <xsl:apply-templates select = "field" mode = "GET_SINGLE"/>
+    }     
+      </xsl:when>
+        <xsl:otherwise>
+  // I am descendant of AoS 2/3 so all my data are stored by putInObject !!!!
+   /* ------------------------------------------------------------------------------------------------------------ */
+   /* -----------------------------------        GET FROM OBJECT   ------------------------------------------------ */  
+   /* ------------------------------------------------------------------------------------------------------------ */
+   
+    	public void getFromObject(int expIdx, int idObj, String strParentObjPath, int objIdx)  throws UALException
+    {
+          String        timepath = null;
+	  Vect1DDouble  time = null;
+	  
+          String        ual_debug = System.getenv("ual_debug");
+	  
+	 String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
+    
+          <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT"/>
+    }          
+     
+   </xsl:otherwise>
+   </xsl:choose>
    /* ------------------------------------------------------------------------------------------------------------ */
    /* -----------------------------------       DELETE     ------------------------------------------------------- */  
    /* ------------------------------------------------------------------------------------------------------------ */ 
@@ -786,13 +827,17 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <!-- ======================================================================================================================================================================= -->
 
   <xsl:template match="field[@data_type='struct_array']" mode="CLASS">
-
+	  <xsl:variable name="class_name">
+	<xsl:call-template name="BUILD_CLASS_NAME">
+<!--	<xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param > -->
+	</xsl:call-template>
+</xsl:variable>
 /* ------------------------------------------------------------------------------------------------------------------------ */  
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* ---------           CLASS: <xsl:call-template name="COMMENT_FIELD_SHORT"/>                           ----------- */
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------------------------------------------------------ */
-     public static class  <xsl:value-of select="translate(@path,'/','_')"/>__AoS_Class 
+     public static class  <xsl:value-of select="$class_name"/>
 {
      <xsl:apply-templates select = "field" mode = "DECLARE"/>
     
@@ -815,7 +860,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	  
 	 String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
     
-          <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/>
+      <!--    <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/> -->
     }          
     
   
@@ -834,12 +879,49 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	  
 	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
     
-          <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/>
+     <!--     <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> -->
     }          
    </xsl:otherwise>
    </xsl:choose>
    
+   <xsl:choose>
+    <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
+   /* ------------------------------------------------------------------------------------------------------------ */
+   /* -----------------------------------       GET       ------------------------------------------------------- */  
+   /* ------------------------------------------------------------------------------------------------------------ */
+  	public void get(int expIdx, String path, String strParentPath, int nodeIdx)   throws UALException
+    {
+          String        timepath = null;
+	  Vect1DDouble  time = null;
+	  
+          String       ual_debug = System.getenv("ual_debug");
+	  
+	 String strNodePath = strParentPath + nodeIdx + "/<xsl:value-of select="@name"/>/";
     
+          <xsl:apply-templates select = "field" mode = "GET_SINGLE"/>
+    }     
+      </xsl:when>
+        <xsl:otherwise>
+  // I am descendant of AoS 2/3 so all my data are stored by putInObject !!!!
+   /* ------------------------------------------------------------------------------------------------------------ */
+   /* -----------------------------------        GET FROM OBJECT   ------------------------------------------------ */  
+   /* ------------------------------------------------------------------------------------------------------------ */
+   
+    	public void getFromObject(int expIdx, int idObj, String strParentObjPath, int objIdx)  throws UALException
+    {
+          String        timepath = null;
+	  Vect1DDouble  time = null;
+	  
+          String        ual_debug = System.getenv("ual_debug");
+	  
+	 String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
+    
+          <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT"/>
+    }          
+     
+   </xsl:otherwise>
+   </xsl:choose>
+   
    /* ------------------------------------------------------------------------------------------------------------ */
    /* -----------------------------------       DELETE     ------------------------------------------------------- */  
    /* ------------------------------------------------------------------------------------------------------------ */
@@ -1274,17 +1356,19 @@ public class <xsl:value-of select="@name"/>_IDSBase
     </xsl:when>
     <!--                       -->
     <xsl:when test="@data_type='struct_array'">
-   <!--   public static class <xsl:value-of select = "@name"/>Class {
-      <xsl:apply-templates select = "field" mode = "DECLARE"/>
-      }
-   -->   public  <xsl:value-of select="translate(@path,'/','_')"/>__AoS_Class  <xsl:value-of select = "@name"/>[];
+      <xsl:variable name="class_name">
+	<xsl:call-template name="BUILD_CLASS_NAME">
+	</xsl:call-template>
+</xsl:variable>
+	public  <xsl:value-of select="$class_name"/><xsl:text> </xsl:text> <xsl:value-of select = "@name"/>[];
     </xsl:when>
 
     <xsl:when test="@data_type='structure'">
-   <!--   public static class <xsl:value-of select = "@name"/>Class {
-      <xsl:apply-templates select = "field" mode = "DECLARE"/>
-      }
-    -->  public  <xsl:value-of select="translate(@path,'/','_')"/>__structure_Class  <xsl:value-of select = "@name"/> = new  <xsl:value-of select="translate(@path,'/','_')"/>__structure_Class();
+      <xsl:variable name="class_name">
+	<xsl:call-template name="BUILD_CLASS_NAME">
+	</xsl:call-template>
+</xsl:variable>
+    public  <xsl:value-of select="$class_name"/><xsl:text> </xsl:text>  <xsl:value-of select = "@name"/> = new  <xsl:value-of select="$class_name"/>();
     </xsl:when>
 
   </xsl:choose>
@@ -1312,6 +1396,36 @@ public class <xsl:value-of select="@name"/>_IDSBase
 </xsl:template>
 
 
+<!--=================================================================-->
+<!-- function to generate the full subclass name from the field path -->
+<!--           (adds the "Class" keyword for each subclass)          -->
+<!--=================================================================-->
+
+<xsl:template name="BUILD_CLASS_NAME">
+  <xsl:value-of select="translate(@path,'/','_')"/><xsl:text>__</xsl:text>
+     <xsl:choose>
+ 	<!-- =============================== Regular structure  ====================================== -->
+        <xsl:when test="@data_type='structure'">
+        <xsl:text>structure</xsl:text>
+        </xsl:when>
+
+ 	<!-- ===================================== AoS type 1  ========================================= -->
+         <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
+             <xsl:text>AoS1</xsl:text>
+        </xsl:when>
+         <!-- ====================== AoS type 2  ============================= -->
+	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and (not(@type) or @type!='dynamic')">
+             <xsl:text>AoS2</xsl:text>
+      </xsl:when>
+ 	<!-- ===================================== AoS type 3  ========================================= -->
+<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
+               <xsl:text>AoS3</xsl:text>
+      </xsl:when>
+           </xsl:choose>
+                   <xsl:text>_Class</xsl:text>
+</xsl:template>
+
+
 <!--=================================================-->
 <!--      Get field from a time-independent IDS      -->
 <!--=================================================-->
@@ -1320,129 +1434,60 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <xsl:param name="variable_path"/>
 <xsl:param name="mds_path"/>
 <xsl:param name="ids_name"/>
-
+  <xsl:call-template name="COMMENT_FIELD_SHORT"/>
+  	  <xsl:variable name="class_name">
+	<xsl:call-template name="BUILD_CLASS_NAME">
+<!--	<xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param > -->
+	</xsl:call-template>
+</xsl:variable>
       <xsl:choose>
-        <!--========== Regular structures ==========-->
+ 	<!-- =============================== Regular structure  ====================================== -->
         <xsl:when test="@data_type='structure'">
 <!--          <xsl:apply-templates select = "field" mode = "GET_SINGLE"/> -->
-<xsl:choose>
-<xsl:when test="$variable_path">
-<xsl:apply-templates select="field" mode="GET_SINGLE">
-<xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name)"/>
-<xsl:with-param name ="mds_path" select="concat($mds_path,' + &quot;/',@name,'&quot;')"/>
-<xsl:with-param name ="ids_name" select="$ids_name"/>
-</xsl:apply-templates>
-</xsl:when>
-<xsl:otherwise>
-<xsl:apply-templates select="field" mode="GET_SINGLE">
-<xsl:with-param name ="variable_path" select="@name"/>
-<xsl:with-param name ="mds_path" select="concat('&quot;',@name,'&quot;')"/>
-<xsl:with-param name ="ids_name" select="$ids_name"/>
-</xsl:apply-templates>
-</xsl:otherwise>
-</xsl:choose>
+	this.<xsl:value-of select = "@name"/>.get(expIdx, path, strNodePath);
         </xsl:when>
 
-        <!--========== Arrays of structures ==========-->
+ 	<!-- ===================================== AoS type 1  ========================================= -->
          <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
           <!-- Generate the full name of the subclass from the field path -->
-          <xsl:variable name="fulltypepath">
-            <xsl:call-template name="BUILD_TYPENAME">
-              <xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
-            </xsl:call-template>
-          </xsl:variable>
-<!-- Type 1 arrays of structure, with potentially multiple time bases -->
-// Get <xsl:value-of select="@path"/>
-<xsl:choose>
-<xsl:when test="$variable_path">
-        //06/12/2015: avoid large try blocks  try {
-            ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[UALLowLevel.getInt(expIdx,path, <xsl:value-of select="$mds_path"/>+&quot;/<xsl:value-of select="@name"/>/Shape_of&quot;)];
-            for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/> &lt; ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i<xsl:value-of select = "@name"/>++) {
-              ids.<xsl:value-of select="concat($variable_path,'.',@name,'[i',@name,']')"/> = new <xsl:value-of select="$fulltypepath"/>();
-              <xsl:apply-templates select = "field" mode = "GET_SINGLE">
-                <xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name,'[i',@name,']')"/>
-                <xsl:with-param name="mds_path" select="concat($mds_path,' + ','&quot;/',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
-              </xsl:apply-templates>
+
+         try {
+	    int iTimeVectSize = UALLowLevel.getInt(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");
+            this.<xsl:value-of select="@name"/> = new <xsl:value-of select="$class_name"/>[iTimeVectSize];
+            for (int i = 0; i &lt; this.<xsl:value-of select = "@name"/>.length; i++) 
+	    {
+              this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="$class_name"/>();
+	      this.<xsl:value-of select = "@name"/>[i].get(expIdx, path, strNodePath, i);
+
             }
-     //06/12/2015: avoid large try blocks     } catch(Exception exc){ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = null;}
-</xsl:when>
-<xsl:otherwise>
-         //06/12/2015: avoid large try blocks try {
-            ids.<xsl:value-of select="@name"/> = new <xsl:value-of select="$fulltypepath"/>[UALLowLevel.getInt(expIdx,path, &quot;<xsl:value-of select="@name"/>/Shape_of&quot;)];
-//   allocate(ids.<xsl:value-of select = "@name"/>(int0d))
-            for (int i<xsl:value-of select = "@name"/> = 0; i<xsl:value-of select = "@name"/> &lt; ids.<xsl:value-of select = "@name"/>.length; i<xsl:value-of select = "@name"/>++) {
-              ids.<xsl:value-of select="concat(@name,'[i',@name,']')"/> = new <xsl:value-of select="$fulltypepath"/>();
-              <xsl:apply-templates select = "field" mode = "GET_SINGLE">
-                <xsl:with-param name ="variable_path" select="concat(@name,'[i',@name,']')"/>
-                <xsl:with-param name="mds_path" select="concat('&quot;',@name,'/&quot; + Integer.toString(i',@name,'+1).trim()')"/>
-              </xsl:apply-templates>
-            }
-     // 06/12/2015: avoid large try blocks     } catch(Exception exc){ids.<xsl:value-of select="@name"/> = null;}
-</xsl:otherwise>
-</xsl:choose>
-</xsl:when>
+     } catch(Exception exc){this.<xsl:value-of select="@name"/> = null;}
+
+      </xsl:when>
+         <!-- ====================== AoS type 2  ============================= -->
+	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and (not(@type) or @type!='dynamic')">
+	TBDXXX!!!
+      </xsl:when>
+ 	<!-- ===================================== AoS type 3  ========================================= -->
 <xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
-          <!-- Generate the full name of the subclass from the field path -->
-          <xsl:variable name="fulltypepath">
-            <xsl:call-template name="BUILD_TYPENAME">
-              <xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
-            </xsl:call-template>
-          </xsl:variable>
-<!-- Type 3 arrays of structure, with a unique time base -->
-<xsl:choose>
-<xsl:when test="$variable_path">
-// Structure array of type 3 nested below a Type 1 : <xsl:value-of select = "concat($variable_path,'.',@name)"/>
-//          try {
-            obj_all_times = UALLowLevel.getObject(expIdx, path, <xsl:value-of select = "concat($mds_path,' + &quot;/',@name,'&quot;')"/>, imas.TIMED); //read the whole timed block, returns -1 if Aos is empty
-            if (obj_all_times > -1) {
-              lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
-              ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/> = new <xsl:value-of select="$fulltypepath"/>[lentime];
-//            if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select = "concat($variable_path,'.',@name)"/> + lentime =" + lentime");
-              for (int i1 = 0; i1 &lt; lentime; i1++) { // fill every time slice
-                ids.<xsl:value-of select="concat($variable_path,'.',@name,'[i1]')"/> = new <xsl:value-of select="$fulltypepath"/>();
-//                try {
-                  obj1 = UALLowLevel.getObjectFromObject(expIdx, obj_all_times,"ALLTIMES", i1);
-                  //UALLowLevel.getObjectDim(expIdx, obj1, dimObj1);
-                  <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
-                    <xsl:with-param name="level" select="1"/>
-                    <xsl:with-param name="objpath" select="@name"/>
-                    <xsl:with-param name="idxpath" select="concat('ids.',$variable_path,'.',@name,'[i1]')"/>
-                    <xsl:with-param name="timed" select="'yes'"/>
-                  </xsl:apply-templates>
-//              } catch(Exception exc){<xsl:value-of select="concat('ids.',$variable_path,'.',@name,'[i1]')"/> = null;}
+          try {
+            int idObjAllTimes = UALLowLevel.getObject(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", imas.TIMED); //read the whole timed block, returns -1 if Aos is empty
+            if (idObjAllTimes > -1) 
+	    {
+            int iTimeVectSize = UALLowLevel.getObjectDim(expIdx, idObjAllTimes); // the size of this top object is the number of time slices
+             this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="$class_name"/>[iTimeVectSize];
+//          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select="translate(@path,'/','.')"/> + lentime =" + lentime");
+            for (int i = 0; i &lt; iTimeVectSize; i++) {
+               this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="$class_name"/>();
+              try {
+                int idObj = UALLowLevel.getObjectFromObject(expIdx, idObjAllTimes, "ALLTIMES", i);
+    		 this.<xsl:value-of select = "@name"/>[i].getFromObject(expIdx, idObj, "", 0);
+              } catch(Exception exc){ this.<xsl:value-of select = "@name"/>[i] = null;}
             }
-            UALLowLevel.releaseObject(expIdx,obj_all_times);
-            } // close of "if (obj_all_times > -1)"
-//          } catch(Exception exc){<xsl:value-of select="concat('ids.',$variable_path,'.',@name)"/> = null;}
+            UALLowLevel.releaseObject(expIdx, idObjAllTimes);
+            } // close of "if (idObjAllTimes > -1)"
+          } catch(Exception exc){ this.<xsl:value-of select = "@name"/> = null;}
 </xsl:when>
 
-<xsl:otherwise>
-// Structure array of type 3 : <xsl:value-of select = "@path"/>
-//          try {
-            obj_all_times = UALLowLevel.getObject(expIdx, path, "<xsl:value-of select = "@path"/>", imas.TIMED); //read the whole timed block, returns -1 if Aos is empty
-            if (obj_all_times > -1) {
-            lentime = UALLowLevel.getObjectDim(expIdx, obj_all_times); // the size of this top object is the number of time slices
-            ids.<xsl:value-of select = "translate(@path,'/','.')"/> = new <xsl:value-of select="$fulltypepath"/>[lentime];
-//          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select="translate(@path,'/','.')"/> + lentime =" + lentime");
-            for (int i1 = 0; i1 &lt; lentime; i1++) {
-              ids.<xsl:value-of select="concat(translate(@path,'/','.'),'[i1]')"/> = new <xsl:value-of select="$fulltypepath"/>();
-//              try {
-                obj1 = UALLowLevel.getObjectFromObject(expIdx, obj_all_times,"ALLTIMES", i1);
-                //UALLowLevel.getObjectDim(expIdx, obj1, dimObj1);
-                <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
-                  <xsl:with-param name="level" select="1"/>
-                  <xsl:with-param name="objpath" select="@name"/>
-                  <xsl:with-param name="idxpath" select="concat('ids.',translate(@path,'/','.'),'[i1]')"/>
-                  <xsl:with-param name="timed" select="'yes'"/>
-                </xsl:apply-templates>
-//              } catch(Exception exc){<xsl:value-of select="concat('ids.',translate(@path,'/','.'),'[i1]')"/> = null;}
-            }
-            UALLowLevel.releaseObject(expIdx,obj_all_times);
-            } // close of "if (obj_all_times > -1)"
-//          } catch(Exception exc){<xsl:value-of select="concat('ids.',translate(@path,'/','.'))"/> = null;}
-</xsl:otherwise>
-</xsl:choose>
-</xsl:when>
 <!-- old comment from ITM MDS object tobe implemented for AoS type 2
 ! Read non-timed content
 call get_object(idx,path,"<xsl:value-of select = "@path"/>",obj1,0,status); ! read the whole non-timed block
@@ -1957,7 +2002,7 @@ endif
 <!--              Get array of structure             -->
 <!--=================================================-->
 
-<xsl:template match="field" mode = "GET_OBJECT">
+<xsl:template match="field" mode = "GET_OBJECTX">
   <xsl:param name="fulltypepath">
     <xsl:call-template name="BUILD_TYPENAME">
       <xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
@@ -2655,48 +2700,98 @@ endif
   <xsl:param name="currentidxpath"><xsl:value-of select="concat($idxpath,'.',@name)"/></xsl:param>
 
   <!-- Generate the full name of the subclass from the field path -->
-  <xsl:param name="fulltypepath">
-    <xsl:call-template name="BUILD_TYPENAME">
+  <xsl:param name="class_name">
+    <xsl:call-template name="BUILD_CLASS_NAME">
       <xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
     </xsl:call-template>
   </xsl:param>
-
+  <xsl:call-template name="COMMENT_FIELD_SHORT"/>
   <xsl:choose>
+      <!--============================== Regular structure ====================-->
+    <xsl:when test="@data_type='structure'">
+	this.<xsl:value-of select="@name"/>.getFromObject( expIdx,  idObj,  strObjPath, objIdx);
+    </xsl:when>
+    
+         <!-- =========================== AoS type 2  ================================== -->
+	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and (not(@type) or @type!='dynamic')">
+	 try 
+	 { 
+	     int idAoS2Obj = UALLowLevel.getObjectFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select = "@name"/>", objIdx);
+	     int iAoS2Size = UALLowLevel.getObjectDim(expIdx, idAoS2Obj);
+	     if(iAoS2Size > 0)
+	     {
+	        this.<xsl:value-of select="@name"/> = new <xsl:value-of select = "$class_name"/>[iAoS2Size];
+	        for (int i = 0; i &lt; iAoS2Size; i++) {
+                   this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "$class_name"/>();
+		   this.<xsl:value-of select="@name"/>[i].getFromObject(expIdx, idAoS2Obj,  "", i);
+                }
+	    }
+
+	 }  catch(UALException exc) 
+	 {
+//                throw new UALException("Error in get: for <xsl:value-of select = "translate(@path,'/','.')"/> " + exc);
+	 }
+      </xsl:when>
+        <!-- =========================== AoS type 3  ================================== -->
+      	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
+          try {
+            int idObjAllTimes = UALLowLevel.getObjectFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select = "@name"/>", objIdx); //read the whole timed block, returns -1 if Aos is empty
+            if (idObjAllTimes > -1) 
+	    {
+            int iTimeVectSize = UALLowLevel.getObjectDim(expIdx, idObjAllTimes); // the size of this top object is the number of time slices
+	     if (this.<xsl:value-of select="@name"/> != null) { // does this array already exist? (timed and non timed parts can share the same array)
+                 if (iTimeVectSize != 0 &amp;&amp;  this.<xsl:value-of select="@name"/>.length != iTimeVectSize) { // then it must have the right number of elements
+                    throw new UALException("Error in get: array of structures has different number of timed and nontimed elements");
+                 }
+	      }
+	      else
+	      {
+	          this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="$class_name"/>[iTimeVectSize];
+	      }
+//          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select="translate(@path,'/','.')"/> + lentime =" + lentime");
+            for (int i = 0; i &lt; iTimeVectSize; i++) {
+	        try {
+		  if(this.<xsl:value-of select = "@name"/>[i] == null){
+		       this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="$class_name"/>();
+        	    }
+                int idObjAoS3 = UALLowLevel.getObjectFromObject(expIdx, idObjAllTimes, "ALLTIMES", i);
+    		 this.<xsl:value-of select = "@name"/>[i].getFromObject(expIdx, idObjAoS3, "", 0);
+              } catch(Exception exc){ this.<xsl:value-of select = "@name"/>[i] = null;}
+            }
+            } 
+          } catch(Exception exc){ this.<xsl:value-of select = "@name"/> = null;}
+	</xsl:when>
+      
     <!--========== Arrays of structures ==========-->
     <xsl:when test="@data_type='struct_array'">
     <!-- -->
     <xsl:choose>
       <xsl:when test="$timed = 'yes'">
       <!-- We are scanning the children of a Type 3 AoS, so we extract the child object at index 0 of the parent object -->
-          //try { 06/12/2015: avoid large try blocks
-            obj<xsl:value-of select="$level + 1"/> = UALLowLevel.getObjectFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select = "$currentobjpath"/>", 0);
-//            int obj<xsl:value-of select="$level + 1"/> = UALLowLevel.getObjectFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select = "$currentobjpath"/>", 0);
+          try { 
+            obj1 = UALLowLevel.getObjectFromObject(expIdx, obj, "<xsl:value-of select = "$currentobjpath"/>", 0);
+//            int obj1= UALLowLevel.getObjectFromObject(expIdx, obj, "<xsl:value-of select = "$currentobjpath"/>", 0);
       </xsl:when>
       <xsl:otherwise>
 <!-- Otherwise we assume it is a Type 2 AoS, so we extract the child object at index iobject -->
           //try { 06/12/2015: avoid large try blocks
-            obj<xsl:value-of select="$level + 1"/> = UALLowLevel.getObjectFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select = "$currentobjpath"/>", i<xsl:value-of select="$level"/>);
+            obj1 = UALLowLevel.getObjectFromObject(expIdx, obj, "<xsl:value-of select = "$currentobjpath"/>", i);
       </xsl:otherwise>
     </xsl:choose>
-            if (<xsl:value-of select="$currentidxpath"/> != null) { // does this array already exist? (timed and non timed parts can share the same array)
-              if (UALLowLevel.getObjectDim(expIdx,obj<xsl:value-of select="$level + 1"/>) != 0 &amp;&amp; <xsl:value-of select="$currentidxpath"/>.length != UALLowLevel.getObjectDim(expIdx,obj<xsl:value-of select="$level + 1"/>)) { // then it must have the right number of elements
+            if (this.<xsl:value-of select="@name"/> != null) { // does this array already exist? (timed and non timed parts can share the same array)
+              if (UALLowLevel.getObjectDim(expIdx,obj1) != 0 &amp;&amp;  this.<xsl:value-of select="@name"/>.length != UALLowLevel.getObjectDim(expIdx,obj1)) { // then it must have the right number of elements
                 throw new UALException("Error in get: array of structures has different number of timed and nontimed elements");
               }
             } else { // else allocate it
-              if (UALLowLevel.getObjectDim(expIdx,obj<xsl:value-of select="$level + 1"/>) != 0) // empty arrays of struct must remain set to null
-                <xsl:value-of select="$currentidxpath"/> = new <xsl:value-of select = "$fulltypepath"/>[UALLowLevel.getObjectDim(expIdx,obj<xsl:value-of select="$level + 1"/>)];
+              if (UALLowLevel.getObjectDim(expIdx,obj1) != 0) // empty arrays of struct must remain set to null
+                this.<xsl:value-of select="@name"/> = new <xsl:value-of select = "$class_name"/>[UALLowLevel.getObjectDim(expIdx,obj1)];
 
-              for (int i<xsl:value-of select="$level + 1"/> = 0; i<xsl:value-of select="$level + 1"/> &lt; UALLowLevel.getObjectDim(expIdx,obj<xsl:value-of select="$level + 1"/>); i<xsl:value-of select="$level + 1"/>++) {
-                <xsl:value-of select="$currentidxpath"/>[i<xsl:value-of select="$level + 1"/>] = new <xsl:value-of select = "$fulltypepath"/>();
+              for (int i1 = 0; i1 &lt; UALLowLevel.getObjectDim(expIdx,obj1); i1++) {
+                this.<xsl:value-of select="@name"/>[i1] = new <xsl:value-of select = "$class_name"/>();
               }
             }
-            for (int i<xsl:value-of select="$level + 1"/> = 0; i<xsl:value-of select="$level + 1"/> &lt; UALLowLevel.getObjectDim(expIdx,obj<xsl:value-of select="$level + 1"/>); i<xsl:value-of select="$level + 1"/>++) {
-              <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
-                <xsl:with-param name="level"><xsl:value-of select="$level + 1"/></xsl:with-param>
-                <xsl:with-param name="objpath"><xsl:value-of select="@name"/></xsl:with-param>
-                <xsl:with-param name="idxpath"><xsl:value-of select="$currentidxpath"/>[i<xsl:value-of select="$level + 1"/>]</xsl:with-param>
-                <xsl:with-param name="timed"><xsl:value-of select="'no'"/></xsl:with-param>
-              </xsl:apply-templates>
+            for (int i1 = 0; i1 &lt; UALLowLevel.getObjectDim(expIdx,obj1); i1++) {
+		this.<xsl:value-of select="@name"/>[i1].getFromObject();
             }
 
 // 06/12/2015: avoid large try blocks         } catch(UALException exc) {
@@ -2705,15 +2800,7 @@ endif
   <!--    </xsl:if> -->
     </xsl:when>
 
-    <!--========== Regular structure ==========-->
-    <xsl:when test="@data_type='structure'">
-      <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
-        <xsl:with-param name="level"><xsl:value-of select="$level"/></xsl:with-param>
-        <xsl:with-param name="objpath"><xsl:value-of select="$currentobjpath"/></xsl:with-param>
-        <xsl:with-param name="idxpath"><xsl:value-of select="$currentidxpath"/></xsl:with-param>
-        <xsl:with-param name="timed"><xsl:value-of select="$timed"/></xsl:with-param>
-      </xsl:apply-templates>
-    </xsl:when>
+
 
     <xsl:otherwise>
       <!--========== select either timed or non-timed fields ==========-->
@@ -2721,83 +2808,83 @@ endif
         <xsl:choose>
           <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">
 <!--xsl//GABRIELE MARCH 2011            try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getStringFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-<!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getStringFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
+<!--xsl//            } catch(Exception exc){  this.<xsl:value-of select="@name"/> = null;} -->
           </xsl:when>
           <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
-<!--xsl //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = imas.EMPTY_INT;} -->
+              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getIntFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
+<!--xsl //            } catch(Exception exc){  this.<xsl:value-of select="@name"/> = imas.EMPTY_INT;} -->
           </xsl:when>
           <xsl:when test="@name='xs:boolean'">
 <!--xsl//GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getBooleanFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getBooleanFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){} -->
           </xsl:when>
           <xsl:when test="@name='xs:double'">
 <!--xsl//GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getDoubleFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = imas.EMPTY_DOUBLE;} -->
           </xsl:when>
           <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getDoubleFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = imas.EMPTY_DOUBLE;} -->
           </xsl:when>
 
           <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect1DDoubleFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
           </xsl:when>
           <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DStringFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect1DStringFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
           </xsl:when>
 
           <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect1DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect1DIntFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl //            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
           </xsl:when>
 
           <xsl:when test="@data_type='FLT_2D'">
 <!--xsl//GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect2DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect2DDoubleFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
         </xsl:when>
           <xsl:when test="@data_type='INT_2D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect2DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect2DIntFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
         </xsl:when>
 
           <xsl:when test="@data_type='FLT_3D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect3DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect3DDoubleFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
         </xsl:when>
         <xsl:when test="@data_type='INT_3D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect3DIntFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect3DIntFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;} -->
         </xsl:when>
 
           <xsl:when test="@data_type='FLT_4D'">
 <!--xsl //GABRIELE MARCH 2011              try {-->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect4DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect4DDoubleFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}-->
         </xsl:when>
           <xsl:when test="@data_type='FLT_5D'">
 <!--xsl//GABRIELE MARCH 2011              try {-->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect5DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect5DDoubleFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}-->
         </xsl:when>
 
           <xsl:when test="@data_type='FLT_6D'">
 <!--xsl//GABRIELE MARCH 2011              try {-->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getVect6DDoubleFromObject(expIdx, obj<xsl:value-of select="$level"/>, "<xsl:value-of select="$currentobjpath"/>", <xsl:choose><xsl:when test="$timed='yes'">0</xsl:when><xsl:otherwise>i<xsl:value-of select="$level"/></xsl:otherwise></xsl:choose>);
+              this.<xsl:value-of select="@name"/> = UALLowLevel.getVect6DDoubleFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){  <xsl:value-of select="$currentidxpath"/> = null;}-->
         </xsl:when>
 
@@ -3871,18 +3958,9 @@ endif
 <xsl:param name="mds_path" />
 <xsl:param name="Function" />
 <xsl:param name="Exception" />
-	<xsl:choose>
-		<xsl:when test="$variable_path">
           try {
-            ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = UALLowLevel.get<xsl:value-of select="$Function"/>(expIdx, path, <xsl:value-of select="$mds_path"/> + &quot;/<xsl:value-of select="@name"/>&quot;);
-          } catch(Exception exc){ids.<xsl:value-of select="concat($variable_path,'.',@name)"/> = <xsl:value-of select="$Exception"/>;}
-		</xsl:when>
-		<xsl:otherwise>
-          try {
-            ids.<xsl:value-of select="@name"/> = UALLowLevel.get<xsl:value-of select="$Function"/>(expIdx, path, &quot;<xsl:value-of select="@name"/>&quot;);
-          } catch(Exception exc){ids.<xsl:value-of select="@name"/> = <xsl:value-of select="$Exception"/>;}
-		</xsl:otherwise>
-	</xsl:choose>
+            this.<xsl:value-of select="@name"/> = UALLowLevel.get<xsl:value-of select="$Function"/>(expIdx, path, strNodePath + &quot;/<xsl:value-of select="@name"/>&quot;);
+          } catch(Exception exc){this.<xsl:value-of select="@name"/> = <xsl:value-of select="$Exception"/>;}
 </xsl:template>
 
 <xsl:template name ="getVariableSlice">
