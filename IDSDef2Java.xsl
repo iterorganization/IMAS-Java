@@ -405,19 +405,34 @@ public class <xsl:value-of select="@name"/>_IDSBase
  **/
     public static void putSlice(int expIdx, String path, imas.<xsl:value-of select="@name"/> ids) throws UALException
     {
-          String        timepath;
-          String        ual_debug = System.getenv("ual_debug");
 
-    	  if (<xsl:value-of select="@name"/>_IDSBase.isHomogeneous() ) {
+    	  if (ids.ids_properties.homogeneous_time == 0) {
             System.out.println("ERROR : the PUT_SLICE routine works only for homogeneous time IDS");
             return;
           }
-	  
-          timepath="time";
+
+	  	
+	  <xsl:value-of select="@name"/>_IDSBase.setIdsTime(ids.time);
+	
           UALLowLevel.beginIDSPutSlice(expIdx, path);
-          <xsl:apply-templates select = "field" mode = "PUT_SLICE"/>
+	  ids.putSlice(expIdx, path);
           UALLowLevel.endIDSPutSlice(expIdx, path);
     }
+
+
+    public void putSlice(int expIdx, String path) throws UALException
+    {
+          String        timepath;
+	  String strNodePath = "";
+	  Vect1DDouble  idsGlobalTime = this.time;
+	  
+          String        ual_debug = System.getenv("ual_debug");
+
+  	  
+          timepath="time";
+          <xsl:apply-templates select = "field" mode = "PUT_SLICE"/>
+    }
+
 
 
     <xsl:choose>
@@ -841,7 +856,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
   	public void putSlice(int expIdx, String path, String strParentPath)  throws UALException
     {
           String        timepath = null;
-	  Vect1DDouble  time = null;
+	  Vect1DDouble  idsGlobalTime = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
 	  
           String        ual_debug = System.getenv("ual_debug");
 	  
@@ -1023,10 +1038,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
        /* ____________________________________________________________________________________________________________ */
    /*_________________________________       PUT  SLICE    _________________________________ */  
    /* ____________________________________________________________________________________________________________  */
-  	public void putSlice(int expIdx, String path, String strParentPath)  throws UALException
+  	public void putSlice(int expIdx, String path, String strParentPath, int nodeIdx)  throws UALException
     {
           String        timepath = null;
-	  Vect1DDouble  time = null;
+	Vect1DDouble  idsGlobalTime = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
 	  
           String        ual_debug = System.getenv("ual_debug");
 	  
@@ -3272,36 +3287,33 @@ endif
 <xsl:param name="variable_path"/>
 <xsl:param name="mds_path"/>
   <xsl:call-template name="COMMENT_FIELD_SHORT"/>
+
 <xsl:if test="@type ='dynamic' or @data_type='structure' or @data_type='struct_array'"> <!-- This skips the routine for non timed fields -->
       <xsl:choose>
         <!--========== Regular structures ==========-->
         <xsl:when test="@data_type='structure'">
-	this.<xsl:value-of select = "@name"/>.putSlice();
+	this.<xsl:value-of select = "@name"/>.putSlice(expIdx, path, strNodePath);
         </xsl:when>
 
         <!-- ========================================================== AoS type 1  =================================================================================== -->
         <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
 	
           if (this.<xsl:value-of select = "@name"/> != null) {
-            UALLowLevel.putInt(expIdx,path, <xsl:value-of select="$mds_path"/>+&quot;/<xsl:value-of select="@name"/>/Shape_of&quot;,
-       		this.<xsl:value-of select="@name"/>.length);
+            UALLowLevel.putInt(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of", this.<xsl:value-of select="@name"/>.length);
              for (int i = 0; i&lt; this.<xsl:value-of select = "@name"/>.length; i++){
-      		this.<xsl:value-of select = "@name"/>[i].putSlice();
+      		this.<xsl:value-of select = "@name"/>[i].putSlice(expIdx, path, strNodePath, i);
              }
           }
 		
         </xsl:when>
 	<!-- ========================================================== AoS type 2  =================================================================================== -->
 		<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and (not(@type) or @type!='dynamic')">
-		TBD
+	///	TBD
         </xsl:when>
 	<!-- ========================================================== AoS type 3  =================================================================================== -->
 	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
-<!-- Type 3 arrays of structure, with a unique time base -->
-
-	  // Structure array of type 3 nested below a Type 1 : <xsl:value-of select = "concat($variable_path,'.',@name)"/>
           if (this.<xsl:value-of select = "@name"/> != null) {
-            int obj_single_time = UALLowLevel.beginObject(expIdx,-1,0,path + <xsl:value-of select = "concat('&quot;','/',substring($mds_path,2),' + &quot;/',@name,'&quot;')"/>, imas.TIMED);
+            int obj_single_time = UALLowLevel.beginObject(expIdx, -1, 0, path + strNodePath + "<xsl:value-of select = "@name"/>", imas.TIMED);
             int obj1 = UALLowLevel.beginObject(expIdx,obj_single_time,0,"ALLTIMES", imas.TIMED);
         	this.<xsl:value-of select = "@name"/>.putInObject();
             UALLowLevel.putObjectInObject(expIdx,obj_single_time,"ALLTIMES", 0, obj1);
@@ -3310,14 +3322,9 @@ endif
             // Store time of the array of structure (hidden variable for the user, but used by the UAL for future get_slice operations)
             // A temporary "time" vector is filled then put as a regular variable (outside of the object) as AoS%time
             Vect1DDouble time = new Vect1DDouble(1);
-            if (ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>[0].time == imas.EMPTY_DOUBLE) { // Check the presence of a time vector at the root of the AoS (on the first index only)
+            if (this.<xsl:value-of select = "@name"/>[0].time == imas.EMPTY_DOUBLE) { // Check the presence of a time vector at the root of the AoS (on the first index only)
               if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous()) {
                 time = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime(); // Use the general time vector of the IDS to fill time
-<!--then  ! For an homogeneous IDS, force the time of the AoS to be equal to the general one
-                for ( i1 = 1; i1< ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>.length; i1++){
-                  ids.<xsl:value-of select = "concat($variable_path,'.',@name)"/>[i1].time = ids.time[i1]
-                  time(
-                } -->
               }
               else {
                 System.out.println("ERROR : the time vector of the type 3 array of structure <xsl:value-of select = "translate(@path,'/','.')"/> must be filled");
@@ -3329,155 +3336,129 @@ endif
                 time.setElementAt(i1,this.<xsl:value-of select = "@name"/>[i1].time);
               }
             }
-            timepath=<xsl:value-of select="concat($mds_path,' + &quot;/',@name,'/time')"/>"; // Start to put time
+	    timepath = strNodePath + "<xsl:value-of select = "@name"/>/time";
             UALLowLevel.putDoubleSlice(expIdx, path, timepath.trim(), timepath.trim(), time.getElementAt(0), time.getElementAt(0));
             //if (ual_debug.equals("yes")) System.out.println("Put " + <xsl:value-of select="concat($mds_path,' + &quot;/',@name,'/time')"/>");
           }
 	</xsl:when>
 
-        <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">
-<!--      UALLowLevel.putStringSlice(expIdx, path, "<xsl:value-of select = "@path"/>", ids.<xsl:value-of select = "translate(@path,'/','.')"/>, ids.time); -->
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">StringSlice</xsl:with-param>
-	</xsl:call-template>
-        </xsl:when>
-
-        <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/>      		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">IntSlice</xsl:with-param>
-	</xsl:call-template>
-        </xsl:when>
-
-        <xsl:when test="@name='xs:boolean'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">BooleanSlice</xsl:with-param>
-	</xsl:call-template>Slice
-        </xsl:when>
-
-        <xsl:when test="@name='xs:double'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/>
-	<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">DoubleSlice</xsl:with-param>
-	</xsl:call-template>
-	</xsl:when>
-
-        <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">DoubleSlice</xsl:with-param>
-	</xsl:call-template>
-	</xsl:when>
-
+  <xsl:when test="(@data_type='str_type' or @data_type='STR_0D'
+	                 or @data_type='int_type' or @data_type='INT_0D'
+			 or @data_type='flt_type' or @data_type='FLT_0D') and not(ancestor::field[@data_type='struct_array' and @maxoccur='unbounded']) ">
+		         <xsl:message terminate="no"> Error! Scalar cannot be of DYNAMIC type: <xsl:value-of select="ancestor::IDS/@name"/>:<xsl:value-of select="@path"/>:<xsl:value-of select="@data_type"/>:<xsl:value-of select="@type"/> </xsl:message>
+  </xsl:when>
+  
 	<xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect1DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice">
+	<xsl:with-param name="Function">DoubleSlice</xsl:with-param>
 	</xsl:call-template>
 	</xsl:when>
 
         <xsl:when test="@name='vecdbl_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect1DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">DoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect1DIntSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice">
+	<xsl:with-param name="Function">IntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
- 	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect1DStringSlice</xsl:with-param>
+ 	<xsl:call-template name="putdynamicSlice">
+	<xsl:with-param name="Function">StringSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_2D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect2DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect1DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='INT_2D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect2DIntSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect1DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='matdbl_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect2DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice">
+	<xsl:with-param name="Function">Vect1DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_3D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect3DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice">
+	<xsl:with-param name="Function">Vect2DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='INT_3D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect3DIntSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice">
+	<xsl:with-param name="Function">Vect2DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array3ddbl_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect3DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect2DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_4D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect4DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect3DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array4dint_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect4DIntSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect3DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array4ddbl_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect4DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice">
+	<xsl:with-param name="Function">Vect3DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_5D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect5DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect4DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array5dint_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect5DIntSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect4DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array5ddbl_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect5DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect4DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_6D'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect6DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect5DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array6dint_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect6DIntSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect5DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array6ddbl_type'">
-	<xsl:call-template name="putdynamicSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> 		<xsl:with-param name="mds_path" select="$mds_path"/>
-	<xsl:with-param name="Function">Vect6DDoubleSlice</xsl:with-param>
+	<xsl:call-template name="putdynamicSlice"> 
+	<xsl:with-param name="Function">Vect5DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
 
@@ -3959,7 +3940,7 @@ endif
 
 <xsl:template name ="putdynamicSlice">
 <xsl:param name="Function" />
-          UALLowLevel.put<xsl:value-of select="$Function"/>(expIdx,path, "<xsl:value-of select="@path"/>", <xsl:call-template name="printPathoftime"/>, this.<xsl:value-of select="@name"/>, ids.time.getElementAt(0));
+          UALLowLevel.put<xsl:value-of select="$Function"/>(expIdx,path, strNodePath + "<xsl:value-of select="@name"/>", "time", this.<xsl:value-of select="@name"/>.getElementAt(0), idsGlobalTime.getElementAt(0));
 </xsl:template>
 
 
