@@ -16,7 +16,7 @@ gen : IDSDef2Java.xsl
 	 java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl 
 
 comp: 
-	javac ./src/imasjava/*.java -sourcepath ./src  -d ./build 
+	javac -Xmaxerrs 10 ./src/imasjava/*.java -sourcepath ./src  -d ./build 
 
 install: all
 	mkdir -p $(INSTALL)/jar
@@ -34,7 +34,7 @@ imas.jar : $(SOURCES) imasjava/imas.java
 #	javac $(SOURCES)
 #	jar cf imas.jar $(CLASSES)
 	mkdir -p ./build/
-	javac ./src/imasjava/*.java -sourcepath ./src  -d ./build
+	javac -Xmaxerrs 10 ./src/imasjava/*.java -sourcepath ./src  -d ./build
 	mkdir -p ./lib/
 	jar cvf ./lib/imas.jar -C ./build . 
 
