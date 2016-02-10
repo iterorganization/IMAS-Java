@@ -936,7 +936,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	  
           String        ual_debug = System.getenv("ual_debug");
 	  
-	 String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>";
+	 String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
     
           <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/> 
     }          
@@ -1143,9 +1143,13 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
         <!--========== Arrays of structures ==========-->
 <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
-    for (int i = 0; i &lt;<xsl:value-of select = "@maxoccur"/>; i++){
+if(this.<xsl:value-of select = "@name"/> != null)
+{
+    int iArraySize = this.<xsl:value-of select = "@name"/>.length;
+    for (int i = 0; i &lt; iArraySize; i++){
        this.<xsl:value-of select = "@name"/>[i].delete(expIdx,path,strNodePath, i);
       }
+}
     
 </xsl:when>
 <xsl:otherwise>
@@ -1505,7 +1509,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	{
 	
 	}
-	public  <xsl:value-of select="$class_name"/><xsl:text> </xsl:text> <xsl:value-of select = "@name"/>[];
+	public  <xsl:value-of select="@name"/>Class <xsl:value-of select = "@name"/>[];
     </xsl:when>
 
     <xsl:when test="@data_type='structure'">
@@ -1517,7 +1521,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	{
 	
 	}
-    public  <xsl:value-of select="$class_name"/><xsl:text> </xsl:text>  <xsl:value-of select = "@name"/> = new  <xsl:value-of select="$class_name"/>();
+    public  <xsl:value-of select="@name"/>Class  <xsl:value-of select = "@name"/> = new   <xsl:value-of select="@name"/>Class();
     </xsl:when>
 
   </xsl:choose>
@@ -1601,11 +1605,11 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
          try {
 	    int iTimeVectSize = UALLowLevel.getInt(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");
-            this.<xsl:value-of select="@name"/> = new <xsl:value-of select="$class_name"/>[iTimeVectSize];
+            this.<xsl:value-of select="@name"/> = new <xsl:value-of select="@name"/>Class[iTimeVectSize];
             for (int i = 0; i &lt; this.<xsl:value-of select = "@name"/>.length; i++) 
 	    {
-              this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="$class_name"/>();
-	      this.<xsl:value-of select = "@name"/>[i].get(expIdx, path, strNodePath, i);
+              this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="@name"/>Class();
+	      this.<xsl:value-of select = "@name"/>[i].get(expIdx, path, strNodePath, i + 1);
 
             }
      } catch(Exception exc){this.<xsl:value-of select="@name"/> = null;}
@@ -1651,10 +1655,10 @@ endif
             if (idObjAllTimes > -1) 
 	    {
             int iTimeVectSize = UALLowLevel.getObjectDim(expIdx, idObjAllTimes); // the size of this top object is the number of time slices
-             this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="$class_name"/>[iTimeVectSize];
+             this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="@name"/>Class[iTimeVectSize];
 //          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select="translate(@path,'/','.')"/> + lentime =" + lentime");
             for (int i = 0; i &lt; iTimeVectSize; i++) {
-               this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="$class_name"/>();
+               this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="@name"/>Class();
               try {
                 int idObj = UALLowLevel.getObjectFromObject(expIdx, idObjAllTimes, "ALLTIMES", i);
     		 this.<xsl:value-of select = "@name"/>[i].getFromObject(expIdx, idObj, "", 0);
@@ -1846,11 +1850,11 @@ endif
          <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
 	try {
 	  int iVectSize = UALLowLevel.getInt(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");
-            this.<xsl:value-of select="@name"/> = new <xsl:value-of select="$class_name"/>[iVectSize];
+            this.<xsl:value-of select="@name"/> = new <xsl:value-of select="@name"/>Class[iVectSize];
             for (int i = 0; i &lt; this.<xsl:value-of select = "@name"/>.length; i++)
 	    {
-              this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select="$class_name"/>();
-	      this.<xsl:value-of select="@name"/>[i].getSlice(expIdx, path, strNodePath, time, interpolMode, i);
+              this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select="@name"/>Class();
+	      this.<xsl:value-of select="@name"/>[i].getSlice(expIdx, path, strNodePath, time, interpolMode, i + 1);
             }
          } 
 	 catch(Exception exc)
@@ -1863,12 +1867,12 @@ endif
 	         	<!-- ===================================== AoS type 3  ========================================= -->
 	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
           try {
-             int idObjSingleTime = UALLowLevel.getObjectSlice(expIdx, path, strNodePath + <xsl:value-of select = "@name"/>, time); //read the whole timed block containing a single slice
+             int idObjSingleTime = UALLowLevel.getObjectSlice(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", time); //read the whole timed block containing a single slice
           try {
               int idAoS3Obj = UALLowLevel.getObjectFromObject(expIdx, idObjSingleTime, "ALLTIMES", 0);
 
-              this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="$class_name"/>[1];
-              this.<xsl:value-of select = "@name"/>[0] = new <xsl:value-of select="$class_name"/>();
+              this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="@name"/>Class[1];
+              this.<xsl:value-of select = "@name"/>[0] = new <xsl:value-of select="@name"/>Class();
 
              this.<xsl:value-of select="@name"/>[0].getFromObject(expIdx, idAoS3Obj, "", 0);
           } catch(Exception exc)
@@ -2123,9 +2127,9 @@ endif
 	     int iAoS2Size = UALLowLevel.getObjectDim(expIdx, idAoS2Obj);
 	     if(iAoS2Size > 0)
 	     {
-	        this.<xsl:value-of select="@name"/> = new <xsl:value-of select = "$class_name"/>[iAoS2Size];
+	        this.<xsl:value-of select="@name"/> = new <xsl:value-of select = "@name"/>Class[iAoS2Size];
 	        for (int i = 0; i &lt; iAoS2Size; i++) {
-                   this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "$class_name"/>();
+                   this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "@name"/>Class();
 		   this.<xsl:value-of select="@name"/>[i].getFromObject(expIdx, idAoS2Obj,  "", i);
                 }
 	    }
@@ -2149,13 +2153,13 @@ endif
 	      }
 	      else
 	      {
-	          this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="$class_name"/>[iTimeVectSize];
+	          this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="@name"/>Class[iTimeVectSize];
 	      }
 //          if (ual_debug.equals("yes")) System.out.printlln("Get ids%<xsl:value-of select="translate(@path,'/','.')"/> + lentime =" + lentime");
             for (int i = 0; i &lt; iTimeVectSize; i++) {
 	        try {
 		  if(this.<xsl:value-of select = "@name"/>[i] == null){
-		       this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="$class_name"/>();
+		       this.<xsl:value-of select = "@name"/>[i] = new <xsl:value-of select="@name"/>Class();
         	    }
                 int idObjAoS3 = UALLowLevel.getObjectFromObject(expIdx, idObjAllTimes, "ALLTIMES", i);
     		 this.<xsl:value-of select = "@name"/>[i].getFromObject(expIdx, idObjAoS3, "", 0);
@@ -2293,7 +2297,7 @@ endif
 	  {
             UALLowLevel.putInt(expIdx,path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of", this.<xsl:value-of select="@name"/>.length);
             for (int i = 0; i &lt;this.<xsl:value-of select = "@name"/>.length;  i++){
- 		this.<xsl:value-of select="@name"/>[i].put<xsl:value-of select = "$NonTimed"/>(expIdx, path, strNodePath, i);
+ 		this.<xsl:value-of select="@name"/>[i].put<xsl:value-of select = "$NonTimed"/>(expIdx, path, strNodePath, i + 1);
             }
           }
 	</xsl:when>
@@ -2301,7 +2305,7 @@ endif
 	<!-- ====================== AoS type 2  ============================= -->
 	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and (not(@type) or @type!='dynamic')">
 	  if (this.<xsl:value-of select = "@name"/> != null) {
-          int idxObj =UALLowLevel.beginObject(expIdx, -1, 0, path + strNodePath + "<xsl:value-of select = "@name"/>", imas.NON_TIMED);
+          int idxObj =UALLowLevel.beginObject(expIdx, -1, 0, path + "/" + strNodePath + "<xsl:value-of select = "@name"/>", imas.NON_TIMED);
           if (this.<xsl:value-of select = "@name"/> != null) {
             for (int i = 0; i &lt; this.<xsl:value-of select = "@name"/>.length; i++) {
         		this.<xsl:value-of select = "@name"/>[i].putInObject(expIdx, idxObj, "", i);
@@ -2315,7 +2319,7 @@ endif
  	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
 
           if (this.<xsl:value-of select = "@name"/> != null) {
-            int idObjAllTimes = UALLowLevel.beginObject(expIdx,-1,0,path + strNodePath + "<xsl:value-of select = "@name"/>", imas.TIMED_CLEAR);
+            int idObjAllTimes = UALLowLevel.beginObject(expIdx,-1,0,path + "/" + strNodePath + "<xsl:value-of select = "@name"/>", imas.TIMED_CLEAR);
             for (int i = 0; i &lt; this.<xsl:value-of select = "@name"/>.length; i++) 
 	    {
                int idAoS3Obj = UALLowLevel.beginObject(expIdx, idObjAllTimes, i, "ALLTIMES", imas.TIMED);
@@ -2347,7 +2351,7 @@ endif
             UALLowLevel.putVect1DDouble(expIdx, path, timepath.trim(), timepath.trim(), time, true);
             UALLowLevel.endIDSPutTimed(expIdx, path);
             //if (ual_debug.equals("yes")) System.out.println("Put <xsl:call-template name="printtimepath"/> ");
-            UALLowLevel.putObject(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", idObjAllTimes , 0);
+            UALLowLevel.putObject(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", idObjAllTimes , 1);
           }
 
 	</xsl:when>
@@ -2537,7 +2541,7 @@ endif
           if (this.<xsl:value-of select = "@name"/> != null) {
             UALLowLevel.putInt(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of", this.<xsl:value-of select="@name"/>.length);
              for (int i = 0; i&lt; this.<xsl:value-of select = "@name"/>.length; i++){
-      		this.<xsl:value-of select = "@name"/>[i].putSlice(expIdx, path, strNodePath, i);
+      		this.<xsl:value-of select = "@name"/>[i].putSlice(expIdx, path, strNodePath, i + 1);
              }
           }
 		
@@ -2553,7 +2557,7 @@ endif
 	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
           if (this.<xsl:value-of select = "@name"/> != null &amp;&amp; this.<xsl:value-of select = "@name"/>[0] != null) 
 	  {
-            int idObjSingleTime = UALLowLevel.beginObject(expIdx, -1, 0, path + strNodePath + "<xsl:value-of select = "@name"/>", imas.TIMED);
+            int idObjSingleTime = UALLowLevel.beginObject(expIdx, -1, 0, path + "/" + strNodePath + "<xsl:value-of select = "@name"/>", imas.TIMED);
             int idAoS3Obj = UALLowLevel.beginObject(expIdx, idObjSingleTime, 0, "ALLTIMES", imas.TIMED);
              this.<xsl:value-of select = "@name"/>[0].putInObject(expIdx, idAoS3Obj, "", 0);
 	     
@@ -2839,7 +2843,7 @@ endif
   
       <!--====================== Regular structure ==================================-->
     <xsl:when test="@data_type='structure'">
-  		this.<xsl:value-of select = "@name"/>.putInObject(expIdx, idObj, "<xsl:value-of select = "../@name"/>", objIdx);
+  		this.<xsl:value-of select = "@name"/>.putInObject(expIdx, idObj, strObjPath, objIdx);
     </xsl:when>
     
        <!-- ====================== AoS type 1  ============================= -->
@@ -3059,7 +3063,10 @@ endif
 
 <xsl:template name ="putdynamicSlice">
 <xsl:param name="Function" />
+	if(this.<xsl:value-of select="@name"/> != null)
+	{
           UALLowLevel.put<xsl:value-of select="$Function"/>(expIdx,path, strNodePath + "<xsl:value-of select="@name"/>", "time", this.<xsl:value-of select="@name"/>.getElementAt(0), idsGlobalTime.getElementAt(0));
+	}
 </xsl:template>
 
 
