@@ -719,15 +719,13 @@ public class <xsl:value-of select="@name"/>_IDSBase
   <xsl:template match="field[@data_type='structure']" mode="CLASS">
 	  <xsl:variable name="class_name">
 	<xsl:call-template name="BUILD_CLASS_NAME">
-<!--	<xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param > -->
 	</xsl:call-template>
 </xsl:variable>
 /* ------------------------------------------------------------------------------------------------------------------------ */  
 /* ------------------------------------------------------------------------------------------------------------------------ */
-/* ---------           CLASS: <xsl:value-of select="translate(@path,'/','_')"/>__structure                      ----------- */
+/* ---------                         CLASS: <xsl:value-of select="$class_name"/>                                ----------- */
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------------------------------------------------------ */
-    
     public static class  <xsl:value-of select="$class_name"/> 
     {
     
@@ -735,8 +733,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
      
      <xsl:choose>
     <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
-   /* ____________________________________________________________________________________________________________ */
-   /*_________________________________       PUT      _________________________________ */  
+   /* _____________________________________________________________________________________________________________ */
+   /*_________________________________       PUT      _____________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
   	public void put(int expIdx, String path, String strParentPath)  throws UALException
     {
@@ -749,8 +747,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
     
          <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> 
     }       
-       /* ____________________________________________________________________________________________________________ */
-   /*_________________________________       PUT SLICE     _________________________________ */  
+   /* ____________________________________________________________________________________________________________ */
+   /*_________________________________       PUT SLICE     _______________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
   	public void putSlice(int expIdx, String path, String strParentPath)  throws UALException
     {
@@ -818,9 +816,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
       </xsl:when>
         <xsl:otherwise>
   // I am descendant of AoS 2/3 so all my data are stored by putInObject !!!!
-   /* ____________________________________________________________________________________________________________  */
-   /* _________________________________        GET FROM OBJECT   _________________________________ */  
-   /* ____________________________________________________________________________________________________________  */
+   /* _____________________________________________________________________________________________________________  */
+   /* _________________________________        GET FROM OBJECT   ___________________________________________________ */  
+   /* _____________________________________________________________________________________________________________  */
    
     	public void getFromObject(int expIdx, int idObj, String strParentObjPath, int objIdx)  throws UALException
     {
@@ -838,7 +836,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    </xsl:choose>
 
    /* ____________________________________________________________________________________________________________  */
-   /* _________________________________       DELETE     _________________________________ */  
+   /* ________________________________________       DELETE     ___________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */ 
   <xsl:choose>
      <xsl:when test="ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded']">
@@ -853,13 +851,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
       String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
        
       <xsl:apply-templates select = "field" mode = "DELETE"/>
-        
     }             
      </xsl:otherwise>
    </xsl:choose>
-    
-
-
     
        <xsl:if test="not(ancestor-or-self::field[@type='dynamic'])">
     /* ____________________________________________________________________________________________________________ */
@@ -878,11 +872,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
           <xsl:with-param name="non_timed" select="'yes'"/>
           </xsl:apply-templates>
     }    
-    
     </xsl:if>      
 
    /* ____________________________________________________________________________________________________________  */
-   /* ___________________________________        DUMP      ___________________________________ */  
+   /* ___________________________________        DUMP      ________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
    /**
     * Method dump is used for debugging and prints the content of the object
@@ -890,14 +883,12 @@ public class <xsl:value-of select="@name"/>_IDSBase
     public void dump()
    {
      System.out.println("***** <xsl:value-of select="@name"/> *****");
-     <xsl:apply-templates select = "field" mode = "DUMP">
-    </xsl:apply-templates>
+     <xsl:apply-templates select = "field" mode = "DUMP"/>
     System.out.println("******************");
    }
    
-
 }
- 
+
    /* ____________________________________________________________________________________________________________  */
     </xsl:template>
 
@@ -939,9 +930,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	 String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
     
           <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/> 
-    }          
-    
-  
+    }            
       </xsl:when>
         <xsl:otherwise>
 
@@ -1122,22 +1111,6 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <xsl:choose>
         <!--========== Regular structures ==========-->
 <xsl:when test="@data_type='structure'">
-<!-- BP:
-   <xsl:choose>
-   <xsl:when test="$variable_path">
-   <xsl:apply-templates select="field" mode="DELETE">
-   <xsl:with-param name ="variable_path" select="concat($variable_path,'.',@name)"/>
-   <xsl:with-param name ="mds_path" select="concat($mds_path,' + &quot;/',@name,'&quot;')"/>
-   </xsl:apply-templates>
-   </xsl:when>
-   <xsl:otherwise>
-   <xsl:apply-templates select="field" mode="DELETE">
-   <xsl:with-param name ="variable_path" select="@name"/>
-   <xsl:with-param name ="mds_path" select="concat('&quot;',@name,'&quot;')"/>
-   </xsl:apply-templates>
-   </xsl:otherwise>
-   </xsl:choose>
- -->
     this.<xsl:value-of select = "@name"/>.delete(expIdx,path,strNodePath);
 </xsl:when>
 
@@ -1148,12 +1121,11 @@ if(this.<xsl:value-of select = "@name"/> != null)
     int iArraySize = this.<xsl:value-of select = "@name"/>.length;
     for (int i = 0; i &lt; iArraySize; i++){
        this.<xsl:value-of select = "@name"/>[i].delete(expIdx,path,strNodePath, i);
-      }
+     }
 }
     
 </xsl:when>
-<xsl:otherwise>
-      
+<xsl:otherwise>  
       <xsl:if test="@data_type='struct_array' and @maxoccur='unbounded'">
       //AOS 2/3 
      </xsl:if>
@@ -1161,26 +1133,6 @@ if(this.<xsl:value-of select = "@name"/> != null)
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-
-
-<!--=================================================-->
-<!--               Delete timed field                -->
-<!--=================================================-->
-
-<xsl:template match = "field" mode = "DELETE_TIMED">
-  <xsl:choose>
-    <xsl:when test = "@timed = 'yes'">
-        UALLowLevel.deleteData(expIdx, path, "<xsl:value-of select="@path"/>");
-    </xsl:when>
-   </xsl:choose>
-   <xsl:choose>
-     <xsl:when test="@data_type='structure'">
-      <xsl:apply-templates select = "field" mode = "DELETE_TIMED"/>
-    </xsl:when>
-  </xsl:choose>
-</xsl:template>
-
-
 
 <!--=================================================-->
 <!--                Display content                  -->
@@ -1503,12 +1455,9 @@ if(this.<xsl:value-of select = "@name"/> != null)
       <xsl:variable name="class_name">
 	<xsl:call-template name="BUILD_CLASS_NAME">
 	</xsl:call-template>
-</xsl:variable>
-
-	public static class <xsl:value-of select="@name"/>Class extends  <xsl:value-of select="$class_name"/>
-	{
-	
-	}
+      </xsl:variable>
+        //an empty nested static class for easier initialization of IDS elements (new x.y.zClass() )
+	public static class <xsl:value-of select="@name"/>Class extends  <xsl:value-of select="$class_name"/> 	{}
 	public  <xsl:value-of select="@name"/>Class <xsl:value-of select = "@name"/>[];
     </xsl:when>
 
@@ -1516,36 +1465,12 @@ if(this.<xsl:value-of select = "@name"/> != null)
       <xsl:variable name="class_name">
 	<xsl:call-template name="BUILD_CLASS_NAME">
 	</xsl:call-template>
-</xsl:variable>
-	public static class <xsl:value-of select="@name"/>Class extends  <xsl:value-of select="$class_name"/>
-	{
-	
-	}
-    public  <xsl:value-of select="@name"/>Class  <xsl:value-of select = "@name"/> = new   <xsl:value-of select="@name"/>Class();
+     </xsl:variable>
+        //an empty nested static class for easier initialization of IDS elements (new x.y.zClass() )
+       public static class <xsl:value-of select="@name"/>Class extends  <xsl:value-of select="$class_name"/>{}
+       public  <xsl:value-of select="@name"/>Class  <xsl:value-of select = "@name"/> = new   <xsl:value-of select="@name"/>Class();
     </xsl:when>
 
-  </xsl:choose>
-</xsl:template>
-
-
-<!--=================================================================-->
-<!-- function to generate the full subclass name from the field path -->
-<!--           (adds the "Class" keyword for each subclass)          -->
-<!--=================================================================-->
-
-<xsl:template name="BUILD_TYPENAME">
-  <xsl:param name="typepath"/>
-  <xsl:choose>
-    <xsl:when test="contains($typepath,'/')">
-      <xsl:call-template name="BUILD_TYPENAME">
-        <xsl:with-param name="typepath">
-          <xsl:value-of select="substring-before($typepath,'/')"/>Class.<xsl:value-of select="substring-after($typepath,'/')"/>
-        </xsl:with-param >
-      </xsl:call-template>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:value-of select="$typepath"/><xsl:text>Class</xsl:text>
-    </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
@@ -1670,155 +1595,152 @@ endif
 </xsl:when>
 
 
-
-
-
         <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">String</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
         <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Int</xsl:with-param>
 	<xsl:with-param name="Exception">imas.EMPTY_INT</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
         <xsl:when test="@name='xs:boolean'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Boolean</xsl:with-param>
 	<xsl:with-param name="Exception">imas.EMPTY_INT</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
         <xsl:when test="@name='xs:double'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Double</xsl:with-param>
 	<xsl:with-param name="Exception">imas.EMPTY_DOUBLE</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
         <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Double</xsl:with-param>
 	<xsl:with-param name="Exception">imas.EMPTY_DOUBLE</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
 
         <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect1DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
          </xsl:when>
         <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect1DString</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
          </xsl:when>
         <xsl:when test="@name='vecdbl_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect1DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
          </xsl:when>
         <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect1DInt</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
          </xsl:when>
 
         <xsl:when test="@data_type='FLT_2D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect2DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
         <xsl:when test="@name='matdbl_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect2DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
         <xsl:when test="@data_type='INT_2D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect2DInt</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
 
         <xsl:when test="@data_type='FLT_3D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect3DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array3ddbl_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect3DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
        <xsl:when test="@data_type='INT_3D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect3DInt</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
 
         <xsl:when test="@data_type='FLT_4D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect4DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array4ddbl_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect4DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array4dint_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect4DInt</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
 
         <xsl:when test="@data_type='FLT_5D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect5DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array5ddbl_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect5DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array5dint_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect5DInt</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
 
         <xsl:when test="@data_type='FLT_6D'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect6DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array6ddbl_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect6DDouble</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array6dint_type'">
-	<xsl:call-template name="getVariable"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Vect6DInt</xsl:with-param>
 	<xsl:with-param name="Exception">null</xsl:with-param>
 	</xsl:call-template>
@@ -1846,7 +1768,7 @@ endif
 		this.<xsl:value-of select = "@name"/>.getSlice(expIdx, path, strNodePath, time, interpolMode);
         </xsl:when>
 
-         	<!-- ===================================== AoS type 1  ========================================= -->
+         <!-- ===================================== AoS type 1  ========================================= -->
          <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
 	try {
 	  int iVectSize = UALLowLevel.getInt(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");
@@ -1864,7 +1786,7 @@ endif
 
 	</xsl:when>
 	
-	         	<!-- ===================================== AoS type 3  ========================================= -->
+	<!-- ===================================== AoS type 3  ========================================= -->
 	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
           try {
              int idObjSingleTime = UALLowLevel.getObjectSlice(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", time); //read the whole timed block containing a single slice
@@ -1914,14 +1836,14 @@ endif
 
  	<xsl:choose>
 	<xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
-		<xsl:call-template name="getStringSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getStringSlice"> 
 		<xsl:with-param name="Function">String</xsl:with-param>
 		<xsl:with-param name="SliceFunction">String</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
 		</xsl:call-template>
         </xsl:when>
         <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect1DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Double</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1929,7 +1851,7 @@ endif
 		</xsl:call-template>
          </xsl:when>
         <xsl:when test="@name='vecdbl_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect1DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Double</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1938,7 +1860,7 @@ endif
          </xsl:when>
         <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
 // in sequence of test on data_type .... int
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect1DInt</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Int</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1947,7 +1869,7 @@ endif
          </xsl:when>
 
         <xsl:when test="@data_type='FLT_2D'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect2DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect1DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1955,7 +1877,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
         <xsl:when test="@name='matdbl_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice">
 		<xsl:with-param name="Function">Vect2DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect1DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1963,7 +1885,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
         <xsl:when test="@data_type='INT_2D'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect2DInt</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect1DInt</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1972,7 +1894,7 @@ endif
        </xsl:when>
 
         <xsl:when test="@data_type='FLT_3D'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect3DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect2DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1980,7 +1902,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array3ddbl_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect3DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect2DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1988,7 +1910,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
        <xsl:when test="@data_type='INT_3D'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect3DInt</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect2DInt</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -1997,7 +1919,7 @@ endif
        </xsl:when>
 
         <xsl:when test="@data_type='FLT_4D'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect4DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect3DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2005,7 +1927,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array4ddbl_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect4DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect3DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2013,7 +1935,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array4dint_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect4DInt</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect3DInt</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2022,7 +1944,7 @@ endif
        </xsl:when>
 
         <xsl:when test="@data_type='FLT_5D'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect5DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect4DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2030,7 +1952,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array5ddbl_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect5DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect4DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2038,7 +1960,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array5dint_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect5DInt</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect4DInt</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2047,7 +1969,7 @@ endif
        </xsl:when>
 
         <xsl:when test="@data_type='FLT_6D'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect6DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect5DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2055,7 +1977,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array6ddbl_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect6DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect5DDouble</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2063,7 +1985,7 @@ endif
 		</xsl:call-template>
        </xsl:when>
        <xsl:when test="@name='array6dint_type'">
-		<xsl:call-template name="getVariableSlice"> <xsl:with-param name="variable_path" select="$variable_path"/> <xsl:with-param name="mds_path" select="$mds_path"/>
+		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect6DInt</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Vect5DInt</xsl:with-param>
 		<xsl:with-param name="Exception">null</xsl:with-param>
@@ -2095,16 +2017,6 @@ endif
 <!--=================================================-->
 
 <xsl:template match = "field" mode = "GET_FROM_OBJECT">
-  <xsl:param name="level"/>     <!-- recursion level -->
-  <xsl:param name="objpath"/>   <!-- path inside the object -->
-  <xsl:param name="idxpath"/>   <!-- full java path including indices -->
-  <xsl:param name="timed"/>     <!-- are we looking for timed or non-timed fields? -->
-
-  <!-- build the path of the current field inside the object -->
-  <xsl:param name="currentobjpath"><xsl:value-of select="concat($objpath,'/',@name)"/></xsl:param>
-
-  <!-- build the complete path of the current field -->
-  <xsl:param name="currentidxpath"><xsl:value-of select="concat($idxpath,'.',@name)"/></xsl:param>
 
   <!-- Generate the full name of the subclass from the field path -->
   <xsl:param name="class_name">
@@ -2180,12 +2092,12 @@ endif
           </xsl:when>
           <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
 <!--xsl //GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getIntFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
+               this.<xsl:value-of select="@name"/> = UALLowLevel.getIntFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl //            } catch(Exception exc){  this.<xsl:value-of select="@name"/> = imas.EMPTY_INT;} -->
           </xsl:when>
           <xsl:when test="@name='xs:boolean'">
 <!--xsl//GABRIELE MARCH 2011              try { -->
-              <xsl:value-of select="$currentidxpath"/> = UALLowLevel.getBooleanFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
+               this.<xsl:value-of select="@name"/> = UALLowLevel.getBooleanFromObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx);
 <!--xsl//            } catch(Exception exc){} -->
           </xsl:when>
           <xsl:when test="@name='xs:double'">
@@ -2828,15 +2740,6 @@ endif
 <!--=================================================-->
 
 <xsl:template match = "field" mode = "PUT_IN_OBJECT">
-  <xsl:param name="level"/>     <!-- recursion level -->
-  <xsl:param name="objpath"/>   <!-- path inside the object -->
-  <xsl:param name="idxpath"/>   <!-- full java path including indices -->
-  <xsl:param name="child_index"/>     <!-- Index to use to add a child in the current object -->
-
-  <!-- build the path of the current field inside the object -->
-  <xsl:param name="currentobjpath" select="concat($objpath,'/',@name)"/>
-  <!-- build the complete path of the current field -->
-  <xsl:param name="currentidxpath" select="concat($idxpath,'.',@name)"/>
 
   <xsl:call-template name="COMMENT_FIELD_SHORT"/>
   <xsl:choose>
