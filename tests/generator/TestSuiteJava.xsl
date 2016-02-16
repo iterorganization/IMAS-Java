@@ -23,6 +23,23 @@
         <xsl:text>&#9;private static long seed = RANDOM.nextInt();&#10;</xsl:text>
         <xsl:text>&#9;private enum Types { DOUBLE, INTEGER, STRING, COMPLEX };&#10;</xsl:text>
         <xsl:text>&#10;</xsl:text>
+	
+       <xsl:text>&#9;public static void imasTest() throws Exception {&#10;</xsl:text>
+       <xsl:text>&#9;&#9;java.util.ArrayList idss = imas.getAvailableIDSs();&#10;</xsl:text>
+       <xsl:text>&#9;&#9;System.out.println("List of available CPOs\n");&#10;</xsl:text>
+       <xsl:text>&#9;&#9;for(int i=0; i  &lt; idss.size();i++) {&#10;</xsl:text>
+       <xsl:text>&#9;&#9;&#9;System.out.println(idss.get(i));&#10;</xsl:text>
+       <xsl:text>&#9;&#9;}&#10;</xsl:text>
+       <xsl:text>&#10;</xsl:text>
+       <xsl:text>&#9;&#9;System.out.println("\nNumber of occurences\n");&#10;</xsl:text>
+       <xsl:text>&#9;&#9;for(int i=0; i &lt; idss.size();i++) {&#10;</xsl:text>
+       <xsl:text>&#9;&#9;&#9;int occur = imas.getMaxOccurences((String)idss.get(i));&#10;</xsl:text>
+       <xsl:text>&#9;&#9;&#9;System.out.format("%2d - %s\n",occur, (String)idss.get(i));&#10;</xsl:text>
+       <xsl:text>&#9;&#9;}&#10;</xsl:text>
+       <xsl:text>&#10;</xsl:text>
+       <xsl:text>&#9;&#9;}&#10;</xsl:text>
+       <xsl:text>&#10;</xsl:text>
+       
         <xsl:text>&#9;public static void main(String[] args) {&#10;</xsl:text>
         <xsl:text>&#9;&#9;try {&#10;</xsl:text>
      <!--   <xsl:text>&#9;&#9;&#9;init(args);&#10;</xsl:text> -->
@@ -37,6 +54,10 @@
         <xsl:text>&#9;&#9;}&#10;</xsl:text>
         <xsl:text>&#9;}&#10;</xsl:text>
         <xsl:text>&#10;</xsl:text>
+
+
+  
+  
 
         <xsl:text>&#9;private static Vect1DDouble getTime() {&#10;</xsl:text>
         <xsl:text>&#9;&#9;return new Vect1DDouble(new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0});&#10;</xsl:text>
@@ -440,40 +461,33 @@
 		</xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
-    
-    
+   
       <xsl:template name="type2value4slice">
         <xsl:choose>
-
-	      <xsl:when test="@name='homogeneous_time'">              <xsl:text>1</xsl:text></xsl:when>
-
-
-            <xsl:when test="@name='time' and (@data_type='flt_1d_type' or @data_type='FLT_1D')">              <xsl:text>getTime()[0]</xsl:text></xsl:when> -->
-            <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">        <xsl:text>getString()</xsl:text></xsl:when>
-            <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">    <xsl:text>(new Vect1DString((String[]) getArray(Types.STRING, 1))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">          <xsl:text>getDouble()</xsl:text></xsl:when>
-            <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">     <xsl:text>new Vect1DDouble((double[]) getArray(Types.DOUBLE, 1))</xsl:text></xsl:when>
-            <xsl:when test="@data_type='FLT_2D'">     <xsl:text>(new Vect2DDouble(1, 2, (double[]) getArray(Types.DOUBLE, 2))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='FLT_3D'">   <xsl:text>(new Vect3DDouble(1, 1, 3, (double[]) getArray(Types.DOUBLE, 3))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='FLT_4D'">   <xsl:text>(new Vect4DDouble(1, 1, 1, 4, (double[]) getArray(Types.DOUBLE, 4))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='FLT_5D'">   <xsl:text>(new Vect5DDouble(1, 1, 1, 1, 5, (double[]) getArray(Types.DOUBLE, 5))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='FLT_6D'">	<xsl:text>(new Vect6DDouble(1, 1, 1, 1, 1, 6, (double[]) getArray(Types.DOUBLE, 6))).getElementAt(0)</xsl:text></xsl:when>
-
-            <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">        <xsl:text>(getInteger()</xsl:text></xsl:when>
-            <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">       <xsl:text>new Vect1DInt((int[]) getArray(Types.INTEGER, 1))</xsl:text></xsl:when>
-            <xsl:when test="@data_type='INT_2D'">      <xsl:text>(new Vect2DInt(1, 2, (int[]) getArray(Types.INTEGER, 2))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='INT_3D'">  <xsl:text>(new Vect3DInt(1, 1, 3, (int[]) getArray(Types.INTEGER, 3))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='INT_4D'">  <xsl:text>(new Vect4DInt(1, 1, 1, 4, (int[]) getArray(Types.INTEGER, 4))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='INT_5D'">   <xsl:text>(new Vect5DInt(1, 1, 1, 1, 5, (int[]) getArray(Types.INTEGER, 5))).getElementAt(0)</xsl:text></xsl:when>
-            <xsl:when test="@data_type='INT_6D'">  <xsl:text>(new Vect6DInt(1, 1, 1, 1, 1, 6, (int[]) getArray(Types.INTEGER, 6))).getElementAt(0)</xsl:text></xsl:when>
-
-
-            <xsl:otherwise>
-	       <xsl:message terminate="yes">     
-		             <xsl:text>&#xA; UNKNOWN TYPE:   </xsl:text>  <xsl:value-of select="@data_type"/>  : <xsl:value-of select="@path"/>   : <xsl:value-of select="@maxoccur"/>   :  <xsl:value-of select="@type"/> 
+	      <xsl:when test="@name='homogeneous_time'">              <xsl:text>1</xsl:text>	      </xsl:when>
+       	      <xsl:when test="@name='time' and (@data_type='flt_1d_type' or @data_type='FLT_1D')">   <xsl:text>getTime()</xsl:text></xsl:when> 
+              <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">                         <xsl:text>getString()</xsl:text></xsl:when>
+              <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">                      <xsl:text>(new Vect1DString((String[]) getArray(Types.STRING, 1))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">                         <xsl:text>getDouble()</xsl:text></xsl:when>
+              <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">             <xsl:text>new Vect1DDouble((double[]) getArray(Types.DOUBLE, 1))</xsl:text></xsl:when>
+              <xsl:when test="@data_type='FLT_2D'">     <xsl:text>(new Vect2DDouble(1, 2, (double[]) getArray(Types.DOUBLE, 2))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='FLT_3D'">   <xsl:text>(new Vect3DDouble(1, 1, 3, (double[]) getArray(Types.DOUBLE, 3))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='FLT_4D'">   <xsl:text>(new Vect4DDouble(1, 1, 1, 4, (double[]) getArray(Types.DOUBLE, 4))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='FLT_5D'">   <xsl:text>(new Vect5DDouble(1, 1, 1, 1, 5, (double[]) getArray(Types.DOUBLE, 5))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='FLT_6D'">	<xsl:text>(new Vect6DDouble(1, 1, 1, 1, 1, 6, (double[]) getArray(Types.DOUBLE, 6))).getElementAt(0)</xsl:text></xsl:when>
+              
+	      <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">        <xsl:text>(getInteger()</xsl:text></xsl:when>
+              <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">       <xsl:text>new Vect1DInt((int[]) getArray(Types.INTEGER, 1))</xsl:text></xsl:when>
+              <xsl:when test="@data_type='INT_2D'">      <xsl:text>(new Vect2DInt(1, 2, (int[]) getArray(Types.INTEGER, 2))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='INT_3D'">  <xsl:text>(new Vect3DInt(1, 1, 3, (int[]) getArray(Types.INTEGER, 3))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='INT_4D'">  <xsl:text>(new Vect4DInt(1, 1, 1, 4, (int[]) getArray(Types.INTEGER, 4))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='INT_5D'">   <xsl:text>(new Vect5DInt(1, 1, 1, 1, 5, (int[]) getArray(Types.INTEGER, 5))).getElementAt(0)</xsl:text></xsl:when>
+              <xsl:when test="@data_type='INT_6D'">  <xsl:text>(new Vect6DInt(1, 1, 1, 1, 1, 6, (int[]) getArray(Types.INTEGER, 6))).getElementAt(0)</xsl:text></xsl:when>
+	      <xsl:otherwise>
+	         <xsl:message terminate="yes">     
+		      <xsl:text>&#xA; UNKNOWN TYPE:   </xsl:text>  <xsl:value-of select="@data_type"/>  : <xsl:value-of select="@path"/>   : <xsl:value-of select="@maxoccur"/>   :  <xsl:value-of select="@type"/> 
 		</xsl:message>
-		</xsl:otherwise>
+	      </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>
