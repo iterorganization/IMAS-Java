@@ -1542,36 +1542,25 @@ if(this.<xsl:value-of select = "@name"/> != null)
       </xsl:when>
          <!-- ====================== AoS type 2  ============================= -->
 	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and (not(@type) or @type!='dynamic')">
-	TBDXXX!!!
-	<!-- old comment from ITM MDS object tobe implemented for AoS type 2
-! Read non-timed content
-call get_object(idx,path,"<xsl:value-of select = "@path"/>",obj1,0,status); ! read the whole non-timed block
-if (status.EQ.0) then
-   call get_object_dim(idx,obj1,dimObj1)
-   if (dimObj1.NE.0) then
-      do itime = 1,lentime     ! fill every time slice
-         ! does not exist yet (there was no timed content)
-         if (.NOT.associated(cpos(itime)%<xsl:value-of select = "translate(@path,'/','%')"/>)) then
-            allocate(cpos(itime)%<xsl:value-of select = "translate(@path,'/','%')"/>(dimObj1))
-         endif
-         ! must have same number of non-timed elements and timed elements
-         if (size(cpos(itime)%<xsl:value-of select = "translate(@path,'/','%')"/>).NE.dimObj1) then
-            write(*,*) "Error in get: array of structures has different number of timed and nontimed elements for <xsl:value-of select = "@path"/>"
-         else
-            do i1 = 1,dimObj1     ! process array elements
-               <xsl:apply-templates select = "field" mode = "GET_FROM_OBJECT">
-                  <xsl:with-param name="level" select="1"/>
-                  <xsl:with-param name="objpath" select="@name"/>
-                  <xsl:with-param name="idxpath" select="concat('cpos(itime)%',translate(@path,'/','%'),'(i1)')"/>
-                  <xsl:with-param name="timed" select="'no'"/>
-               </xsl:apply-templates>
-            enddo
-         endif
-      enddo
-   endif
-   call release_object(idx,obj1)
-endif
- -->
+ 	 try 
+	 { 
+	     int idAoS2Obj = UALLowLevel.getObject(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", imas.NON_TIMED);
+	     int iAoS2Size = UALLowLevel.getObjectDim(expIdx, idAoS2Obj);
+	     if(iAoS2Size > 0)
+	     {
+	        this.<xsl:value-of select="@name"/> = new <xsl:value-of select = "@name"/>Class[iAoS2Size];
+	        for (int i = 0; i &lt; iAoS2Size; i++) {
+                   this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "@name"/>Class();
+		   this.<xsl:value-of select="@name"/>[i].getFromObject(expIdx, idAoS2Obj,  "", i);
+                }
+	    }
+	     UALLowLevel.releaseObject(expIdx, idAoS2Obj);
+
+	 }  catch(UALException exc) 
+	 {
+                throw new UALException("Error in get: for <xsl:value-of select = "translate(@path,'/','.')"/> " + exc);
+	 }
+	 
       </xsl:when>
  	<!-- ===================================== AoS type 3  ========================================= -->
 <xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
@@ -1790,50 +1779,30 @@ endif
 	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
           try {
              int idObjSingleTime = UALLowLevel.getObjectSlice(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", time); //read the whole timed block containing a single slice
-          try {
-              int idAoS3Obj = UALLowLevel.getObjectFromObject(expIdx, idObjSingleTime, "ALLTIMES", 0);
-
-              this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="@name"/>Class[1];
-              this.<xsl:value-of select = "@name"/>[0] = new <xsl:value-of select="@name"/>Class();
-
-             this.<xsl:value-of select="@name"/>[0].getFromObject(expIdx, idAoS3Obj, "", 0);
-          } catch(Exception exc)
-	{<xsl:value-of select="@name"/>[0] = null;}
+             try {
+               int idAoS3Obj = UALLowLevel.getObjectFromObject(expIdx, idObjSingleTime, "ALLTIMES", 0);
+	       
+               this.<xsl:value-of select = "@name"/> = new <xsl:value-of select="@name"/>Class[1];
+               this.<xsl:value-of select = "@name"/>[0] = new <xsl:value-of select="@name"/>Class();
+               this.<xsl:value-of select="@name"/>[0].getFromObject(expIdx, idAoS3Obj, "", 0);
+             }catch(Exception exc)
+	     {
+	       <xsl:value-of select="@name"/>[0] = null;
+	     }
             UALLowLevel.releaseObject(expIdx, idObjSingleTime);
           } catch(Exception exc)
-	{
-		this.<xsl:value-of select="@name"/> = null;
-	}
-
+	  {
+             this.<xsl:value-of select="@name"/> = null;
+	  }
 	</xsl:when>
 
    	<xsl:when test="@type='dynamic'">
-	<xsl:choose>
-		<xsl:when test="$variable_path">
    	if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous()) {
-       <!--XSLtest whether this is a data/time structure, otherwise assume that the timepath attribute from IDSDef is correct-->
-       		<xsl:choose>
-       			<xsl:when test="(@name='data' and ../field[@name='time']) or (@name='time' and ../field[@name='data']) or @name='data_error_upper' or @name='data_error_lower'">
-       	  timepath=<xsl:value-of select="$mds_path"/> + &quot;/time&quot; ;
-       			</xsl:when>
-       			<xsl:otherwise>
-       	  timepath=&quot;<xsl:call-template name="printtimepath"/>&quot; ;
-       			</xsl:otherwise>
-       		</xsl:choose>
-   	} else {
-          timepath="time";
+       	  timepath = "time";
+    	} 
+	else {
+          timepath = strNodePath + "time";
    	}
-   		</xsl:when>
- 		<xsl:otherwise>
-		
-   	if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous()) {
-       	  timepath="<xsl:call-template name="printtimepath"/>";
-   	} else {
-          timepath="time";
-   	}
-   		</xsl:otherwise>
- 	</xsl:choose>
-
  	<xsl:choose>
 	<xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
 		<xsl:call-template name="getStringSlice"> 
@@ -2436,10 +2405,7 @@ endif
 <!--        Put time-dependent field in a slice      -->
 <!--=================================================-->
 <xsl:template match = "field" mode = "PUT_SLICE">
-<xsl:param name="variable_path"/>
-<xsl:param name="mds_path"/>
 <xsl:call-template name="COMMENT_FIELD_SHORT"/>
-
 <xsl:if test="@type ='dynamic' or @data_type='structure' or @data_type='struct_array'"> <!-- This skips the routine for non timed fields -->
       <xsl:choose>
         <!--========== Regular structures ==========-->
@@ -2461,9 +2427,9 @@ endif
 	<!-- ========================================================== AoS type 2  =================================================================================== -->
 		<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and (not(@type) or @type!='dynamic')">
 		 
-		   <xsl:message terminate="no">XXX<xsl:call-template name="COMMENT_FIELD_SHORT"/>     
+		<!--   <xsl:message terminate="no">XXX<xsl:call-template name="COMMENT_FIELD_SHORT"/>     
 		             <xsl:text>&#xA; Ancestor of type AoS2:   </xsl:text>  <xsl:value-of select="../@data_type"/>  : <xsl:value-of select="../@path"/>   : <xsl:value-of select="../@maxoccur"/>   :  <xsl:value-of select="../@type"/> 
-		</xsl:message>
+		</xsl:message>   -->
         </xsl:when>
 	<!-- ========================================================== AoS type 3  =================================================================================== -->
 	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
@@ -2478,10 +2444,10 @@ endif
             UALLowLevel.putObjectSlice(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", sliceTime, idObjSingleTime);
          
                       
-	    //timepath = strNodePath + "<xsl:value-of select = "@name"/>/time";
-	    timepath = "time";
+	    timepath = strNodePath + "<xsl:value-of select = "@name"/>/time";
+	<!--    //timepath = "time"; -->
             UALLowLevel.putDoubleSlice(expIdx, path, timepath, timepath, sliceTime, sliceTime);
-            //if (ual_debug.equals("yes")) System.out.println("Put " + <xsl:value-of select="concat($mds_path,' + &quot;/',@name,'/time')"/>");
+            //if (ual_debug.equals("yes")) System.out.println("Put " + <xsl:value-of select="@path"/>/time");
           }
 	</xsl:when>
 
@@ -2766,13 +2732,27 @@ endif
     </xsl:when>
 
        	<!-- ====================== AoS type 3  ============================= -->
-	    	<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and  @type='dynamic'">
-		 
+    <xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and  @type='dynamic'">
+
 		   <xsl:message terminate="no"><xsl:call-template name="COMMENT_FIELD_SHORT"/>     
 		    <xsl:for-each select="./ancestor::field[@data_type='struct_array' and @maxoccur='unbounded' and  @type='dynamic']">
 		             <xsl:text>&#xA; Ancestor of type AoS3:   </xsl:text>  <xsl:value-of select="@path"/>        
 		</xsl:for-each>
 		</xsl:message>
+		
+
+  if (this.<xsl:value-of select = "@name"/> != null) {
+            int idObjAllTimes = UALLowLevel.beginObject(expIdx, idObj, 0,  strObjPath + "<xsl:value-of select="@name"/>", imas.TIMED_CLEAR);
+            for (int i = 0; i &lt; this.<xsl:value-of select = "@name"/>.length; i++) 
+	    {
+               int idAoS3Obj = UALLowLevel.beginObject(expIdx, idObjAllTimes, i, "ALLTIMES", imas.TIMED);
+               this.<xsl:value-of select = "@name"/>[i].putInObject(expIdx, idAoS3Obj, "", 0);
+               UALLowLevel.putObjectInObject(expIdx, idObjAllTimes, "ALLTIMES", i, idAoS3Obj);
+            }
+   		    
+	  UALLowLevel.putObjectInObject(expIdx, idObj, strObjPath + "<xsl:value-of select="@name"/>", objIdx, idObjAllTimes);
+	  }
+	  
 	     </xsl:when>
 
     <!--========== select either timed or non-timed fields ==========-->
@@ -2987,7 +2967,7 @@ endif
 <xsl:param name="Function" />
 <xsl:param name="Exception" />
           try {
-            this.<xsl:value-of select="@name"/> = UALLowLevel.get<xsl:value-of select="$Function"/>(expIdx, path, strNodePath + &quot;/<xsl:value-of select="@name"/>&quot;);
+            this.<xsl:value-of select="@name"/> = UALLowLevel.get<xsl:value-of select="$Function"/>(expIdx, path, strNodePath + &quot;<xsl:value-of select="@name"/>&quot;);
           } catch(Exception exc){this.<xsl:value-of select="@name"/> = <xsl:value-of select="$Exception"/>;}
 </xsl:template>
 
@@ -2999,10 +2979,10 @@ endif
 <xsl:param name="number" />
 <xsl:param name="Exception" />
           try {
-	    Vect1DInt dimVect = UALLowLevel.getDimension(expIdx, path, strNodePath + &quot;/<xsl:value-of select="@name"/>&quot;);
+	    Vect1DInt dimVect = UALLowLevel.getDimension(expIdx, path, strNodePath + &quot;<xsl:value-of select="@name"/>&quot;);
 	    if (dimVect.getElementAt(0) > 0) {
               this.<xsl:value-of select="@name"/> = new <xsl:value-of select="$Function"/>(<xsl:call-template name="printDimensions"><xsl:with-param name="number" select="$number"/></xsl:call-template>);
-              this.<xsl:value-of select="@name"/>.setElementAt(0, UALLowLevel.get<xsl:value-of select="$SliceFunction"/>Slice(expIdx, path, strNodePath + &quot;/<xsl:value-of select="@name"/>&quot;, <xsl:call-template name="printPathoftime"/>, time, interpolMode));
+              this.<xsl:value-of select="@name"/>.setElementAt(0, UALLowLevel.get<xsl:value-of select="$SliceFunction"/>Slice(expIdx, path, strNodePath + &quot;<xsl:value-of select="@name"/>&quot;, <xsl:call-template name="printPathoftime"/>, time, interpolMode));
             }
           } catch(Exception exc){this.<xsl:value-of select="@name"/> = <xsl:value-of select="$Exception"/>;}
 </xsl:template>
@@ -3012,7 +2992,7 @@ endif
 <xsl:param name="mds_path" />
           try {
             this.<xsl:value-of select="@name"/> = new Vect1DString(1);
-            this.<xsl:value-of select="@name"/>.setElementAt(0, UALLowLevel.getStringSlice(expIdx, path, strNodePath + &quot;/<xsl:value-of select="@name"/>&quot;, <xsl:call-template name="printPathoftime"/>, time, interpolMode));
+            this.<xsl:value-of select="@name"/>.setElementAt(0, UALLowLevel.getStringSlice(expIdx, path, strNodePath + &quot;<xsl:value-of select="@name"/>&quot;, <xsl:call-template name="printPathoftime"/>, time, interpolMode));
           } catch(Exception exc){this.<xsl:value-of select="@name"/> = null;}
 </xsl:template>
 
