@@ -30,6 +30,7 @@
 <xsl:result-document href="src/imasjava/imas.java" method="text"> 
  package imasjava;
 import java.io.File;
+   import java.lang.reflect.*;
 
 import imasjava.ids.*;
 
@@ -75,6 +76,48 @@ public class imas {
  public static final int INTERPOLATION = 3, CLOSEST_SAMPLE = 1, PREVIOUS_SAMPLE = 2;
 
  public static final int NON_TIMED = 0, TIMED = 1, TIMED_CLEAR = 2;
+
+
+    
+	       
+ public static java.util.ArrayList getAvailableIDSs()  throws
+                         java.lang.NoSuchMethodException,
+			 java.lang.IllegalAccessException,               
+		         java.lang.reflect.InvocationTargetException
+{
+       java.util.ArrayList result = new java.util.ArrayList();
+       Class[] classes = imasjava.imas.class.getClasses();
+     
+       for(Class classId : classes) 
+       { 
+        //  if(CPOInterface.class.isAssignableFrom(classId)) 
+	  {
+	        Method method = classId.getMethod("getIdsName");           
+	        Object retVal = method.invoke(null);
+		result.add( (String) retVal );
+	  }
+        }
+      return result;
+}
+										  
+    public static int getMaxOccurences(String idsName) throws
+          java.lang.NoSuchMethodException,
+	  java.lang.IllegalAccessException,
+          java.lang.reflect.InvocationTargetException 
+    {
+       Class[] classes = imasjava.imas.class.getClasses();
+       Class idsClass = null;
+	
+	for(Class classId : classes) {
+	        if(classId.getName().contains(idsName)) {
+	                 Method method = classId.getMethod("getMaxOccurences");
+		         Object retVal = method.invoke(null);
+	                  return ((Integer) retVal).intValue();	    		    
+		  }
+	  }
+	  return -1;
+      }
+		    	    
 
  //Cache Management methods
  public static native void enableMemCache(int expIdx);
@@ -258,9 +301,21 @@ import imasjava.*;
 
 public class <xsl:value-of select="@name"/>_IDSBase
 {
+
+    private static final int maxOccurences = <xsl:value-of select="@maxoccur"/>;
+    private static final String idsName    = "<xsl:value-of select="@name"/>";
+
     static private boolean isHomogeneous = false;
     static private Vect1DDouble idsTime = null;
     
+    public static int getMaxOccurences() {
+                return maxOccurences;
+        }
+
+    public static String getIdsName() 
+    {
+           return idsName;
+    }
     
     static private void setHomogeneous(boolean isHomogeneous)
     {
