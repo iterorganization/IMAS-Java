@@ -1,6 +1,13 @@
 include ../Makefile.common
 
-SOURCES = src/imasjava/*.java
+ifeq ("no","$(JAVA)")
+$(warning Ignoring javainterface (JAVA=no).)
+all:
+clean:
+clean-src:
+install:
+else
+SOURCES = imasjava/*.java
 
 #-------- Options for cache monitoring ---------
 ifeq (yes,$(strip $(MONITOR)))
@@ -39,7 +46,12 @@ imas.jar : $(SOURCES) imasjava/imas.java
 	jar cvf ./lib/imas.jar -C ./build . 
 
 imasjava/imas.java : IDSDef2Java.xsl
+<<<<<<< HEAD
 	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl 
 #	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl -o:imasjava/imas.java
 #	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
 
+=======
+	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
+endif # JAVA=no?
+>>>>>>> develop
