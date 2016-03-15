@@ -37,7 +37,7 @@ clean-src: clean
 	$(RM) -rf ./src/imasjava/imas.java
 	$(RM) -rf ./src/imasjava/ids
 
-imas.jar : $(SOURCES) imasjava/imas.java
+imas.jar : $(SOURCES) 
 #	javac $(SOURCES)
 #	jar cf imas.jar $(CLASSES)
 	mkdir -p ./build/
@@ -45,13 +45,8 @@ imas.jar : $(SOURCES) imasjava/imas.java
 	mkdir -p ./lib/
 	jar cvf ./lib/imas.jar -C ./build . 
 
-imasjava/imas.java : IDSDef2Java.xsl
-<<<<<<< HEAD
+$(SOURCES) : IDSDef2Java.xsl
 	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl 
 #	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl -o:imasjava/imas.java
 #	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
-
-=======
-	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
-endif # JAVA=no?
->>>>>>> develop
+endif
