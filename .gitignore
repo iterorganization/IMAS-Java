@@ -1,2 +1,5 @@
-imas.jar
-imasjava/imas.java
+build/
+lib/
+src/imasjava/ids/
+src/imasjava/imas.java
+
