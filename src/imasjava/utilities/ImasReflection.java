@@ -36,11 +36,11 @@ public class ImasReflection {
 		return classIdsNode;
 	}
 	
+
 	
-	static public String getClassNameForNode(String strIdsName, String strNodePath) 
+	static public Class<?> getClassForNode(String strIdsName, String strNodePath) 
 	{
 		Class<?> nodeClass = null;
-		String strClassName = null;
 		
 		try
 		{
@@ -52,14 +52,25 @@ public class ImasReflection {
 		       		nodeClass = ImasReflection.getNodeClass(nodeClass, strNodeName);
 		 	}
 	     	
-			strClassName = nodeClass.getName();
 		}
 		catch(Exception ex)
 		{
 			ex.printStackTrace();
 		}
-		return strClassName;
+		return nodeClass;
 	}
+	
+	
+	static public String getClassNameForNode(String strIdsName, String strNodePath) 
+	{
+		Class<?> nodeClass = null;
+		
+		nodeClass = ImasReflection.getClassForNode(strIdsName, strNodePath);
+	
+		return nodeClass.getName();
+	}
+
+
 
 
 	public static void main(String [] arg) 
