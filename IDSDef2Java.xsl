@@ -691,6 +691,18 @@ public class <xsl:value-of select="@name"/>_IDSBase
       
       imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
       retTime = UALLowLevel.beginIDSGetSlice(expIdx, path, time);
+      
+      // read a value of ids_properties/homogeneous_time  
+          try {
+            int homogeneous_time = UALLowLevel.getInt(expIdx, path, "ids_properties/homogeneous_time");
+            <xsl:value-of select="@name"/>_IDSBase.setHomogeneous(homogeneous_time == 1);
+            
+          } catch(Exception exc)
+          {
+          	throw new UALException("Fatal error: value of homogeneous_time cannot be read: " + exc.getMessage());  
+          }
+      
+      
  	ids.doGetSlice( expIdx,  path,  time,  interpolMode);
       UALLowLevel.endIDSGetSlice(expIdx, path);
       return ids;
@@ -2514,115 +2526,115 @@ if(this.<xsl:value-of select = "@name"/> != null)
   
 	<xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
 	<xsl:call-template name="putdynamicSlice">
-	<xsl:with-param name="Function">DoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect1DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
 	</xsl:when>
 
         <xsl:when test="@name='vecdbl_type'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">DoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect1DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
 	<xsl:call-template name="putdynamicSlice">
-	<xsl:with-param name="Function">IntSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect1DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
  	<xsl:call-template name="putdynamicSlice">
-	<xsl:with-param name="Function">StringSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect1DStringSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_2D'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect1DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect2DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='INT_2D'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect1DIntSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect2DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='matdbl_type'">
 	<xsl:call-template name="putdynamicSlice">
-	<xsl:with-param name="Function">Vect1DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect2DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_3D'">
 	<xsl:call-template name="putdynamicSlice">
-	<xsl:with-param name="Function">Vect2DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect3DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='INT_3D'">
 	<xsl:call-template name="putdynamicSlice">
-	<xsl:with-param name="Function">Vect2DIntSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect3DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array3ddbl_type'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect2DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect3DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_4D'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect3DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect4DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array4dint_type'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect3DIntSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect4DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array4ddbl_type'">
 	<xsl:call-template name="putdynamicSlice">
-	<xsl:with-param name="Function">Vect3DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect4DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_5D'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect4DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect5DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array5dint_type'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect4DIntSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect5DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array5ddbl_type'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect4DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect5DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@data_type='FLT_6D'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect5DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect6DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array6dint_type'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect5DIntSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect6DIntSlice</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
 
         <xsl:when test="@name='array6ddbl_type'">
 	<xsl:call-template name="putdynamicSlice"> 
-	<xsl:with-param name="Function">Vect5DDoubleSlice</xsl:with-param>
+	<xsl:with-param name="Function">Vect6DDoubleSlice</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
 
@@ -3003,7 +3015,7 @@ if(this.<xsl:value-of select = "@name"/> != null)
 <xsl:param name="Function" />
 	if(this.<xsl:value-of select="@name"/> != null)
 	{
-          UALLowLevel.put<xsl:value-of select="$Function"/>(expIdx,path, strNodePath + "<xsl:value-of select="@name"/>", "time", this.<xsl:value-of select="@name"/>.getElementAt(0), idsGlobalTime.getElementAt(0));
+          UALLowLevel.put<xsl:value-of select="$Function"/>(expIdx,path, strNodePath + "<xsl:value-of select="@name"/>", "time", this.<xsl:value-of select="@name"/>, idsGlobalTime.getElementAt(0));
 	}
 </xsl:template>
 
