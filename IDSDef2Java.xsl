@@ -1190,8 +1190,7 @@ for (int i = 0; i &lt; <xsl:value-of select = "@maxoccur"/>; i++){
    this.<xsl:value-of select = "@name"/>[0].delete(expIdx,path,strNodePath, i + 1);
 }
 UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");  
-System.out.println(strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");
-    
+ 
 </xsl:when>
 <xsl:otherwise>  
       <xsl:if test="@data_type='struct_array' and @maxoccur='unbounded'">
