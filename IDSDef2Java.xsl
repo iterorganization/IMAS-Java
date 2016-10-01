@@ -1183,13 +1183,14 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
         <!--========== Arrays of structures ==========-->
 <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
-if(this.<xsl:value-of select = "@name"/> != null)
-{
-    int iArraySize = this.<xsl:value-of select = "@name"/>.length;
-    for (int i = 0; i &lt; iArraySize; i++){
-       this.<xsl:value-of select = "@name"/>[i].delete(expIdx,path,strNodePath, i);
-     }
+this.<xsl:value-of select = "@name"/> = new <xsl:value-of select = "@name"/>Class[1];  // We just need an empty class (allocated to size 1) to reflect the structure of the class
+this.<xsl:value-of select = "@name"/>[0] = new <xsl:value-of select = "@name"/>Class();
+// AoS 1 : systematic delete of all predefined slots in the MDS pulse file 
+for (int i = 0; i &lt; <xsl:value-of select = "@maxoccur"/>; i++){
+   this.<xsl:value-of select = "@name"/>[0].delete(expIdx,path,strNodePath, i + 1);
 }
+UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");  
+System.out.println(strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");
     
 </xsl:when>
 <xsl:otherwise>  
@@ -1524,7 +1525,7 @@ if(this.<xsl:value-of select = "@name"/> != null)
 	</xsl:call-template>
       </xsl:variable>
         //an empty nested static class for easier initialization of IDS elements (new x.y.zClass() )
-	public static class <xsl:value-of select="@name"/>Class extends  <xsl:value-of select="$class_name"/> 	{}
+	public static class <xsl:value-of select="@name"/>Class extends  <xsl:value-of select="$class_name"/>{}
 	public  <xsl:value-of select="@name"/>Class <xsl:value-of select = "@name"/>[];
     </xsl:when>
 
