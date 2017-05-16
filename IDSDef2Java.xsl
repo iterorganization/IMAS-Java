@@ -201,6 +201,7 @@ static public int createdb(String user, String machine, int shot, int run, Strin
 
 
  static public native int openHdf5(String name, int shot, int run)  throws UALException;
+ 
  /**
  *Creates a new database instance.
  * @param name Name of the database (by convention imas).
@@ -213,6 +214,21 @@ static public int createdb(String user, String machine, int shot, int run, Strin
  **/
  static public native int createHdf5(String name, int shot, int run, int refShot, int refRun) throws UALException;
 
+
+ static public native int openPublic(String name, int shot, int run, String expName)  throws UALException;
+
+ /**
+ *Creates a new database instance.
+ * @param name Name of the database (by convention imas).
+ * @param shot Shot number.
+ * @param run Run Number.
+ * @param refShot Shot number of the reference database.
+ * @param runRun Run Number of the reference database.
+ * @param expName Name of the remote experiment to fetch data from.
+ * @return the database index to be used in subsequent get/put calls
+ * @exception UALException is thrown if the database cannot be open.
+ **/
+ static public native int createPublic(String name, int shot, int run, int refShot, int refRun, String expName) throws UALException;
 
 
  /**
