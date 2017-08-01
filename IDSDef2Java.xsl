@@ -32,7 +32,9 @@
 import java.io.File;
    import java.lang.reflect.*;
 
+import imasjava.utilities.ImasReflection;
 import imasjava.ids.*;
+
 
 public class imas {
         static {
@@ -78,6 +80,27 @@ public class imas {
  public static final int NON_TIMED = 0, TIMED = 1, TIMED_CLEAR = 2;
 
 
+
+public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException{
+		Class ids = ImasReflection.getIdsClass(idsName);
+		return imas.isIDSClassTimeDependent(ids);
+	}
+
+
+public static boolean isIDSClassTimeDependent(Class idsClass) {
+	Field[] fields = idsClass.getFields();
+	boolean timedIds = false;
+
+	for(Field field : fields) {
+		if(field.getName().equals("time")) {
+			timedIds = true;
+			break;
+		}
+	}
+
+	return timedIds;
+}
+		
     
 	       
  public static java.util.ArrayList getAvailableIDSs()  throws
