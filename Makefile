@@ -3,52 +3,73 @@ include ../Makefile.common
 ifeq ("no","$(JAVA)")
 $(warning Ignoring javainterface (JAVA=no).)
 all:
+sources:
 clean:
 clean-src:
 install:
 else
-SOURCES = imasjava/*.java
 
-#-------- Options for cache monitoring ---------
-ifeq (yes,$(strip $(MONITOR)))
- SOURCES += CacheMonitor.java
-endif
-#-----------------------------------------------
+JAVAC = javac
+JAR = jar
+JFLAGS = -g -Xmaxerrs 10 -sourcepath ./src -d ./build
 
-CLASSES = $(SOURCES:.java=.class)
+# Get a list of IDS from IDSDEF file
+IDSDEF = ../xml/IDSDef.xml
+IDSNAMES := $(shell sed '/<IDS name=/!d;s/.*name="\(.*\)"/\1/' $(IDSDEF))
+IDSSOURCES = $(addprefix src/imasjava/ids/,$(addsuffix _IDSBase.java,$(IDSNAMES)))
+# Generated sources (not all sources)
+GENSOURCES = src/imasjava/imas.java $(IDSSOURCES)
 
-all : imas.jar
+# List of class files (not including derived class files)
+CLASSES = $(subst src/,build/,$(GENSOURCES:.java=.class))
 
-gen : IDSDef2Java.xsl
-	 java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl 
+# We can do with just one class file target
+CLASSFILE = build/imasjava/imas.class
+JARFILE = lib/imas.jar
 
-comp: 
-	javac -g -Xmaxerrs 10 ./src/imasjava/*.java           -sourcepath ./src  -d ./build 
-	javac -g -Xmaxerrs 10 ./src/imasjava/utilities/*.java -sourcepath ./src  -d ./build
+all: $(JARFILE)
+
+sources: $(GENSOURCES)
 
 install: all
-	mkdir -p $(INSTALL)/jar
-	cp ./lib/imas.jar $(INSTALL)/jar
+	install -d $(INSTALL)/jar
+	install -m644 ./lib/imas.jar $(INSTALL)/jar/
 
 clean:
-	$(RM) -rf ./build/ 
-	$(RM) -rf ./lib/
+	$(RM) -r ./build ./lib
+	$(RM) $(JARFILE)
 
 clean-src: clean
-	$(RM) -rf ./src/imasjava/imas.java
-	$(RM) -rf ./src/imasjava/ids
+	$(RM) $(GENSOURCES)
 
-imas.jar : $(SOURCES) 
-#	javac $(SOURCES)
-#	jar cf imas.jar $(CLASSES)
-	mkdir -p ./build/
-	javac -g -Xmaxerrs 10 ./src/imasjava/*.java           -sourcepath ./src  -d ./build
-	javac -g -Xmaxerrs 10 ./src/imasjava/utilities/*.java -sourcepath ./src  -d ./build
-	mkdir -p ./lib/
-	jar cf ./lib/imas.jar -C ./build . 
+$(JARFILE): $(dir $(JARFILE)) $(CLASSFILE)
+	$(JAR) cvf $@ -C ./build .
 
-$(SOURCES) : IDSDef2Java.xsl
-	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl 
-#	java net.sf.saxon.Transform -t -s:../xml/IDSDef.xml -xsl:IDSDef2Java.xsl -o:imasjava/imas.java
-#	xsltproc IDSDef2Java.xsl ../xml/IDSDef.xml > imasjava/imas.java
+$(CLASSFILE): $(dir $(CLASSFILE)) $(GENSOURCES)
+	$(JAVAC) $(JFLAGS) $(subst build/,src/,$(@:.class=.java))
+
+# Use an intermediate target to enforce nonparallel generation.
+gensources: IDSDef2Java.xsl saxonicajar
+	java net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$<
+
+# Test if all generated sources are found to exist as files to
+# gracefully skip generation if not needed.
+ifeq ($(words $(GENSOURCES)), $(words $(wildcard $(GENSOURCES))))
+$(GENSOURCES):
+else
+$(GENSOURCES): gensources
+endif
+
+# Directory prerequisites
+$(dir $(CLASSFILE) $(JARFILE)):
+	install -d $@
+
+# Test for saxon
+# Check that "saxon9he.jar" utility is set in CLASSPATH and existst
+SAXONICAJAR=$(wildcard $(filter %saxon9he.jar,$(subst :, ,$(CLASSPATH))))
+saxonicajar:
+ifeq (,$(SAXONICAJAR))
+	$(error Invalid /path/to/saxon9he.jar in CLASSPATH. Forgot to load module?)
+endif
+
 endif
