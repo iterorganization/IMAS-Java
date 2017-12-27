@@ -6,7 +6,7 @@
 <xsl:stylesheet xmlns:yaslt="http://www.mod-xslt2.com/ns/1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0"  xmlns:exsl="http://exslt.org/common" extension-element-prefixes="yaslt exsl"
   xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
- 
+
   <!--   <xsl:stylesheet xmlns:yaslt="http://www.mod-xslt2.com/ns/1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
      xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
        xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
@@ -27,51 +27,47 @@
 <!--=================================================-->
 
 <xsl:template match = "/IDSs">
-<xsl:result-document href="src/imasjava/imas.java" method="text"> 
- package imasjava;
+<xsl:result-document href="src/imasjava/imas.java" method="text">
+package imasjava;
 import java.io.File;
-   import java.lang.reflect.*;
+import java.lang.reflect.*;
 
 import imasjava.utilities.ImasReflection;
 import imasjava.ids.*;
 
-
 public class imas {
-        static {
-        String libpath = System.getenv("IMAS_HOME");
-        String imasversion = System.getenv("IMAS_VERSION");
-        String ualversion = System.getenv("UAL_VERSION");
-        if ( libpath == null ) {
-            System.err.println("IMAS library not set up in the environment. (IMAS_HOME missing)");
-            System.exit(0);
-        }
-        if ( imasversion == null ) {
-            System.err.println("IMAS library not set up in the environment. (IMAS_VERSION missing)");
-            System.exit(0);
-        }
-        if ( ualversion == null ) {
-            System.err.println("IMAS library not set up in the environment. (UAL_VERSION missing)");
-            System.exit(0);
-        }
-        libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
-        String imas_library = libpath + "/libimas.so";
-        File f = new File(imas_library);
-        if (! f.exists() ) {
-            System.err.println("IMAS library not set up in the environment. (libimas.so missing)");
-        }
+ static {
+  String libpath = System.getenv("IMAS_HOME");
+  String imasversion = System.getenv("IMAS_VERSION");
+  String ualversion = System.getenv("UAL_VERSION");
+  if (libpath == null) {
+   System.err.println("IMAS library not set up in the environment. (IMAS_HOME missing)");
+   System.exit(0);
+  }
+  if (imasversion == null) {
+   System.err.println("IMAS library not set up in the environment. (IMAS_VERSION missing)");
+   System.exit(0);
+  }
+  if (ualversion == null) {
+   System.err.println("IMAS library not set up in the environment. (UAL_VERSION missing)");
+   System.exit(0);
+  }
+  libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
+  String imas_library = libpath + "/libimas.so";
+  File f = new File(imas_library);
+  if (!f.exists()) {
+   System.err.println("IMAS library not set up in the environment. (libimas.so missing)");
+  }
 
-        try {
-            System.load(imas_library);
-        }
-        catch(UnsatisfiedLinkError exc) {
-          System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
-        }
-        catch(Throwable exc)
-        {
-            System.err.println("Cannot link to JNI library: " + exc);
-            System.exit(0);
-        }
-        }
+  try {
+   System.load(imas_library);
+  } catch (UnsatisfiedLinkError exc) {
+   System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
+  } catch (Throwable exc) {
+   System.err.println("Cannot link to JNI library: " + exc);
+   System.exit(0);
+  }
+ }
  public static final int EMPTY_INT = -999999999;
  public static final double EMPTY_DOUBLE = -9.0E40;
 
@@ -81,66 +77,63 @@ public class imas {
 
 
 
-public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException{
-		Class ids = ImasReflection.getIdsClass(idsName);
-		return imas.isIDSClassTimeDependent(ids);
-	}
+ public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException {
+  Class ids = ImasReflection.getIdsClass(idsName);
+  return imas.isIDSClassTimeDependent(ids);
+ }
 
 
-public static boolean isIDSClassTimeDependent(Class idsClass) {
-	Field[] fields = idsClass.getFields();
-	boolean timedIds = false;
+ public static boolean isIDSClassTimeDependent(Class idsClass) {
+  Field[] fields = idsClass.getFields();
+  boolean timedIds = false;
 
-	for(Field field : fields) {
-		if(field.getName().equals("time")) {
-			timedIds = true;
-			break;
-		}
-	}
+  for (Field field: fields) {
+   if (field.getName().equals("time")) {
+    timedIds = true;
+    break;
+   }
+  }
 
-	return timedIds;
-}
-		
-    
-	       
- public static java.util.ArrayList getAvailableIDSs()  throws
-                         java.lang.NoSuchMethodException,
-			 java.lang.IllegalAccessException,               
-		         java.lang.reflect.InvocationTargetException
-{
-       java.util.ArrayList result = new java.util.ArrayList();
-       Class[] classes = imasjava.imas.class.getClasses();
-     
-       for(Class classId : classes) 
-       { 
-        //  if(CPOInterface.class.isAssignableFrom(classId)) 
-	  {
-	        Method method = classId.getMethod("getIdsName");           
-	        Object retVal = method.invoke(null);
-		result.add( (String) retVal );
-	  }
-        }
-      return result;
-}
-										  
-    public static int getMaxOccurences(String idsName) throws
-          java.lang.NoSuchMethodException,
-	  java.lang.IllegalAccessException,
-          java.lang.reflect.InvocationTargetException 
+  return timedIds;
+ }
+
+
+
+ public static java.util.ArrayList getAvailableIDSs() throws
+ java.lang.NoSuchMethodException,
+  java.lang.IllegalAccessException,
+  java.lang.reflect.InvocationTargetException {
+   java.util.ArrayList result = new java.util.ArrayList();
+   Class[] classes = imasjava.imas.class.getClasses();
+
+   for (Class classId: classes) {
+    //  if(CPOInterface.class.isAssignableFrom(classId))
     {
-       Class[] classes = imasjava.imas.class.getClasses();
-       Class idsClass = null;
-	
-	for(Class classId : classes) {
-	        if(classId.getName().contains(idsName)) {
-	                 Method method = classId.getMethod("getMaxOccurences");
-		         Object retVal = method.invoke(null);
-	                  return ((Integer) retVal).intValue();	    		    
-		  }
-	  }
-	  return -1;
-      }
-		    	    
+     Method method = classId.getMethod("getIdsName");
+     Object retVal = method.invoke(null);
+     result.add((String) retVal);
+    }
+   }
+   return result;
+  }
+
+ public static int getMaxOccurences(String idsName) throws
+ java.lang.NoSuchMethodException,
+  java.lang.IllegalAccessException,
+  java.lang.reflect.InvocationTargetException {
+   Class[] classes = imasjava.imas.class.getClasses();
+   Class idsClass = null;
+
+   for (Class classId: classes) {
+    if (classId.getName().contains(idsName)) {
+     Method method = classId.getMethod("getMaxOccurences");
+     Object retVal = method.invoke(null);
+     return ((Integer) retVal).intValue();
+    }
+   }
+   return -1;
+  }
+
 
  //Cache Management methods
  public static native void enableMemCache(int expIdx);
@@ -151,175 +144,175 @@ public static boolean isIDSClassTimeDependent(Class idsClass) {
  public static native void flush(int expIdx, String idsPath);
 
  /**
- *Open the selected database. Missing fields in the database will be retrieved from the reference database.
- * @param name Name of the database (by convention imas).
- * @param shot Shot number.
- * @param run Run Number.
- * @param refShot Shot number of the reference database.
- * @param runRun Run Number of the reference database.
- * @return the database index to be used in subsequent get/put calls
- * @exception UALException is thrown if the database cannot be open
- **/
- static public native int open(String name, int shot, int run)  throws UALException;
+  *Open the selected database. Missing fields in the database will be retrieved from the reference database.
+  * @param name Name of the database (by convention imas).
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param refShot Shot number of the reference database.
+  * @param runRun Run Number of the reference database.
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open
+  **/
+ static public native int open(String name, int shot, int run) throws UALException;
  /**
- *Creates a new database instance.
- * @param name Name of the database (by convention imas).
- * @param shot Shot number.
- * @param run Run Number.
- * @param refShot Shot number of the reference database.
- * @param runRun Run Number of the reference database.
- * @return the database index to be used in subsequent get/put calls
- * @exception UALException is thrown if the database cannot be open.
- **/
+  *Creates a new database instance.
+  * @param name Name of the database (by convention imas).
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param refShot Shot number of the reference database.
+  * @param runRun Run Number of the reference database.
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open.
+  **/
  static public native int create(String name, int shot, int run, int refShot, int refRun) throws UALException;
- static public native int openEnv(String name, int shot, int run, String user, String tokamak, String version)  throws UALException;
+ static public native int openEnv(String name, int shot, int run, String user, String tokamak, String version) throws UALException;
  /**
- *Creates a new database instance.
- * @param name Name of the database (by convention imas).
- * @param shot Shot number.
- * @param run Run Number.
- * @param refShot Shot number of the reference database.
- * @param runRun Run Number of the reference database.
- * @return the database index to be used in subsequent get/put calls
- * @exception UALException is thrown if the database cannot be open.
- **/
+  *Creates a new database instance.
+  * @param name Name of the database (by convention imas).
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param refShot Shot number of the reference database.
+  * @param runRun Run Number of the reference database.
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open.
+  **/
  static public native int createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version) throws UALException;
 
-/*
-//---------- Create a new run with an automatically generated run number ---------
- static public int createdb(String user, String machine, int shot, String dataVersion) throws UALException
+ /*
+ //---------- Create a new run with an automatically generated run number ---------
+  static public int createdb(String user, String machine, int shot, String dataVersion) throws UALException
+  {
+      return createdb(user, machine, shot, dataVersion, null, null, 0, 0);
+  }
+  static public int createdb(String user, String machine, int shot, String dataVersion, String parentUser,
+      String parentMachine, int parentShot, int parentRun) throws UALException
+  {
+      int run;
+      if(parentUser == null)
+      	run = UALLowLevel.createNewRunDb(user, machine, shot, dataVersion);
+      else
+     	run = UALLowLevel.createNewRunParentDb(user, machine, shot, dataVersion, parentUser, parentMachine, parentShot, parentRun);
+
+      if(run <xsl:text disable-output-escaping = "yes"> &lt; </xsl:text> 0)
+ 	throw new UALException("Cannot create Catalogue Entry");
+      return createEnv("ids", shot, run, shot, run, user, machine, dataVersion);
+  }
+
+ //---------- Create a new run with a specified run number ---------
+ static public int createdb(String user, String machine, int shot, int run, String dataVersion) throws UALException
  {
-     return createdb(user, machine, shot, dataVersion, null, null, 0, 0);
+ 	return createdb(user, machine, shot, run, dataVersion, null, null, 0, 0);
  }
- static public int createdb(String user, String machine, int shot, String dataVersion, String parentUser,
-     String parentMachine, int parentShot, int parentRun) throws UALException
+ static public int createdb(String user, String machine, int shot, int run, String dataVersion, String parentUser,
+ 	String parentMachine, int parentShot, int parentRun) throws UALException
  {
-     int run;
-     if(parentUser == null)
-     	run = UALLowLevel.createNewRunDb(user, machine, shot, dataVersion);
-     else
-    	run = UALLowLevel.createNewRunParentDb(user, machine, shot, dataVersion, parentUser, parentMachine, parentShot, parentRun);
+ 	if(parentUser == null)
+ 		UALLowLevel.createSpecifiedRunDb(user, machine, shot, run, dataVersion);
+ 	else
+ 		UALLowLevel.createSpecifiedRunParentDb(user, machine, shot, run, dataVersion, parentUser, parentMachine, parentShot, parentRun);
 
-     if(run <xsl:text disable-output-escaping = "yes"> &lt; </xsl:text> 0)
-	throw new UALException("Cannot create Catalogue Entry");
-     return createEnv("ids", shot, run, shot, run, user, machine, dataVersion);
+ 	return createEnv("ids", shot, run, shot, run, user, machine, dataVersion);
  }
-
-//---------- Create a new run with a specified run number ---------
-static public int createdb(String user, String machine, int shot, int run, String dataVersion) throws UALException
-{
-	return createdb(user, machine, shot, run, dataVersion, null, null, 0, 0);
-}
-static public int createdb(String user, String machine, int shot, int run, String dataVersion, String parentUser,
-	String parentMachine, int parentShot, int parentRun) throws UALException
-{
-	if(parentUser == null)
-		UALLowLevel.createSpecifiedRunDb(user, machine, shot, run, dataVersion);
-	else
-		UALLowLevel.createSpecifiedRunParentDb(user, machine, shot, run, dataVersion, parentUser, parentMachine, parentShot, parentRun);
-
-	return createEnv("ids", shot, run, shot, run, user, machine, dataVersion);
-}
-*/
+ */
 
 
- static public native int openHdf5(String name, int shot, int run)  throws UALException;
- 
+ static public native int openHdf5(String name, int shot, int run) throws UALException;
+
  /**
- *Creates a new database instance.
- * @param name Name of the database (by convention imas).
- * @param shot Shot number.
- * @param run Run Number.
- * @param refShot Shot number of the reference database.
- * @param runRun Run Number of the reference database.
- * @return the database index to be used in subsequent get/put calls
- * @exception UALException is thrown if the database cannot be open.
- **/
+  *Creates a new database instance.
+  * @param name Name of the database (by convention imas).
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param refShot Shot number of the reference database.
+  * @param runRun Run Number of the reference database.
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open.
+  **/
  static public native int createHdf5(String name, int shot, int run, int refShot, int refRun) throws UALException;
 
 
- static public native int openPublic(String name, int shot, int run, String expName)  throws UALException;
+ static public native int openPublic(String name, int shot, int run, String expName) throws UALException;
 
  /**
- *Creates a new database instance.
- * @param name Name of the database (by convention imas).
- * @param shot Shot number.
- * @param run Run Number.
- * @param refShot Shot number of the reference database.
- * @param runRun Run Number of the reference database.
- * @param expName Name of the remote experiment to fetch data from.
- * @return the database index to be used in subsequent get/put calls
- * @exception UALException is thrown if the database cannot be open.
- **/
+  *Creates a new database instance.
+  * @param name Name of the database (by convention imas).
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param refShot Shot number of the reference database.
+  * @param runRun Run Number of the reference database.
+  * @param expName Name of the remote experiment to fetch data from.
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open.
+  **/
  static public native int createPublic(String name, int shot, int run, int refShot, int refRun, String expName) throws UALException;
 
 
  /**
- * Connect to a remote database
- * @param ip address or name of the MDSplus server
- * @exception UALException is thrown if the connection fails
- **/
+  * Connect to a remote database
+  * @param ip address or name of the MDSplus server
+  * @exception UALException is thrown if the connection fails
+  **/
  static public native void connect(String ip) throws UALException;
 
  /**
- * Disconnect from a remote database
- * @exception UALException is thrown if the disconnection fails
- **/
+  * Disconnect from a remote database
+  * @exception UALException is thrown if the disconnection fails
+  **/
  static public native void disconnect() throws UALException;
 
  /**
- * Execute a shell command (either locally or remotely)
- * @param ip address or name of the MDSplus server
- * @param command command to be executed
- * @return the standard output of the command
- * @exception UALException is thrown if the execution fails
- **/
+  * Execute a shell command (either locally or remotely)
+  * @param ip address or name of the MDSplus server
+  * @param command command to be executed
+  * @return the standard output of the command
+  * @exception UALException is thrown if the execution fails
+  **/
  static public native String exec(String ip, String command) throws UALException;
 
  /**
- *Closes the currently open database.
- * @param refIdx database index, returned by create or open.
- * @param name Name of the database (by convention imas).
- * @param shot Shot number.
- * @param run Run Number.
- **/
+  *Closes the currently open database.
+  * @param refIdx database index, returned by create or open.
+  * @param name Name of the database (by convention imas).
+  * @param shot Shot number.
+  * @param run Run Number.
+  **/
  static public native int close(int refIdx);
 
- static int getShot(int idx){return UALLowLevel.getShot(idx);}
- static int getRun(int idx){return UALLowLevel.getRun(idx);}
+ static int getShot(int idx) {
+  return UALLowLevel.getShot(idx);
+ }
+ static int getRun(int idx) {
+  return UALLowLevel.getRun(idx);
+ }
 
- static public int close(int refIdx, String name, int shot, int run){return close(refIdx);}
+ static public int close(int refIdx, String name, int shot, int run) {
+  return close(refIdx);
+ }
 
  /**
- *Get the time base of a ids.
- * @param idx database index, returned by create or open.
- * @param path name of the IDS
- * @return a vector containing the times of all slices
- * @exception UALException is thrown if the time base cannot be read.
- **/
- static public Vect1DDouble getTime(int expIdx, String path) throws UALException
-{
-	UALLowLevel.beginIDSGet(expIdx,path,true);
-	Vect1DDouble time = UALLowLevel.getVect1DDouble(expIdx,path,"time");
-	UALLowLevel.endIDSGet(expIdx,path);
-	return time;
-}
+  *Get the time base of a ids.
+  * @param idx database index, returned by create or open.
+  * @param path name of the IDS
+  * @return a vector containing the times of all slices
+  * @exception UALException is thrown if the time base cannot be read.
+  **/
+ static public Vect1DDouble getTime(int expIdx, String path) throws UALException {
+  UALLowLevel.beginIDSGet(expIdx, path, true);
+  Vect1DDouble time = UALLowLevel.getVect1DDouble(expIdx, path, "time");
+  UALLowLevel.endIDSGet(expIdx, path);
+  return time;
+ }
 
  <xsl:apply-templates select = "IDS" mode="DEFINE_IDS_MEMBER"/>
  }
-
 </xsl:result-document>
 
- <xsl:apply-templates select = "IDS" mode="DEFINE_IDS_BASE_CLASS"/> 
+<xsl:apply-templates select = "IDS" mode="DEFINE_IDS_BASE_CLASS"/>
 </xsl:template>
 
-
-
 <xsl:template match = "IDS" mode="DEFINE_IDS_MEMBER">
-public static class <xsl:value-of select="@name"/> extends <xsl:value-of select="@name"/>_IDSBase 
+public static class <xsl:value-of select="@name"/> extends <xsl:value-of select="@name"/>_IDSBase
 {
-
-
 }
 </xsl:template>
 <!--=======================================================================================================================-->
