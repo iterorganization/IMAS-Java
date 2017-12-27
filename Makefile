@@ -30,6 +30,9 @@ JARFILE = lib/imas.jar
 all: $(JARFILE)
 
 sources: $(GENSOURCES)
+sources_install: $(GENSOURCES)
+	install -d $(INSTALL)/share/src/javainterface
+	cp -r ./src/imasjava $(INSTALL)/share/src/javainterface
 
 install: all
 	install -d $(INSTALL)/jar
