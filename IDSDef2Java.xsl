@@ -4,7 +4,7 @@
 
 
 <xsl:stylesheet xmlns:yaslt="http://www.mod-xslt2.com/ns/1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"  xmlns:exsl="http://exslt.org/common" extension-element-prefixes="yaslt exsl"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0"  xmlns:exsl="http://exslt.org/common" extension-element-prefixes="yaslt exsl"
   xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
  
   <!--   <xsl:stylesheet xmlns:yaslt="http://www.mod-xslt2.com/ns/1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -1910,14 +1910,10 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
           timepath = strNodePath + "time";
    	}
  	<xsl:choose>
-	<xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
-		<xsl:call-template name="getStringSlice"> 
-		<xsl:with-param name="Function">String</xsl:with-param>
-		<xsl:with-param name="SliceFunction">String</xsl:with-param>
-		<xsl:with-param name="Exception">null</xsl:with-param>
-		</xsl:call-template>
-        </xsl:when>
-        <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
+		<xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
+				<xsl:call-template name="getStringSlice"/>
+		</xsl:when>
+		<xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
 		<xsl:call-template name="getVariableSlice"> 
 		<xsl:with-param name="Function">Vect1DDouble</xsl:with-param>
 		<xsl:with-param name="SliceFunction">Double</xsl:with-param>
@@ -2095,9 +2091,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 
   <!-- Generate the full name of the subclass from the field path -->
   <xsl:param name="class_name">
-    <xsl:call-template name="BUILD_CLASS_NAME">
-      <xsl:with-param name="typepath"><xsl:value-of select = "@path"/></xsl:with-param >
-    </xsl:call-template>
+    <xsl:call-template name="BUILD_CLASS_NAME"/>
   </xsl:param>
   <xsl:call-template name="COMMENT_FIELD_SHORT"/>
   <xsl:choose>
