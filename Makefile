@@ -15,7 +15,7 @@ JFLAGS = -g -Xmaxerrs 10 -sourcepath ./src -d ./build
 
 # Get a list of IDS from IDSDEF file
 IDSDEF = ../xml/IDSDef.xml
-IDSNAMES := $(shell sed '/<IDS name=/!d;s/.*name="\(.*\)"/\1/' $(IDSDEF))
+IDSNAMES := $(shell sed '/<IDS name=/!d;s/.*name="\([^"]*\)".*/\1/' $(IDSDEF))
 IDSSOURCES = $(addprefix src/imasjava/ids/,$(addsuffix _IDSBase.java,$(IDSNAMES)))
 # Generated sources (not all sources)
 GENSOURCES = src/imasjava/imas.java $(IDSSOURCES)
