@@ -1,12 +1,9 @@
+# -*- makefile -*- #
 include ../Makefile.common
 
 ifeq ("no","$(JAVA)")
-$(warning Ignoring javainterface (JAVA=no).)
-all:
-sources:
-clean:
-clean-src:
-install:
+all sources sources_install install clean clean-src:
+	$(warning "Ignoring javainterface (JAVA=no).")
 else
 
 JAVAC = javac
