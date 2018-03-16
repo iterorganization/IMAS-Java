@@ -1,7 +1,7 @@
 # -*- makefile -*- #
 include ../Makefile.common
 
-ifeq ("no","$(JAVA)")
+ifeq ("no","$(strip $(JAVA))")
 all sources sources_install install clean clean-src:
 	$(warning "Ignoring javainterface (JAVA=no).")
 else
