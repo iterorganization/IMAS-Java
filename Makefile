@@ -1,9 +1,9 @@
 # -*- makefile -*- #
 include ../Makefile.common
 
-ifeq ("no","$(strip $(JAVA))")
+ifeq ("no","$(strip $(IMAS_JAVA))")
 all sources sources_install install clean clean-src:
-	$(warning "Ignoring javainterface (JAVA=no).")
+	$(warning "Ignoring javainterface (IMAS_JAVA=no).")
 else
 
 JAVAC = javac
@@ -76,4 +76,4 @@ ifeq (,$(SAXONICAJAR))
 	$(error Invalid /path/to/saxon9he.jar in CLASSPATH. Forgot to load module?)
 endif
 
-endif
+endif # IMAS_JAVA=no?
