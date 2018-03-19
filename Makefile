@@ -32,14 +32,14 @@ all: $(JARFILE)
 
 sources: $(GENSOURCES)
 sources_install: $(GENSOURCES)
-	install -d $(INSTALL)/share/src/javainterface/imasjava/{ids,utilities}
-	install -m644 src/imasjava/*.java $(INSTALL)/share/src/javainterface/imasjava
-	install -m644 src/imasjava/ids/*.java $(INSTALL)/share/src/javainterface/imasjava/ids
-	install -m644 src/imasjava/utilities/*.java $(INSTALL)/share/src/javainterface/imasjava/utilities
+	install -d $(datadir)/src/javainterface/imasjava/{ids,utilities}
+	install -m644 src/imasjava/*.java $(datadir)/src/javainterface/imasjava
+	install -m644 src/imasjava/ids/*.java $(datadir)/src/javainterface/imasjava/ids
+	install -m644 src/imasjava/utilities/*.java $(datadir)/src/javainterface/imasjava/utilities
 
 install: all
-	install -d $(INSTALL)/jar
-	install -m644 ./lib/imas.jar $(INSTALL)/jar/
+	install -d $(prefix)/jar
+	install -m644 ./lib/imas.jar $(prefix)/jar/
 
 clean:
 	$(RM) -r ./build ./lib
