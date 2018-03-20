@@ -32,14 +32,14 @@ all: $(JARFILE)
 
 sources: $(GENSOURCES)
 sources_install: $(GENSOURCES)
-	install -d $(datadir)/src/javainterface/imasjava/{ids,utilities}
-	install -m644 src/imasjava/*.java $(datadir)/src/javainterface/imasjava
-	install -m644 src/imasjava/ids/*.java $(datadir)/src/javainterface/imasjava/ids
-	install -m644 src/imasjava/utilities/*.java $(datadir)/src/javainterface/imasjava/utilities
+	$(mkdir_p) $(datadir)/src/javainterface/imasjava/{ids,utilities}
+	$(INSTALL_DATA) src/imasjava/*.java $(datadir)/src/javainterface/imasjava
+	$(INSTALL_DATA) src/imasjava/ids/*.java $(datadir)/src/javainterface/imasjava/ids
+	$(INSTALL_DATA) src/imasjava/utilities/*.java $(datadir)/src/javainterface/imasjava/utilities
 
 install: all
-	install -d $(prefix)/jar
-	install -m644 ./lib/imas.jar $(prefix)/jar/
+	$(mkdir_p) $(prefix)/jar
+	$(INSTALL_DATA) ./lib/imas.jar $(prefix)/jar/
 
 clean:
 	$(RM) -r ./build ./lib
@@ -49,11 +49,11 @@ clean-src: clean
 	$(RM) $(GENSOURCES)
 
 $(JARFILE): $(CLASSFILE)
-	@install -d $(dir $@)
+	@$(mkdir_p) $(dir $@)
 	$(JAR) cf $@ -C ./build .
 
 $(CLASSES): $(GENSOURCES)
-	@install -d $(dir $@)
+	@$(mkdir_p) $(dir $@)
 	$(JAVAC) $(JFLAGS) $(subst build/,src/,$(@:.class=.java))
 
 # Use an intermediate target to enforce nonparallel generation.
