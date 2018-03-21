@@ -49,11 +49,11 @@ clean-src: clean
 	$(RM) $(GENSOURCES)
 
 $(JARFILE): $(CLASSFILE)
-	@$(mkdir_p) $(dir $@)
+	@$(mkdir_p) $(@D)
 	$(JAR) cf $@ -C ./build .
 
 $(CLASSES): $(GENSOURCES)
-	@$(mkdir_p) $(dir $@)
+	@$(mkdir_p) $(@D)
 	$(JAVAC) $(JFLAGS) $(subst build/,src/,$(@:.class=.java))
 
 # Use an intermediate target to enforce nonparallel generation.
