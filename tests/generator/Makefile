@@ -5,10 +5,10 @@ all: test
 
 
 clean:
-		rm -rf $(TESTDIR)
+		$(RM) -r $(TESTDIR)
 
 $(TESTDIR)/TestSuite.java:  TestSuiteJava.xsl $(IDSDEF)
-	mkdir -p $(TESTDIR)
+	$(mkdir_p) $(TESTDIR)
 	xsltproc TestSuiteJava.xsl $(IDSDEF) > $(TESTDIR)/TestSuite.java
 
 $(TESTDIR)/TestSuite.class:  $(TESTDIR)/TestSuite.java
