@@ -429,6 +429,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
  **/
     public static void put(int expIdx, String path, imas.<xsl:value-of select="@name"/> ids)  throws UALException
     {
+	if (ids.ids_properties.homogeneous_time == imas.EMPTY_INT) 
+    		return;
+
     	<xsl:value-of select="@name"/>_IDSBase.setHomogeneous(ids.ids_properties.homogeneous_time == 1);
 	
 	<xsl:value-of select="@name"/>_IDSBase.setIdsTime(ids.time);
@@ -461,6 +464,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
  **/
     public static void putNonTimed(int expIdx, String path, imas.<xsl:value-of select="@name"/> ids) throws UALException
     {
+	if (ids.ids_properties.homogeneous_time == imas.EMPTY_INT) 
+    		return;
+
          ids.putNonTimed(expIdx,  path);
     }
 
@@ -492,6 +498,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
  **/
     public static void putSlice(int expIdx, String path, imas.<xsl:value-of select="@name"/> ids) throws UALException
     {
+	if (ids.ids_properties.homogeneous_time == imas.EMPTY_INT) 
+    		return;
+
 
     	  if (ids.ids_properties.homogeneous_time == 0) {
             System.out.println("ERROR : the PUT_SLICE routine works only for homogeneous time IDS");
