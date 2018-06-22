@@ -430,7 +430,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
     public static void put(int expIdx, String path, imas.<xsl:value-of select="@name"/> ids)  throws UALException
     {
 	if (ids.ids_properties.homogeneous_time == imas.EMPTY_INT) 
+	{
+		System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
     		return;
+	}
 
     	<xsl:value-of select="@name"/>_IDSBase.setHomogeneous(ids.ids_properties.homogeneous_time == 1);
 	
@@ -465,7 +468,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
     public static void putNonTimed(int expIdx, String path, imas.<xsl:value-of select="@name"/> ids) throws UALException
     {
 	if (ids.ids_properties.homogeneous_time == imas.EMPTY_INT) 
+	{
+		System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUTNONTIMED quits with no action.");
     		return;
+	}
 
          ids.putNonTimed(expIdx,  path);
     }
@@ -499,7 +505,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
     public static void putSlice(int expIdx, String path, imas.<xsl:value-of select="@name"/> ids) throws UALException
     {
 	if (ids.ids_properties.homogeneous_time == imas.EMPTY_INT) 
+	{
+		System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUTSLICE quits with no action.");
     		return;
+	}
 
 
     	  if (ids.ids_properties.homogeneous_time == 0) {
