@@ -42,6 +42,15 @@ public class Vect2DInt
     {
         return array;
     }
+
+    public void setArray(int[] array, int dim1, int dim2) 
+    {
+        //this.array = new int[dim1 * dim2 ];
+        this.array = array;
+        this.dim1 = dim1;
+        this.dim2 = dim2;
+    }
+
     public String toString()
     {
         String retStr = "[";

@@ -1,7 +1,7 @@
 package imasjava;
 public class Vect1DDouble
 {
-    double array[];
+    double array[] = null;
     
     public Vect1DDouble(int dim)
     {
@@ -17,6 +17,13 @@ public class Vect1DDouble
     public double getElementAt(int idx) {return array[idx];}
     public void setElementAt(int idx, double element) {array[idx] = element;}
     public double[] getArray() {return array;}
+
+    public void setArray(double[] array, int dim) 
+    {
+        //this.array = new double[dim];
+        this.array = array;
+    }
+
     public String toString()
     {
         String retStr = "[";

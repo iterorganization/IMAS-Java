@@ -68,6 +68,21 @@ public class Vect7DDouble
     {
         return array;
     }
+
+    public void setArray(double[] array, int dim1, int dim2, int dim3, int dim4, int dim5, int dim6, int dim7) 
+    {
+        //this.array = new double[dim1 * dim2 * dim3 * dim4 * dim5 * dim6 * dim7];
+        this.array = array;
+        this.dim1 = dim1;
+        this.dim2 = dim2;
+        this.dim3 = dim3;
+        this.dim4 = dim4;
+        this.dim5 = dim5;
+        this.dim6 = dim6;
+        this.dim7 = dim7;
+    }
+
+
     public String toString()
     {
         String retStr = "[";

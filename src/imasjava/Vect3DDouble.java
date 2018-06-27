@@ -46,6 +46,16 @@ public class Vect3DDouble
     {
         return array;
     }
+
+    public void setArray(double[] array, int dim1, int dim2, int dim3) 
+    {
+        //this.array = new double[dim1 * dim2 * dim3];
+        this.array = array;
+        this.dim1 = dim1;
+        this.dim2 = dim2;
+        this.dim3 = dim3;
+    }
+
     public String toString()
     {
         String retStr = "[";

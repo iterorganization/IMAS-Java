@@ -52,6 +52,18 @@ public class Vect5DDouble
     {
         return array;
     }
+
+    public void setArray(double[] array, int dim1, int dim2, int dim3, int dim4, int dim5) 
+    {
+        //this.array = new double[dim1 * dim2 * dim3 * dim4 * dim5];
+        this.array = array;
+        this.dim1 = dim1;
+        this.dim2 = dim2;
+        this.dim3 = dim3;
+        this.dim4 = dim4;
+        this.dim5 = dim5;
+    }
+
     public String toString()
     {
         String retStr = "[";
