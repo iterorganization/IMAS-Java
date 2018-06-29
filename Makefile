@@ -1,9 +1,9 @@
 # -*- makefile -*- #
 include ../Makefile.common
 
-ifeq ("no","$(JAVA)")
+ifeq ("no","$(strip $(IMAS_JAVA))")
 all sources sources_install install clean clean-src:
-	$(warning "Ignoring javainterface (JAVA=no).")
+	$(warning "Ignoring javainterface (IMAS_JAVA=no).")
 else
 
 JAVAC = javac
@@ -32,14 +32,14 @@ all: $(JARFILE)
 
 sources: $(GENSOURCES)
 sources_install: $(GENSOURCES)
-	install -d $(INSTALL)/share/src/javainterface/imasjava/{ids,utilities}
-	install -m644 src/imasjava/*.java $(INSTALL)/share/src/javainterface/imasjava
-	install -m644 src/imasjava/ids/*.java $(INSTALL)/share/src/javainterface/imasjava/ids
-	install -m644 src/imasjava/utilities/*.java $(INSTALL)/share/src/javainterface/imasjava/utilities
+	$(mkdir_p) $(datadir)/src/javainterface/imasjava/{ids,utilities}
+	$(INSTALL_DATA) src/imasjava/*.java $(datadir)/src/javainterface/imasjava
+	$(INSTALL_DATA) src/imasjava/ids/*.java $(datadir)/src/javainterface/imasjava/ids
+	$(INSTALL_DATA) src/imasjava/utilities/*.java $(datadir)/src/javainterface/imasjava/utilities
 
 install: all
-	install -d $(INSTALL)/jar
-	install -m644 ./lib/imas.jar $(INSTALL)/jar/
+	$(mkdir_p) $(prefix)/jar
+	$(INSTALL_DATA) ./lib/imas.jar $(prefix)/jar/
 
 clean:
 	$(RM) -r ./build ./lib
@@ -49,11 +49,11 @@ clean-src: clean
 	$(RM) $(GENSOURCES)
 
 $(JARFILE): $(CLASSFILE)
-	@install -d $(dir $@)
+	@$(mkdir_p) $(@D)
 	$(JAR) cf $@ -C ./build .
 
 $(CLASSES): $(GENSOURCES)
-	@install -d $(dir $@)
+	@$(mkdir_p) $(@D)
 	$(JAVAC) $(JFLAGS) $(subst build/,src/,$(@:.class=.java))
 
 # Use an intermediate target to enforce nonparallel generation.
@@ -76,4 +76,4 @@ ifeq (,$(SAXONICAJAR))
 	$(error Invalid /path/to/saxon9he.jar in CLASSPATH. Forgot to load module?)
 endif
 
-endif
+endif # IMAS_JAVA=no?
