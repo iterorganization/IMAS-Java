@@ -224,26 +224,23 @@ public class LowLevel {
 		    int dim,
 		    int *size) throws UALException;
   */
- public static native int ual_read_data_int(int ctx,
+ public static native int[] ual_read_data_int(int ctx,
 		    final String fieldpath,
 		    final String timebasepath,
-		    int[] data,
 		    int datatype,
 		    int dim,
 		    int[] size) throws UALException;
 
- public static native int ual_read_data_double(int ctx,
+ public static native double[] ual_read_data_double(int ctx,
             final String fieldpath,
             final String timebasepath,
-            double[] data,
             int datatype,
             int dim,
             int[] size) throws UALException;
 
- public static native int ual_read_data_char(int ctx,
+ public static native byte[] ual_read_data_char(int ctx,
             final String fieldpath,
             final String timebasepath,
-            byte[] data,
             int datatype,
             int dim,
             int[] size) throws UALException;
