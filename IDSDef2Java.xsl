@@ -137,17 +137,6 @@ public class imas {
 
 
  /**
-  *Open the selected database. Missing fields in the database will be retrieved from the reference database.
-  * @param name Name of the database (by convention imas).
-  * @param shot Shot number.
-  * @param run Run Number.
-  * @param refShot Shot number of the reference database.
-  * @param runRun Run Number of the reference database.
-  * @return the database index to be used in subsequent get/put calls
-  * @exception UALException is thrown if the database cannot be open
-  **/
- static public native int open(String name, int shot, int run) throws UALException;
- /**
   *Creates a new database instance.
   * @param name Name of the database (by convention imas).
   * @param shot Shot number.
@@ -157,7 +146,7 @@ public class imas {
   * @return the database index to be used in subsequent get/put calls
   * @exception UALException is thrown if the database cannot be open.
   **/
- static public native int create(String name, int shot, int run, int refShot, int refRun) throws UALException;
+
  static public native int openEnv(String name, int shot, int run, String user, String tokamak, String version) throws UALException;
  /**
   *Creates a new database instance.
@@ -171,42 +160,7 @@ public class imas {
   **/
  static public native int createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version) throws UALException;
 
- /*
- //---------- Create a new run with an automatically generated run number ---------
-  static public int createdb(String user, String machine, int shot, String dataVersion) throws UALException
-  {
-      return createdb(user, machine, shot, dataVersion, null, null, 0, 0);
-  }
-  static public int createdb(String user, String machine, int shot, String dataVersion, String parentUser,
-      String parentMachine, int parentShot, int parentRun) throws UALException
-  {
-      int run;
-      if(parentUser == null)
-      	run = UALLowLevel.createNewRunDb(user, machine, shot, dataVersion);
-      else
-     	run = UALLowLevel.createNewRunParentDb(user, machine, shot, dataVersion, parentUser, parentMachine, parentShot, parentRun);
-
-      if(run <xsl:text disable-output-escaping = "yes"> &lt; </xsl:text> 0)
- 	throw new UALException("Cannot create Catalogue Entry");
-      return createEnv("ids", shot, run, shot, run, user, machine, dataVersion);
-  }
-
- //---------- Create a new run with a specified run number ---------
- static public int createdb(String user, String machine, int shot, int run, String dataVersion) throws UALException
- {
- 	return createdb(user, machine, shot, run, dataVersion, null, null, 0, 0);
- }
- static public int createdb(String user, String machine, int shot, int run, String dataVersion, String parentUser,
- 	String parentMachine, int parentShot, int parentRun) throws UALException
- {
- 	if(parentUser == null)
- 		UALLowLevel.createSpecifiedRunDb(user, machine, shot, run, dataVersion);
- 	else
- 		UALLowLevel.createSpecifiedRunParentDb(user, machine, shot, run, dataVersion, parentUser, parentMachine, parentShot, parentRun);
-
- 	return createEnv("ids", shot, run, shot, run, user, machine, dataVersion);
- }
- */
+ 
 
 
  
@@ -273,6 +227,7 @@ public static class <xsl:value-of select="@name"/> extends <xsl:value-of select=
 
 package imasjava.ids;
 
+import imasjava.wrapper.*;
 import imasjava.*;
 
 public class <xsl:value-of select="@name"/>_IDSBase
@@ -468,14 +423,14 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
     public void putSlice(int expIdx, String path) throws UALException
     {
-          String        timepath;
+          String        strTimeBasePath;
 	  String strNodePath = "";
 	  Vect1DDouble  idsGlobalTime = this.time;
 	  
           String        ual_debug = System.getenv("ual_debug");
 
   	  
-          timepath="time";
+          strTimeBasePath="time";
    <!--     <xsl:apply-templates select = "field" mode = "PUT_SLICE"/> 
     <xsl:apply-templates select="field" mode="PUT_SINGLE">
         <xsl:with-param name="dynamic_only" select="'yes'"/>
@@ -484,162 +439,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
 
 
-    <xsl:choose>
-      <!--============ General case (except topinfo) ============-->
-      <xsl:when test = "@name != 'topinfo'">
 
-/**
- * Method putdb stores a non timed <xsl:value-of select="@name"/> IDSs in the open database only if
- *  datainto.isref == 1. In any case it calls afterwards UALLowLevel.putIdsDb() in order to update catalogue
- * @param expIdx The index to the database, returned by imas.open()
- * @param user The current username
- * @param machine The current machine
- * @param shot The current shot
- * @param run The current run
- * @param path The path name to the selected ids. By convention, only a single tree level is defined for IDS objects in the database.
- * @param occurrence The occurence of the selected ids.
- * @param ids The  <xsl:value-of select="@name"/> IDSs
- * @exception UALException Issued when data cannot be stored for any reason.
- **/
-/*
-    public static void putdb(int expIdx, String user, String machine, int shot, int run,
-    	String path, int occurrence, <xsl:value-of select="@name"/> ids) throws UALException
-    {
-    	String actPath;
-        if(occurrence > 0)
-	    actPath = path+"/"+occurrence;
-	else
-	    actPath = path;
-	if(ids.IDS_Properties.isref == 1)
-	{
-	    put(expIdx, actPath, ids);
-	    UALLowLevel.putIdsDb(user, machine, shot, run, path, occurrence, 1,
-	    	user, machine, shot, run, occurrence);
-	}
-	else //isref == 2
-	{
-	    UALLowLevel.putIdsDb(user, machine, shot, run, path, occurrence, 2,
-	    	ids.IDS_Properties.whatref.user,  ids.IDS_Properties.whatref.machine,
-		ids.IDS_Properties.whatref.shot, ids.IDS_Properties.whatref.run,
-		ids.IDS_Properties.whatref.occurrence);
-
-	}
-    }
-*/
-
-/**
- * Method getdb retrieves the non timed <xsl:value-of select="@name"/> IDSs in the open database, taking the correct reference.
- * @param user The current username
- * @param machine The current machine
- * @param shot The current shot
- * @param run The current run
- * @param path The path name to the selected data item. By convention, only a single tree level is defined for IDS objects in the database.
- * @param occurrence The occurence of the selected ids.
- * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
- * missing IDS fields.
- * @return the <xsl:value-of select="@name"/> IDS . Missing fields are represented by zero sized vectors if not scalars,
- * by imas.EMPTY_INT if integer, imas.EMPTY_DOUBLE if float or double and empty String is string.
- **/
-    public static imas.<xsl:value-of select="@name"/> getdb(String user, String machine, int shot, int run, String version, String path, int occurrence) throws UALException
-    {
-//		int idx = UALLowLevel.openDb(user, machine, shot, run, path, occurrence);
-		int idx = imas.openEnv("ids", shot, run, user, machine, version);
-		if (occurrence != 0)
-			path = path + "/" + occurrence;
-		imas.<xsl:value-of select="@name"/> retIdss = null;
-                try {
-                        retIdss = get(idx, path);
-                }
-                catch(Exception exc) {
-                        retIdss = new imas.<xsl:value-of select="@name"/> ();
-                        System.out.println("Return a new <xsl:value-of select="@name"/> empty IDS after catching exception: "+exc);
-                }
-		imas.close(idx);
-		return retIdss;
-    }
-
-/*
-    public static void fillIdsRef(<xsl:value-of select="@name"/> ids, int isRef, String refUser, String refMachine, int refShot, int refRun, int refOccurrence)
-    {
-        ids.IDS_Properties.isref = isRef;
-        if(isRef != 1)
-        {
-            ids.IDS_Properties.whatref.user = refUser;
-                ids.IDS_Properties.whatref.machine = refMachine;
-                ids.IDS_Properties.whatref.shot = refShot;
-                ids.IDS_Properties.whatref.run = refRun;
-                ids.IDS_Properties.whatref.occurrence = refOccurrence;
-        }
-    }
-*/
-        </xsl:when>
-        <!--============ Special case: topinfo ============-->
-       <xsl:otherwise>
-/**
- * Method putdb always stores a non timed topinfo IDS in the open database (it is never a reference). It calls afterwards UALLowLevel.putIdsDb() in order to update catalogue
- * @param expIdx The index to the database, returned by imas.open()
- * @param user The current username
- * @param machine The current machine
- * @param shot The current shot
- * @param run The current run
- * @param path The path name to the selected ids. By convention, only a single tree level is defined for IDS objects in the database.
- * @param occurrence The occurence of the selected ids.
- * @param ids The topinfo IDS
- * @exception UALException Issued when data cannot be stored for any reason.
- **/
-/*
-	public static void putdb(int expIdx, String user, String machine, int shot, int run,
-		String path, int occurrence, <xsl:value-of select="@name"/> ids) throws UALException
-	{
-		String actPath;
-		if(occurrence > 0)
-			actPath = path+"/"+occurrence;
-		else
-			actPath = path;
-		put(expIdx, actPath, ids);
-		UALLowLevel.putIdsDb(user, machine, shot, run, path, occurrence, 1, user, machine, shot, run, occurrence);
-	}
-*/
-
-/**
- * Method getdb retrieves the non timed topinfo IDS in the open database.
- * @param user The current username
- * @param machine The current machine
- * @param shot The current shot
- * @param run The current run
- * @param path The path name to the selected data item. By convention, only a single tree level is defined for IDS objects in the database.
- * @param occurrence The occurence of the selected ids.
- * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
- * missing IDS fields.
- * @return the topinfo ids. Missing fields are represented by zero sized vectors if not scalars,
- * by imas.EMPTY_INT if integer, imas.EMPTY_DOUBLE if float or double and empty String is string.
- **/
-/*
-    public static <xsl:value-of select="@name"/> getdb(String user, String machine, int shot, int run, String path, int occurrence) throws UALException
-    {
-		int idx = UALLowLevel.openDb(user, machine, shot, run, path, occurrence);
-		if (occurrence != 0)
-			path = path + "/" + occurrence;
-		<xsl:value-of select="@name"/> retIdss = null;
-                try {
-                        retIdss = get(expIdx, path);
-                }
-                catch(Exception exc) {
-                        retIdss = new <xsl:value-of select="@name"/> ();
-                        System.out.println("Return a new <xsl:value-of select="@name"/> empty IDS after catching exception: "+exc);
-                }
-		imas.close(idx);
-		return retIdss;
-    }
-
-	public static void fillIdsRef(<xsl:value-of select="@name"/> ids, int isRef, String refUser, String refMachine,
-		int refShot, int refRun, int refOccurrence)
-	{
-		// do nothing since topinfo does not have any reference field
-	}
-*/
-        </xsl:otherwise>
-   </xsl:choose>
 
 
    /* ------------------------------------------------------------------------------------------------------------ */
@@ -704,7 +504,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
     
     public void doGetSlice(int expIdx, String path, double time, int interpolMode) throws UALException
     {
-      String        timepath;
+      String        strTimeBasePath;
       String        ual_debug = System.getenv("ual_debug");
       double        retTime;
       String strNodePath = "";
@@ -778,7 +578,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <!-- ============================================================ SUBCLASS == 'structure' type element	 =================================================================== -->
 <!-- ======================================================================================================================================================================= -->
 
-  <xsl:template match="field[@data_type='structure']" mode="CLASS">
+  <xsl:template match="field[@data_type='structure' or @data_type='struct_array']" mode="CLASS">
 	  <xsl:variable name="class_name">
 	<xsl:call-template name="BUILD_CLASS_NAME">
 	</xsl:call-template>
@@ -798,14 +598,14 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* _____________________________________________________________________________________________________________ */
    /*_________________________________       PUT      _____________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
-  	public void put(int expIdx, String path, String strParentPath)  throws UALException
+  	public void put(int ctx, boolean isIdsHomogeneous)  throws UALException
     {
-          String        timepath = null;
-	  Vect1DDouble  time = null;
+        String strTimeBasePath = null;
+        String strNodePath = null;
+        Vect1DDouble  time = null;
+        int status = -1;
+        String   ual_debug = System.getenv("ual_debug");
 	  
-          String        ual_debug = System.getenv("ual_debug");
-	  
-	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
     
          <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> 
     }       
@@ -814,15 +614,16 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________  */
   	public void putSlice(int expIdx, String path, String strParentPath)  throws UALException
     {
-          String        timepath = null;
+          String        strTimeBasePath = null;
 	  Vect1DDouble  idsGlobalTime = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
 	  
           String        ual_debug = System.getenv("ual_debug");
 	  
 	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
     
-         <xsl:apply-templates select = "field" mode = "PUT_SLICE"/> 
-    }       
+      <!--   <xsl:apply-templates select = "field" mode = "PUT_SLICE"/> 
+  --> 
+   }       
  </xsl:when> 
    <xsl:otherwise>
   // I am descendant of AoS 2/3 so all my data are stored by putInObject !!!!
@@ -831,14 +632,15 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* _______________________________________________________________________________________________________________ */
     	public void putInObject(int expIdx, int idObj, String strParentObjPath, int objIdx)  throws UALException
     {
-          String        timepath = null;
+          String        strTimeBasePath = null;
 	  Vect1DDouble  time = null;
 	  
           String        ual_debug = System.getenv("ual_debug");
 	  
 	  String strObjPath = strParentObjPath + "<xsl:value-of select="@name"/>/";
     
-       <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/> 
+    <!--   <xsl:apply-templates select = "field" mode = "PUT_IN_OBJECT"/> 
+    -->
     }          
      </xsl:otherwise>
    </xsl:choose>
@@ -851,7 +653,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________  */
   	public void get(int expIdx, String path, String strParentPath)   throws UALException
     {
-          String        timepath = null;
+          String        strTimeBasePath = null;
 	  Vect1DDouble  time = null;
 	  
           String       ual_debug = System.getenv("ual_debug");
@@ -859,6 +661,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
     <!--
           <xsl:apply-templates select = "field" mode = "GET_SINGLE"/>
+-->
     }     
      
    /* ____________________________________________________________________________________________________________  */
@@ -866,7 +669,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________  */
   	public void getSlice(int expIdx, String path, String strParentPath, double time, int interpolMode)   throws UALException
     {
-          String        timepath = null;
+          String        strTimeBasePath = null;
 	  
           String       ual_debug = System.getenv("ual_debug");
 	  
@@ -885,7 +688,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    
     	public void getFromObject(int expIdx, int idObj, String strParentObjPath, int objIdx)  throws UALException
     {
-          String        timepath = null;
+          String        strTimeBasePath = null;
 	  Vect1DDouble  time = null;
 	  
           String        ual_debug = System.getenv("ual_debug");
@@ -926,7 +729,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________  */
   	public void putNonTimed(int expIdx, String path, String strParentPath)  throws UALException
     {
-          String        timepath = null;
+          String        strTimeBasePath = null;
 	  Vect1DDouble  time = null;
 	  
           String        ual_debug = System.getenv("ual_debug");
@@ -959,150 +762,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
 <!-- ============================================================= SUBCLASS == 'structure' type element	- END ============================================================== -->
 
- <!-- ====================================================================================================================================================================== -->
-<!-- ======================================================================================================================================================================= -->
-<!-- ============================================================ SUBCLASS == 'AoS' type element	 =================================================================== -->
-<!-- ======================================================================================================================================================================= -->
 
-  <xsl:template match="field[@data_type='struct_array']" mode="CLASS">
-	  <xsl:variable name="class_name">
-	<xsl:call-template name="BUILD_CLASS_NAME">
-	</xsl:call-template>
-</xsl:variable>
-/* ------------------------------------------------------------------------------------------------------------------------ */  
-/* ------------------------------------------------------------------------------------------------------------------------ */
-/* ---------           CLASS: <xsl:call-template name="COMMENT_FIELD_SHORT"/>                           ----------- */
-/* ------------------------------------------------------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------------------------------------------------------ */
-     public static class  <xsl:value-of select="$class_name"/>
-{
-     <xsl:apply-templates select = "field" mode = "DECLARE"/>
- 
-   <xsl:choose>
-     <xsl:when test="ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded']">
-  // I am descendant of AoS 2/3 so all my data are stored by putInObject !!!!
-   /* ____________________________________________________________________________________________________________ */
-   /* ___________________________________        PUT IN OBJECT   ___________________________________ */  
-   /* ____________________________________________________________________________________________________________ */
-   
-  
-      </xsl:when>
-        <xsl:otherwise>
-
-   /* ____________________________________________________________________________________________________________ */
-   /* ___________________________________        PUT       ___________________________________ */  
-   /* ____________________________________________________________________________________________________________ */
-  	public void put(int expIdx, String path, String strParentPath, int objIdx)   throws UALException
-    {
-          String        timepath = null;
-	  Vect1DDouble  time = null;
-	  
-          String       ual_debug = System.getenv("ual_debug");
-	  
-	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/" + objIdx + "/";
-    
-         <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> 
-    }          
-    
-           /* ____________________________________________________________________________________________________________ */
-   /*_________________________________       PUT  SLICE    _________________________________ */  
-   /* ____________________________________________________________________________________________________________  */
-  	public void putSlice(int expIdx, String path, String strParentPath, int nodeIdx)  throws UALException
-    {
-          String        timepath = null;
-	Vect1DDouble  idsGlobalTime = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
-	  
-          String        ual_debug = System.getenv("ual_debug");
-	  
-	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/" + nodeIdx + "/";
-  <!--  
-         <xsl:apply-templates select = "field" mode = "PUT_SLICE"/> 
-   --> }       
-   </xsl:otherwise>
-   </xsl:choose>
-
-   <xsl:choose>
-    <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
-   /* ____________________________________________________________________________________________________________ */
-   /* ___________________________________       GET       ___________________________________ */  
-   /* ____________________________________________________________________________________________________________ */
-  	public void get(int expIdx, String path, String strParentPath, int nodeIdx)   throws UALException
-    {
-          String        timepath = null;
-	  Vect1DDouble  time = null;
-	  
-          String       ual_debug = System.getenv("ual_debug");
-	  
-	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/" + nodeIdx + "/";
-    
-          <xsl:apply-templates select = "field" mode = "GET_SINGLE"/>
-    }     
-    
-       /* ____________________________________________________________________________________________________________  */
-   /* _________________________________       GET  SLICE     ________________________________________________________ */  
-   /* ____________________________________________________________________________________________________________  */
-  	public void getSlice(int expIdx, String path, String strParentPath, double time, int interpolMode, int nodeIdx)   throws UALException
-    {
-          String        timepath = null;
-	  
-          String       ual_debug = System.getenv("ual_debug");
-	  
-	 String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/" + nodeIdx + "/";
-   <!--
-          <xsl:apply-templates select = "field" mode = "GET_SLICE"/>
--->   
- }   
-      </xsl:when>
-        <xsl:otherwise>
-   /* ____________________________________________________________________________________________________________ */
-   /* ___________________________________        GET FROM OBJECT   ___________________________________ */  
-   /* ____________________________________________________________________________________________________________ */
-           
-     
-   </xsl:otherwise>
-   </xsl:choose>
-
-   /* ____________________________________________________________________________________________________________ */
-   /* ___________________________________       DELETE     ___________________________________ */  
-   /* ____________________________________________________________________________________________________________ */
-  <xsl:choose>
-     <xsl:when test="ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded']">
-  //  public void delete(int expIdx, String path, String strParentPath, int idx) throws UALException {}
-  //  		I am descendant of AoS 2/3 so all my data were deleted by (grand)parent and no delete() is needed !!!! ABC
- </xsl:when>
-<xsl:otherwise>
-       public void delete(int expIdx, String path, String strParentPath, int idx) throws UALException
-    {
-      String ual_debug = System.getenv("ual_debug");
-     
-      String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/" + idx + "/";
-       
-      <xsl:apply-templates select = "field" mode = "DELETE"/>
-    }             
-     </xsl:otherwise>
-   </xsl:choose>
-
-
-  
-
-   /* ____________________________________________________________________________________________________________  */
-   /* ___________________________________        DUMP      ___________________________________ */  
-   /* ____________________________________________________________________________________________________________  */
-   /**
-    * Method dump is used for debugging and prints the content of the object
-    **/
-    public void dump()
-   {
-     System.out.println("***** <xsl:value-of select="@name"/> *****");
-     <xsl:apply-templates select = "field" mode = "DUMP"/>
-
-    System.out.println("******************");
-    }
-    
- }
- 
-  /* ___________________________________ */
-    </xsl:template>
 
 <!-- ============================================================= SUBCLASS == 'AoS' type element	- END ============================================================== -->
 
@@ -1112,7 +772,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <!-- ============================================================              TEMPLATES         	 =================================================================== -->
 <!-- ======================================================================================================================================================================= -->
 
-   <xsl:template name = "COMMENT_FIELD_SHORT">
+   <xsl:template name = "COMMENT_NODE">
    <xsl:text>&#xA;// </xsl:text>
    	 <xsl:if test="@maxoccur!='unbounded' and @data_type='struct_array'">
 		<xsl:text>[AoS 1] : </xsl:text>
@@ -1135,7 +795,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <xsl:template match="field" mode="DELETE">
 <xsl:param name="variable_path"/>
 <xsl:param name="mds_path"/>
-<xsl:call-template name="COMMENT_FIELD_SHORT"/>
+<xsl:call-template name="COMMENT_NODE"/>
 <xsl:choose>
         <!--========== Regular structures ==========-->
 <xsl:when test="@data_type='structure'">
@@ -1182,7 +842,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
     </xsl:choose>
   </xsl:param>
 
- <xsl:call-template name="COMMENT_FIELD_SHORT"/>
+ <xsl:call-template name="COMMENT_NODE"/>
    System.out.println("<xsl:value-of select = "@name"/> ");
   <xsl:choose>
     <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">
@@ -1383,7 +1043,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 <!--=================================================-->
 
 <xsl:template match = "field" mode = "DECLARE">
- <xsl:call-template name="COMMENT_FIELD_SHORT"/>
+ <xsl:call-template name="COMMENT_NODE"/>
  <!-- /* <xsl:value-of select="@documentation"/>**/ -->
   <xsl:choose>
     <xsl:when test="@data_type='str_type' or @data_type='STR_0D'">
@@ -1533,6 +1193,224 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 </xsl:template>
 
 
+<xsl:template match="field" mode="PUT_SINGLE">
+<xsl:param name="dynamic_only"/>
+    <xsl:call-template name="COMMENT_NODE"/>
+<xsl:if test="$dynamic_only !='yes' or descendant-or-self::field[@type='dynamic'] or ancestor::field[@type='dynamic' and @data_type='struct_array']">
+
+<xsl:variable name="methodName">
+            <xsl:choose>
+                <xsl:when test="$dynamic_only !='yes'" >
+                        <xsl:value-of select="'put'" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="'putSlice'" />
+                    </xsl:otherwise>
+            </xsl:choose>
+    </xsl:variable>
+<xsl:choose>
+<!--========== Regular structures ==========-->
+    <!-- YB 2014 -->
+        <xsl:when test="@data_type='structure'">
+        status = <xsl:value-of select="@name"/>.<xsl:value-of select="$methodName"/>(ctx, isIdsHomogeneous);
+        if (status != 0)
+            return status;
+        </xsl:when>
+
+<!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX -->
+        <xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
+            <xsl:text>/*-----------------------------------------------------------------------------------------*/&#xA;</xsl:text>
+            <xsl:choose>
+                <xsl:when test="ancestor::field[@data_type='struct_array']">
+                    strNodePath = &quot;<xsl:call-template  name="printAosRelativePath"/>&quot;;
+                </xsl:when>
+                <xsl:otherwise>
+                    strNodePath = &quot;<xsl:value-of select="@path"/>&quot;;
+                </xsl:otherwise>
+            </xsl:choose>
+            strTimeBasePath = "";
+            arraySize = <xsl:value-of select = "@name"/>.getDim();
+            if(arraySize > 0)
+            {
+                int tmpArray[] = { arraySize };
+                aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                if (aosCtx &lt; 0)  
+                {   
+                    LowLevel.ual_end_action(ctx);
+                    return aosCtx; 
+                }
+
+                for( int i = 0; i &lt;arraySize; i++){
+                    status = <xsl:value-of select="@name"/>(i).<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                    if (status != 0)
+                    {   
+                        ual_end_action(ctx);
+                        return status; 
+                    }
+                    status = LowLevel.ual_iterate_over_arraystruct(aosCtx, 1);
+                    if (status != 0)
+                    {   
+                        LowLevel.ual_end_action(aosCtx);
+                        LowLevel.ual_end_action(ctx);
+                        return status; 
+                    }
+                }
+                status = LowLevel.ual_end_action(aosCtx);
+                if (status != 0)  
+                {   
+                    LowLevel.ual_end_action(ctx);
+                    return status; 
+                }
+            }
+        </xsl:when>
+        <xsl:when  test="@data_type='struct_array' and @maxoccur='unbounded' and (@type!='dynamic' or not(@type))">
+        
+            <xsl:text>/*-----------------------------------------------------------------------------------------*/&#xA;</xsl:text>
+            <xsl:choose>
+                <xsl:when test="ancestor::field[@data_type='struct_array']">
+                    strNodePath = &quot;<xsl:call-template  name="printAosRelativePath"/>&quot;;
+                </xsl:when>
+                <xsl:otherwise>
+                    strNodePath = &quot;<xsl:value-of select="@path"/>&quot;;
+                </xsl:otherwise>
+            </xsl:choose>
+            strTimeBasePath = "";
+            arraySize = this.<xsl:value-of select = "@name"/>.getDim();
+            if(arraySize > 0)
+            {   
+                int tmpArray[] = { arraySize };
+                aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                if (aosCtx &lt; 0)  
+                {   
+                    ual_end_action(ctx);
+                    return status;
+                }
+
+                for( int i = 0; i &lt;arraySize; i++){
+                    status = <xsl:value-of select="@name"/>(i).<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                    if (status != 0)
+                    {   
+                        LowLevel.ual_end_action(ctx);
+                        return status;
+                    }
+                    status = LowLevel.ual_iterate_over_arraystruct(aosCtx, 1);
+                    if (status != 0)
+                    {   
+                        LowLevel.ual_end_action(aosCtx);
+                        LowLevel.ual_end_action(ctx);
+                        return status;
+                    }
+                }
+                status = LowLevel.ual_end_action(aosCtx);
+                if (status != 0)  
+                {   
+                    LowLevel.ual_end_action(ctx);
+                    return status;
+                }
+            }
+        </xsl:when>
+        <xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
+
+            <xsl:text>/*-----------------------------------------------------------------------------------------*/&#xA;</xsl:text>
+            <xsl:choose>
+                <xsl:when test="ancestor::field[@data_type='struct_array']">
+                    strNodePath = &quot;<xsl:call-template  name="printAosRelativePath"/>&quot;;
+                    if (isIdsHomogeneous) 
+                            strTimeBasePath = "/time";
+                        else
+                        strTimeBasePath = &quot;<xsl:call-template  name="printAosRelativePath"/>/time&quot;;
+                </xsl:when>
+                <xsl:otherwise>
+                    strNodePath = &quot;<xsl:value-of select="@path"/>&quot;;
+                    if (isIdsHomogeneous) 
+                            strTimeBasePath = "/time";
+                        else
+                        strTimeBasePath = &quot;<xsl:value-of select="@path"/>/time&quot;;
+                </xsl:otherwise>
+            </xsl:choose>
+            arraySize = this.<xsl:value-of select = "@name"/>.dim();
+            if(arraySize > 0)
+            {   
+                int tmpArray[] = { arraySize };
+                aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                if (aosCtx &lt; 0)  
+                {   
+                    LowLevel.ual_end_action(ctx);
+                    return ;
+                }
+
+                for( int i = 0; i &lt;arraySize; i++){
+                    status = <xsl:value-of select="@name"/>(i).<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                    if (status != 0)
+                    {   
+                        LowLevel.ual_end_action(ctx);
+                        return ;
+                    }
+                    status = LowLevel.ual_iterate_over_arraystruct(aosCtx, 1);
+                    if (status != 0)
+                    {   
+                        LowLevel.ual_end_action(aosCtx);
+                        LowLevel.ual_end_action(ctx);
+                        return ;
+                    } 
+                }
+                status = LowLevel.ual_end_action(aosCtx);
+                if (status != 0)  
+                {   
+                    LowLevel.ual_end_action(ctx);
+                    return ;
+                }
+                     
+            }
+        </xsl:when>
+
+    <xsl:when test="
+           @data_type='str_type' or @data_type='STR_0D'
+        or @data_type='str_1d_type' or @data_type='STR_1D'
+        or @data_type='int_type' or @data_type='INT_0D'
+        or @data_type='flt_type' or @data_type='FLT_0D' 
+        or @data_type='flt_1d_type' or @data_type='FLT_1D'
+        or @data_type='int_1d_type' or @data_type='INT_1D'
+        or @data_type='FLT_2D' or @data_type='INT_2D'
+        or @data_type='FLT_3D'  or @data_type='INT_3D'
+        or @data_type='FLT_4D'  or @data_type='INT_4D'
+        or @data_type='FLT_5D'or @data_type='INT_5D'
+        or @data_type='FLT_6D'or @data_type='INT_6D'">
+        <xsl:choose>
+            <xsl:when test="ancestor::field[@data_type='struct_array']">
+                strNodePath = &quot;<xsl:call-template  name="printAosRelativePath"/>&quot;;
+            </xsl:when>
+            <xsl:otherwise>
+                strNodePath = &quot;<xsl:value-of select="@path"/>&quot;;
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="@type='dynamic' and not(ancestor::field[@type='dynamic' and @data_type='struct_array'])">
+            if (isIdsHomogeneous) 
+            strTimeBasePath="/time";
+            else
+                strTimeBasePath=&quot;<xsl:value-of select="@strTimeBasePath"/>&quot;;
+            </xsl:when>
+            <xsl:otherwise>
+                    strTimeBasePath = "";
+            </xsl:otherwise>
+        </xsl:choose>
+        status = Wrapper.writeData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
+        if (status != 0) 
+        {   
+            LowLevel.ual_end_action(ctx);
+            return ;
+        }
+    </xsl:when>
+        <xsl:otherwise>
+            //Doc Put <xsl:value-of select="@path"/> : PROBLEM : UNIDENTIFIED TYPE !!! <!-- for comment only -->
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:if>
+</xsl:template>
+
+
+
 <!--=================================================-->
 <!--      Get field from a time-independent IDS      -->
 <!--=================================================-->
@@ -1541,7 +1419,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 <xsl:param name="variable_path"/>
 <xsl:param name="mds_path"/>
 <xsl:param name="ids_name"/>
-<xsl:call-template name="COMMENT_FIELD_SHORT"/>
+<xsl:call-template name="COMMENT_NODE"/>
   	  <xsl:variable name="class_name">
 	<xsl:call-template name="BUILD_CLASS_NAME">
 	</xsl:call-template>
@@ -1778,7 +1656,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 	<xsl:call-template name="BUILD_CLASS_NAME">
 	</xsl:call-template>
 </xsl:variable>
-<xsl:call-template name="COMMENT_FIELD_SHORT"/>
+<xsl:call-template name="COMMENT_NODE"/>
 <xsl:choose>
    	<!-- ===================================== Structures  ========================================= -->
         <xsl:when test="@data_type='structure'">
@@ -1826,10 +1704,10 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 
    	<xsl:when test="@type='dynamic'">
    	if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous()) {
-       	  timepath = "time";
+       	  strTimeBasePath = "time";
     	} 
 	else {
-          timepath = strNodePath + "time";
+          strTimeBasePath = strNodePath + "time";
    	}
  	<xsl:choose>
 		<xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
@@ -2010,10 +1888,10 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 <!--      Put field in a full time-dependent IDS     -->
 <!--=================================================-->
 
-<xsl:template match = "field" mode = "PUT_SINGLE">
+<xsl:template match = "field" mode = "PUT_SINGLE_X">
 <xsl:param name="non_timed"/>
 
- <xsl:call-template name="COMMENT_FIELD_SHORT"/>
+ <xsl:call-template name="COMMENT_NODE"/>
    <!-- This skips the routine for timed fields when using this template in PUT_NON_TIMED mode -->
 <xsl:if test="$non_timed !='yes' or @type !='dynamic' or not(@type) or @data_type='structure' or (@data_type='struct_array' and @type !='dynamic')">
 
@@ -2090,11 +1968,11 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 	      
              }
             
-            timepath = strNodePath + "<xsl:value-of select = "@name"/>/time";
+            strTimeBasePath = strNodePath + "<xsl:value-of select = "@name"/>/time";
             UALLowLevel.beginIDSPutTimed(expIdx, path, time);
-            UALLowLevel.putVect1DDouble(expIdx, path, timepath.trim(), timepath.trim(), time, true);
+            UALLowLevel.putVect1DDouble(expIdx, path, strTimeBasePath.trim(), strTimeBasePath.trim(), time, true);
             UALLowLevel.endIDSPutTimed(expIdx, path);
-            //if (ual_debug.equals("yes")) System.out.println("Put <xsl:call-template name="printtimepath"/> ");
+            //if (ual_debug.equals("yes")) System.out.println("Put <xsl:call-template name="printstrTimeBasePath"/> ");
             UALLowLevel.putObject(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", idObjAllTimes , 1);
           }
 
@@ -2268,7 +2146,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 <!--        Put time-dependent field in a slice      -->
 <!--=================================================-->
 <xsl:template match = "field" mode = "PUT_SLICE">
-<xsl:call-template name="COMMENT_FIELD_SHORT"/>
+<xsl:call-template name="COMMENT_NODE"/>
 <xsl:if test="@type ='dynamic' or @data_type='structure' or @data_type='struct_array'"> <!-- This skips the routine for non timed fields -->
       <xsl:choose>
         <!--========== Regular structures ==========-->
@@ -2290,7 +2168,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 	<!-- ========================================================== AoS type 2  =================================================================================== -->
 		<xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and (not(@type) or @type!='dynamic')">
 		 
-		<!--   <xsl:message terminate="no">XXX<xsl:call-template name="COMMENT_FIELD_SHORT"/>     
+		<!--   <xsl:message terminate="no">XXX<xsl:call-template name="COMMENT_NODE"/>     
 		             <xsl:text>&#xA; Ancestor of type AoS2:   </xsl:text>  <xsl:value-of select="../@data_type"/>  : <xsl:value-of select="../@path"/>   : <xsl:value-of select="../@maxoccur"/>   :  <xsl:value-of select="../@type"/> 
 		</xsl:message>   -->
         </xsl:when>
@@ -2307,9 +2185,9 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
             UALLowLevel.putObjectSlice(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>", sliceTime, idObjSingleTime);
          
                       
-	    timepath = strNodePath + "<xsl:value-of select = "@name"/>/time";
-	<!--    //timepath = "time"; -->
-            UALLowLevel.putDoubleSlice(expIdx, path, timepath, timepath, sliceTime, sliceTime);
+	    strTimeBasePath = strNodePath + "<xsl:value-of select = "@name"/>/time";
+	<!--    //strTimeBasePath = "time"; -->
+            UALLowLevel.putDoubleSlice(expIdx, path, strTimeBasePath, strTimeBasePath, sliceTime, sliceTime);
             //if (ual_debug.equals("yes")) System.out.println("Put " + <xsl:value-of select="@path"/>/time");
           }
 	</xsl:when>
@@ -2447,10 +2325,9 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 
 
 
-<
 
 
-<xsl:template name ="printtimepath">
+<xsl:template name ="printstrTimeBasePath">
 <xsl:if test="@type = 'dynamic'">
 <xsl:choose>
 <xsl:when test="contains(@coordinate7,'time')"> <xsl:value-of select="translate(replace(@coordinate7,'(itime)',''),'()','')"/></xsl:when> <!-- We remove the (itime) pattern from the coordinate attribute in IDSDef, which is documentation-oriented -->
@@ -2489,7 +2366,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 </xsl:template>
 
 <xsl:template name ="printPathoftime">
-<xsl:choose><xsl:when test="@type = 'dynamic'"> <xsl:value-of select="'timepath.trim()'"/> </xsl:when> <xsl:otherwise>""</xsl:otherwise> </xsl:choose>
+<xsl:choose><xsl:when test="@type = 'dynamic'"> <xsl:value-of select="'strTimeBasePath.trim()'"/> </xsl:when> <xsl:otherwise>""</xsl:otherwise> </xsl:choose>
 </xsl:template>
 
 <xsl:template name ="putdynamic">
@@ -2497,24 +2374,24 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 <!--  ================================================ -->
 
 	<xsl:if test="@type='dynamic'">
-		<xsl:variable name = "NodeTimePath">
-				<xsl:call-template name="printtimepath"/>
+		<xsl:variable name = "NodestrTimeBasePath">
+				<xsl:call-template name="printstrTimeBasePath"/>
 		</xsl:variable>		
 		<xsl:choose>
-			<xsl:when test="$NodeTimePath='time'">
+			<xsl:when test="$NodestrTimeBasePath='time'">
 	//time coordinate point to IDSRoot/time so no difference between homo- and heterogeneous mode
-	timepath = "time" ;
+	strTimeBasePath = "time" ;
 	time = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
 	      		</xsl:when>
 	      		<xsl:otherwise>  
    	if ( <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.isHomogeneous())
 	{
-	  timepath = "time" ;
+	  strTimeBasePath = "time" ;
 	  time = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
 	}
 	else 
 	{
-	  timepath = strNodePath + "time" ;
+	  strTimeBasePath = strNodePath + "time" ;
 	  time = this.time;
 	}
 	 		</xsl:otherwise>
@@ -2612,6 +2489,14 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 		<xsl:when test="$number='7'">dimVect.getElementAt(0),dimVect.getElementAt(1),dimVect.getElementAt(2),dimVect.getElementAt(3),dimVect.getElementAt(4),dimVect.getElementAt(5),dimVect.getElementAt(6),1</xsl:when>
 		<xsl:otherwise></xsl:otherwise>
 	</xsl:choose>
+</xsl:template>
+
+
+<xsl:template name ="printAosRelativePath">
+    <xsl:variable name="AoSPath" select="ancestor::field[@data_type='struct_array'][1]/@path"/>
+    <xsl:variable name="elementPath" select="@path"/>
+
+    <xsl:value-of select="replace($elementPath,concat($AoSPath,'/'),'')"/>
 </xsl:template>
 
 

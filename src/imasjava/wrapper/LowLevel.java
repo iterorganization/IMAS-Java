@@ -169,7 +169,7 @@ public class LowLevel {
 		     int *size) throws UALException;
 */
 
-  public static native int ual_write_data_int(int ctx,
+  public static native void ual_write_data_int(int ctx,
 		     final String fieldpath,
 		     final String timebasepath,
 		     int[] data,
@@ -178,7 +178,7 @@ public class LowLevel {
 		     int[] size) throws UALException;
 
 
-  public static native int ual_write_data_double(int ctx,
+  public static native void ual_write_data_double(int ctx,
              final String fieldpath,
              final String timebasepath,
              double[] data,
@@ -188,7 +188,7 @@ public class LowLevel {
 
 
 
-  public static native int ual_write_data_char(int ctx,
+  public static native void ual_write_data_char(int ctx,
              final String fieldpath,
              final String timebasepath,
              byte[] data,
