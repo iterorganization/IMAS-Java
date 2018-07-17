@@ -13,7 +13,7 @@ public class LowLevel {
      @result error status
      int ual_print_context(int ctx) throws UALException;
    */
-     public static native int ual_print_context(int ctx) throws UALException;
+     public static native void ual_print_context(int ctx) throws UALException;
   /**
      Starts an action on a pulse in the database.
      This function associates a specified back-end with a specific entry in the database.
@@ -55,7 +55,7 @@ public class LowLevel {
 		     int mode, 
 		     const char *options) throws UALException;
 */
-  public static native int ual_open_pulse(int pulseCtx, 
+  public static native void ual_open_pulse(int pulseCtx, 
 		     int mode, 
 		     final String options) throws UALException;
   /**
@@ -72,7 +72,7 @@ public class LowLevel {
 		      const char *options) throws UALException;
 
 */
-  public static native int ual_close_pulse(int pulseCtx, 
+  public static native void ual_close_pulse(int pulseCtx, 
 		      int mode,
 		      final String options) ;
   /**
@@ -139,7 +139,7 @@ public class LowLevel {
 
   int ual_end_action(int ctx) throws UALException; 
   */
-  public static native int ual_end_action(int ctx) throws UALException; 
+  public static native void ual_end_action(int ctx) throws UALException; 
   /**
      Writes data.
      This function writes a signal in the database given the passed context.
@@ -258,7 +258,7 @@ public class LowLevel {
 
 
   */
-  public static native int ual_delete_data(int ctx,
+  public static native void ual_delete_data(int ctx,
 		      final String path) throws UALException;
   /**
      Starts operations on a new array of structure.
@@ -295,7 +295,7 @@ public class LowLevel {
 				   int step) throws UALException;
 
   */
-  public static native int ual_iterate_over_arraystruct(int aosctx, 
+  public static native void ual_iterate_over_arraystruct(int aosctx, 
 				   int step) throws UALException;
 
 }
