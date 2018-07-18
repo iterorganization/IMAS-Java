@@ -34,6 +34,7 @@ import java.lang.reflect.*;
 
 import imasjava.utilities.ImasReflection;
 import imasjava.ids.*;
+import imasjava.wrapper.LowLevel;
 
 public class imas {
  static {
@@ -75,6 +76,13 @@ public class imas {
 
  public static final int NON_TIMED = 0, TIMED = 1, TIMED_CLEAR = 2;
 
+ public static int pulseCtx = -1;
+ 
+    public static String user;
+    public static String tokamak;
+    public static String version;
+    public static int shot; 
+    public static int run;
 
 
  public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException {
@@ -136,6 +144,21 @@ public class imas {
 
 
 
+
+
+
+ 
+
+
+ static public void setPulseCtx(int pulseCtx)
+{
+    <xsl:apply-templates select="IDS" mode="SET_PULSE_CTX"/>
+}
+
+
+
+
+
  /**
   *Creates a new database instance.
   * @param name Name of the database (by convention imas).
@@ -147,7 +170,38 @@ public class imas {
   * @exception UALException is thrown if the database cannot be open.
   **/
 
- static public native int openEnv(String name, int shot, int run, String user, String tokamak, String version) throws UALException;
+ static public int openEnv(String name, int shot, int run, String user, String tokamak, String version) throws UALException
+{
+    int pulseCtx;
+   try{ 
+    
+    pulseCtx = LowLevel.ual_begin_pulse_action(LowLevel.MDSPLUS_BACKEND, shot, run, user, tokamak, version); 
+    }
+    catch(Exception exc){
+        throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
+   
+    }
+
+    try{ 
+    
+    LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, "");
+   }
+    catch(Exception exc){
+        throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
+   
+    }
+
+
+    imas.shot = shot;
+    imas.run = run;
+    imas.user = user;
+    imas.tokamak = tokamak;
+    imas.version = version;
+    imas.pulseCtx = pulseCtx;
+    imas.setPulseCtx(pulseCtx);
+    return pulseCtx;
+}
+
  /**
   *Creates a new database instance.
   * @param name Name of the database (by convention imas).
@@ -158,33 +212,81 @@ public class imas {
   * @return the database index to be used in subsequent get/put calls
   * @exception UALException is thrown if the database cannot be open.
   **/
- static public native int createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version) throws UALException;
+ static public int createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version) throws UALException
+{
+    System.err.println("WARNING:\n"
+                        + "\"createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version)\"  is DEPRECATED.\n"
+                        + "Please use \"createEnv(int shot, int run, String user, String tokamak, String version)\" instead");
+    return imas.createEnv(shot,  run,  user,  tokamak,  version);
+}
 
- 
+static public int createEnv(int shot, int run, String user, String tokamak, String version) throws UALException
+{
+    int pulseCtx = -1;
 
+    try{ 
+    
+    pulseCtx = LowLevel.ual_begin_pulse_action(LowLevel.MDSPLUS_BACKEND, shot, run, user, tokamak, version); 
+    }
+    catch(Exception exc){
+        throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
+   
+    }
 
- 
+    try{ 
+    
+    LowLevel.ual_open_pulse(pulseCtx, LowLevel.FORCE_CREATE_PULSE, "");
+   }
+    catch(Exception exc){
+        throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
+   
+    }
+
+    imas.shot = shot;
+    imas.run = run;
+    imas.user = user;
+    imas.tokamak = tokamak;
+    imas.version = version;
+
+    imas.pulseCtx = pulseCtx;
+    imas.setPulseCtx(pulseCtx);
+    return pulseCtx;
+}
 
 
  
  /**
   *Closes the currently open database.
   * @param refIdx database index, returned by create or open.
-  * @param name Name of the database (by convention imas).
-  * @param shot Shot number.
-  * @param run Run Number.
   **/
- static public native int close(int refIdx);
+ static public void close() throws UALException
+{
+    try{
+        LowLevel.ual_close_pulse(imas.pulseCtx, LowLevel.CLOSE_PULSE, "");
+    }
+    catch (Exception exc)
+    {
+        throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
+    }
+    finally
+    {
+        LowLevel.ual_end_action(imas.pulseCtx);
+    }
+}
 
- static int getShot(int idx) {
-  return UALLowLevel.getShot(idx);
- }
- static int getRun(int idx) {
-  return UALLowLevel.getRun(idx);
- }
+ static public void close(int refIdx) throws UALException
+{
+       System.err.println("WARNING:\n"
+                        + "\"int close(int refIdx)\"  is DEPRECATED.\n"
+                        + "Please use \"close()\" instead");
+   close();
+}
 
- static public int close(int refIdx, String name, int shot, int run) {
-  return close(refIdx);
+ static public void close(int refIdx, String name, int shot, int run) throws UALException{
+    System.err.println("WARNING:\n"
+                        + "\"int close(int refIdx, String name, int shot, int run)\"  is DEPRECATED.\n"
+                        + "Please use \"close()\" instead");
+   close();
  }
 
  /**
@@ -234,10 +336,11 @@ public class <xsl:value-of select="@name"/>_IDSBase
 {
 
     private static final int maxOccurences = <xsl:value-of select="@maxoccur"/>;
-    private static final String idsName    = "<xsl:value-of select="@name"/>";
+    private static final String IDS_NAME    = "<xsl:value-of select="@name"/>";
 
-    static private boolean isHomogeneous = false;
-    static private Vect1DDouble idsTime = null;
+    private static boolean isHomogeneous = false;
+    private static Vect1DDouble idsTime = null;
+    private static int pulseCtx = -1;
     
     public static int getMaxOccurences() {
                 return maxOccurences;
@@ -245,15 +348,15 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
     public static String getIdsName() 
     {
-           return idsName;
+           return <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
     }
     
-    static private void setHomogeneous(boolean isHomogeneous)
+     static private void setHomogeneous(boolean isHomogeneous)
     {
          <xsl:value-of select="@name"/>_IDSBase.isHomogeneous = isHomogeneous;
     }
     
-    static private boolean isHomogeneous()
+     static boolean isHomogeneous()
     {
         return <xsl:value-of select="@name"/>_IDSBase.isHomogeneous;
     }
@@ -261,12 +364,17 @@ public class <xsl:value-of select="@name"/>_IDSBase
     
     static private void setIdsTime(Vect1DDouble idsTime )
     {
-         <xsl:value-of select="@name"/>_IDSBase.idsTime = idsTime;
+          <xsl:value-of select="@name"/>_IDSBase.idsTime = idsTime;
     }
     
     static private Vect1DDouble getIdsTime()
     {
-         return <xsl:value-of select="@name"/>_IDSBase.idsTime;
+         return  <xsl:value-of select="@name"/>_IDSBase.idsTime;
+    }
+
+    static public void setPulseCtx(int pulseCtx)
+    {
+        <xsl:value-of select="@name"/>_IDSBase.pulseCtx = pulseCtx;
     }
   
     <xsl:apply-templates select = "field" mode = "DECLARE"/>
@@ -328,51 +436,73 @@ public class <xsl:value-of select="@name"/>_IDSBase
  **/
     public static void put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids)  throws UALException
     {
+        int iOcurrence = 0;
+
+        System.err.println("WARNING:\n"
+                        + "\"putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) \"  is DEPRECATED.\n"
+                        + "Please use \"putSlice()\" instead");
 
         if(ids.ids_properties.homogeneous_time == imas.EMPTY_INT)
         {
-            System.error.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
+            System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
             return;
         }
     	<xsl:value-of select="@name"/>_IDSBase.setHomogeneous(ids.ids_properties.homogeneous_time == 1);
 	
-	<xsl:value-of select="@name"/>_IDSBase.setIdsTime(ids.time);
+	    //<xsl:value-of select="@name"/>_IDSBase.setIdsTime(ids.time);
 	
-	ids.put(pulseCtx, idsFullName);
+        if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
+        {
+            String tokens[] = idsFullName.split("/");
+            iOcurrence = Integer.parseInt(tokens[1]);          
+        }
+
+	    ids.put(iOcurrence);
     }
 
-    public void put(int pulseCtx, String idsFullName)  throws UALException
+    public void put()  throws UALException
     {
-        int putOpCtx = -1;
+        this.put(0);
+    }
+
+    public void put(int iOccurrence)  throws UALException
+    {
+        int pulseCtx = this.pulseCtx;
         int ctx = -1;
+        String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
+ 
+
+        boolean isIdsHomogeneous = this.isHomogeneous();
+
+        if(iOccurrence > 0)
+            idsFullName = idsFullName + "/" + iOccurrence;
+
+        delete(pulseCtx, idsFullName);
+
+        try{
+            // Open put context
+            ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
+
+            this.putRootFields(ctx, isIdsHomogeneous);
+        }
+        finally {
+            LowLevel.ual_end_action(ctx);
+        }
+    }
+
+    public void putRootFields(int ctx, boolean isIdsHomogeneous)  throws UALException
+    {
         int aosCtx = -1;
-
-	    Vect1DDouble  time = null; 
-        String        ual_debug = System.getenv("ual_debug");
-	    String strNodePath = "";
-        String strTimeBasePath = "";
-
-        int status;
-        bool isIdsHomogeneous = <xsl:value-of select="@name"/>_IDSBase.isHomogeneous();
         int arraySize = -1;
 
-
-        delete(ctx, idsFullName);
-
-        // Open put context
-        putOpCtx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, WRITE_OP);
-
-        if(putOpCtx &lt; 0) return putOpCtx;
-
-
-        ctx = putOpCtx;
+        Vect1DDouble  time = null; 
+        String        ual_debug = System.getenv("ual_debug");
+        String strNodePath = "";
+        String strTimeBasePath = "";
 
         <xsl:apply-templates select="field" mode="PUT_SINGLE">
             <xsl:with-param name="dynamic_only" select="'no'"/>
         </xsl:apply-templates>
-
-    LowLevel.ual_end_action(putOpCtx);
-
 
     }
     
@@ -391,11 +521,19 @@ public class <xsl:value-of select="@name"/>_IDSBase
     public static void putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) throws UALException
     {
         double sliceTime = -1.0;
+        int ctx = -1;
         int putSliceOpCtx = -1;
+        int aosCtx = -1;
+        int arraySize = -1;
+
+        System.err.println("WARNING:\n"
+                        + "\"putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) \"  is DEPRECATED.\n"
+                        + "Please use \"putSlice()\" instead");
+
 
         if(ids.ids_properties.homogeneous_time == imas.EMPTY_INT)
         {
-            System.error.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUTSLICE quits with no action.");
+            System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUTSLICE quits with no action.");
             return;
         }
 	  	
@@ -405,16 +543,15 @@ public class <xsl:value-of select="@name"/>_IDSBase
     sliceTime = ids.time.getElementAt(0);
 
     // Open put context
-    putSliceOpCtx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, WRITE_OP, sliceTime, UNDEFINED_INTERP);
+    putSliceOpCtx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, sliceTime, LowLevel.UNDEFINED_INTERP);
 
-    if(putSliceOpCtx &lt; 0) 
-        return putSliceOpCtx;
+
 
     ctx = putSliceOpCtx;
 
       ids.putSlice(ctx, idsFullName);
 
-    ual_end_action(putSliceOpCtx);
+    LowLevel.ual_end_action(putSliceOpCtx);
 
 
 
@@ -451,9 +588,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
       imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
       
-      UALLowLevel.beginIDSGet(expIdx, path, false);
+      //UALLowLevel.beginIDSGet(expIdx, path, false);
       ids.doGet(expIdx, path);
-      UALLowLevel.endIDSGet(expIdx, path);
+      //UALLowLevel.endIDSGet(expIdx, path);
 	  
       return ids;
     }
@@ -464,8 +601,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
       String        ual_debug = System.getenv("ual_debug");
       String strNodePath = "";
       
-    <xsl:apply-templates select = "field" mode = "GET_SINGLE"/> 
-    }
+    <!--<xsl:apply-templates select = "field" mode = "GET_SINGLE"/> 
+     -->}
 
  /**
  * Method getSlice retrieves the  <xsl:value-of select="@name"/> IDS in the open database corresponding to the passed time, based on the selectted interpolation mode.
@@ -593,8 +730,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
     
  	 <xsl:apply-templates select = "field" mode = "DECLARE"/> 
      
-     <xsl:choose>
-    <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
+
    /* _____________________________________________________________________________________________________________ */
    /*_________________________________       PUT      _____________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
@@ -602,20 +738,23 @@ public class <xsl:value-of select="@name"/>_IDSBase
     {
         String strTimeBasePath = null;
         String strNodePath = null;
+        int arraySize = -1;
+        int aosCtx = -1;
         Vect1DDouble  time = null;
-        int status = -1;
         String   ual_debug = System.getenv("ual_debug");
 	  
     
          <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> 
     }       
+     <xsl:choose>
+    <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
    /* ____________________________________________________________________________________________________________ */
    /*_________________________________       PUT SLICE     _______________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
   	public void putSlice(int expIdx, String path, String strParentPath)  throws UALException
     {
           String        strTimeBasePath = null;
-	  Vect1DDouble  idsGlobalTime = <xsl:value-of select="ancestor::IDS[1]/@name"/>_IDSBase.getIdsTime();
+//	  Vect1DDouble  idsGlobalTime = getIdsTime();
 	  
           String        ual_debug = System.getenv("ual_debug");
 	  
@@ -645,8 +784,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
      </xsl:otherwise>
    </xsl:choose>
  
-   <xsl:choose>
-    <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
+
      
    /* ____________________________________________________________________________________________________________  */
    /* _________________________________       GET       ________________________________________________________ */  
@@ -664,6 +802,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
 -->
     }     
      
+   <xsl:choose>
+    <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
    /* ____________________________________________________________________________________________________________  */
    /* _________________________________       GET  SLICE     ________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
@@ -723,24 +863,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
      </xsl:otherwise>
    </xsl:choose>
     
-       <xsl:if test="not(ancestor-or-self::field[@type='dynamic'])">
-    /* ____________________________________________________________________________________________________________ */
-   /*_________________________________       PUT NON TIMED    __________________________________________ */  
-   /* ____________________________________________________________________________________________________________  */
-  	public void putNonTimed(int expIdx, String path, String strParentPath)  throws UALException
-    {
-          String        strTimeBasePath = null;
-	  Vect1DDouble  time = null;
-	  
-          String        ual_debug = System.getenv("ual_debug");
-	  
-	 String strNodePath = strParentPath +  "<xsl:value-of select="@name"/>/";
-    
-          <xsl:apply-templates select="field" mode="PUT_SINGLE">
-          <xsl:with-param name="non_timed" select="'yes'"/>
-          </xsl:apply-templates>
-    }    
-    </xsl:if>      
+
 
    /* ____________________________________________________________________________________________________________  */
    /* ___________________________________        DUMP      ________________________________________________________ */  
@@ -786,7 +909,13 @@ public class <xsl:value-of select="@name"/>_IDSBase
  <xsl:value-of select="@name"/> : <xsl:value-of select="@path"/> : <xsl:value-of select="@data_type"/> : <xsl:value-of select="@type"/><xsl:text> : </xsl:text>
     </xsl:template>
 
-   
+   <!--=================================================-->
+<!--                 set idx in IDS                  -->
+<!--=================================================-->
+
+<xsl:template match="IDS" mode="SET_PULSE_CTX">
+    imas.<xsl:value-of select="@name"/>.setPulseCtx(imas.pulseCtx);
+</xsl:template>
     
 <!--=====================================================================================================================================-->
 <!--                  Delete field                                                                                                       -->
@@ -1212,9 +1341,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
 <!--========== Regular structures ==========-->
     <!-- YB 2014 -->
         <xsl:when test="@data_type='structure'">
-        status = <xsl:value-of select="@name"/>.<xsl:value-of select="$methodName"/>(ctx, isIdsHomogeneous);
-        if (status != 0)
-            return status;
+        this.<xsl:value-of select="@name"/>.<xsl:value-of select="$methodName"/>(ctx, isIdsHomogeneous);
         </xsl:when>
 
 <!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX -->
@@ -1229,37 +1356,21 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
                 </xsl:otherwise>
             </xsl:choose>
             strTimeBasePath = "";
-            arraySize = <xsl:value-of select = "@name"/>.getDim();
+            arraySize = this.<xsl:value-of select = "@name"/>.length;
             if(arraySize > 0)
-            {
-                int tmpArray[] = { arraySize };
-                aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
-                if (aosCtx &lt; 0)  
-                {   
-                    LowLevel.ual_end_action(ctx);
-                    return aosCtx; 
-                }
-
-                for( int i = 0; i &lt;arraySize; i++){
-                    status = <xsl:value-of select="@name"/>(i).<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
-                    if (status != 0)
-                    {   
-                        ual_end_action(ctx);
-                        return status; 
-                    }
-                    status = LowLevel.ual_iterate_over_arraystruct(aosCtx, 1);
-                    if (status != 0)
-                    {   
-                        LowLevel.ual_end_action(aosCtx);
-                        LowLevel.ual_end_action(ctx);
-                        return status; 
+            {   
+                try{
+                    int tmpArray[] = { arraySize };
+                    aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                    for( int i = 0; i &lt;arraySize; i++)
+                    {
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                        LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
                 }
-                status = LowLevel.ual_end_action(aosCtx);
-                if (status != 0)  
-                {   
-                    LowLevel.ual_end_action(ctx);
-                    return status; 
+                    
+                finally { 
+                    LowLevel.ual_end_action(aosCtx);
                 }
             }
         </xsl:when>
@@ -1275,37 +1386,21 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
                 </xsl:otherwise>
             </xsl:choose>
             strTimeBasePath = "";
-            arraySize = this.<xsl:value-of select = "@name"/>.getDim();
+            arraySize = this.<xsl:value-of select = "@name"/>.length;
             if(arraySize > 0)
             {   
-                int tmpArray[] = { arraySize };
-                aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
-                if (aosCtx &lt; 0)  
-                {   
-                    ual_end_action(ctx);
-                    return status;
-                }
-
-                for( int i = 0; i &lt;arraySize; i++){
-                    status = <xsl:value-of select="@name"/>(i).<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
-                    if (status != 0)
-                    {   
-                        LowLevel.ual_end_action(ctx);
-                        return status;
-                    }
-                    status = LowLevel.ual_iterate_over_arraystruct(aosCtx, 1);
-                    if (status != 0)
-                    {   
-                        LowLevel.ual_end_action(aosCtx);
-                        LowLevel.ual_end_action(ctx);
-                        return status;
+                try{
+                    int tmpArray[] = { arraySize };
+                    aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                    for( int i = 0; i &lt;arraySize; i++)
+                    {
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                        LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
                 }
-                status = LowLevel.ual_end_action(aosCtx);
-                if (status != 0)  
-                {   
-                    LowLevel.ual_end_action(ctx);
-                    return status;
+                    
+                finally { 
+                    LowLevel.ual_end_action(aosCtx);
                 }
             }
         </xsl:when>
@@ -1328,39 +1423,22 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
                         strTimeBasePath = &quot;<xsl:value-of select="@path"/>/time&quot;;
                 </xsl:otherwise>
             </xsl:choose>
-            arraySize = this.<xsl:value-of select = "@name"/>.dim();
+            arraySize = this.<xsl:value-of select = "@name"/>.length;
             if(arraySize > 0)
             {   
-                int tmpArray[] = { arraySize };
-                aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
-                if (aosCtx &lt; 0)  
-                {   
-                    LowLevel.ual_end_action(ctx);
-                    return ;
-                }
-
-                for( int i = 0; i &lt;arraySize; i++){
-                    status = <xsl:value-of select="@name"/>(i).<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
-                    if (status != 0)
-                    {   
-                        LowLevel.ual_end_action(ctx);
-                        return ;
+                try{
+                    int tmpArray[] = { arraySize };
+                    aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                    for( int i = 0; i &lt;arraySize; i++)
+                    {
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                        LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
-                    status = LowLevel.ual_iterate_over_arraystruct(aosCtx, 1);
-                    if (status != 0)
-                    {   
-                        LowLevel.ual_end_action(aosCtx);
-                        LowLevel.ual_end_action(ctx);
-                        return ;
-                    } 
                 }
-                status = LowLevel.ual_end_action(aosCtx);
-                if (status != 0)  
-                {   
-                    LowLevel.ual_end_action(ctx);
-                    return ;
+                    
+                finally { 
+                    LowLevel.ual_end_action(aosCtx);
                 }
-                     
             }
         </xsl:when>
 
@@ -1395,12 +1473,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
                     strTimeBasePath = "";
             </xsl:otherwise>
         </xsl:choose>
-        status = Wrapper.writeData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
-        if (status != 0) 
-        {   
-            LowLevel.ual_end_action(ctx);
-            return ;
-        }
+        Wrapper.writeData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
     </xsl:when>
         <xsl:otherwise>
             //Doc Put <xsl:value-of select="@path"/> : PROBLEM : UNIDENTIFIED TYPE !!! <!-- for comment only -->
