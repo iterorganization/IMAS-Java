@@ -1,6 +1,6 @@
 package imasjava.wrapper;
 
-
+import java.util.Arrays;
 import imasjava.*;
 
 public class Wrapper {
@@ -206,7 +206,7 @@ public class Wrapper {
     	/*********************************                                                                           ************************************/
     	/************************************************************************************************************************************************/
 
-	static public void readData(int ctx, String fieldPath, String timeBasePath, double value)throws UALException
+	static public double readData(int ctx, String fieldPath, String timeBasePath, double value)throws UALException
         {
 
 		int retSize[]  = new int[1];
@@ -216,9 +216,9 @@ public class Wrapper {
   		dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 0, retSize);
 
 		
-		value = dataArr[0];
+		retVal = dataArr[0];
 
-
+        return retVal;
 	}
 
 
@@ -232,9 +232,6 @@ public class Wrapper {
 
 
 		array.setArray(dataArr, retSize[0]);
-
-
-
 	}
 
     static public void readData(int ctx, String fieldPath, String timeBasePath, Vect2DDouble array)throws UALException
@@ -245,27 +242,19 @@ public class Wrapper {
 
         dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 2, retSize);
 
-
         array.setArray(dataArr, retSize[0], retSize[1]);
-
-
-
     }
 
 
   static public void readData(int ctx, String fieldPath, String timeBasePath, Vect3DDouble array)throws UALException
-        {
+  {
 
         int retSize[] = new int[3];
         double dataArr[] = null;
 
         dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 3, retSize);
 
-
         array.setArray(dataArr, retSize[0], retSize[1], retSize[2]);
-
-
-
     }
 
   static public void readData(int ctx, String fieldPath, String timeBasePath, Vect4DDouble array)throws UALException
@@ -330,7 +319,7 @@ public class Wrapper {
 	/************************************************************************************************************************************************/
 	/************************************************************************************************************************************************/
 
-	static public void readData(int ctx, String fieldPath, String timeBasePath, int  value) throws UALException
+	static public int readData(int ctx, String fieldPath, String timeBasePath, int  value) throws UALException
         {
 
         int retSize[]  = new int[1];
@@ -340,8 +329,8 @@ public class Wrapper {
   		LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, LowLevel.INTEGER_DATA, 0, retSize);
 
 		
-		value = dataArr[0];
-
+		retVal = dataArr[0];
+        return retVal;
 	}
 
 
@@ -389,49 +378,51 @@ public class Wrapper {
 	/************************************************************************************************************************************************/
 	/************************************************************************************************************************************************/
 	/************************************************************************************************************************************************/
-    	static public void readData(int ctx, String fieldPath, String timeBasePath, String text) throws UALException
-        {
+    static public String readData(int ctx, String fieldPath, String timeBasePath, String text) throws UALException
+    {
         
-/*
-		int retSize[];	
-		void* ptrData = NULL;
+
+		int retSize[] = new int[1];	
+		byte dataArr[] = null;
+        String str = null;
+
 		
-		ual_read_data(ctx, fieldPath, timeBasePath, ptrData, CHAR_DATA, 1, retSize);
-		if (status != 0)
-    			return status;
+		dataArr = LowLevel.ual_read_data_char(ctx, fieldPath, timeBasePath, LowLevel.CHAR_DATA, 1, retSize);
+
 		
-		text = (char*)ptrData;
+		text = new String(dataArr);
+        return text;
 
-        }
-/*
-	static public void readData(int ctx, String fieldPath, String timeBasePath, blitz::Array<String, 1> array)
-        {
+    }
 
-		int retSize[];
-		char* ptrData = NULL;
+	static public void readData(int ctx, String fieldPath, String timeBasePath, Vect1DString array) throws UALException
+    {
+        int retSize[] = new int[1]; 
+        byte dataArr[] = null;
+        String strArr[] = null;
 
-		int  numberOfStrings = -1;
+		int numberOfStrings = -1;
 		int maxStringSize = -1;
 
-  		ual_read_data(ctx, fieldPath, timeBasePath, (void**)(ptrData), CHAR_DATA, 2, retSize);
-  		if (status != 0)
-    			return status;
+  		dataArr = LowLevel.ual_read_data_char(ctx, fieldPath, timeBasePath, LowLevel.CHAR_DATA, 2, retSize);
+ 
 
-		numberOfStrings = retSize;
+		numberOfStrings = retSize[0];
 		maxStringSize = retSize[1];
 
-		array.resize(numberOfStrings);
+		strArr = new String[numberOfStrings];
 
 		for(int i=0; i < numberOfStrings; i++)
 		{
-			
-			array(i) = ptrData; 	
-			ptrData = ptrData + maxStringSize;	
+            byte buffer[] = Arrays.copyOfRange(dataArr, i * maxStringSize, maxStringSize);
+			String str = new String(buffer);
+			strArr[i] = str; 	
 		}
 
-  		return status;
+  	
+        array.setArray(strArr, retSize[0]);
 	}
-*/
-}
+
+
 }
 
