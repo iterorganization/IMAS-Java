@@ -17,6 +17,11 @@ public class Vect1DString
     public String getElementAt(int idx) {return array[idx];}
     public void setElementAt(int idx, String element) {array[idx] = element;}
     public String[] getArray() {return array;}
+    public void setArray(String[] array, int dim1) 
+    {
+        //this.array = new String[dim1];
+        this.array = array;
+    }
     public String toString()
     {
         String retStr = "[";
