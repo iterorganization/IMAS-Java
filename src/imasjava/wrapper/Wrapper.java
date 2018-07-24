@@ -36,9 +36,10 @@ public class Wrapper {
         {
         
             int dataArray[] = {value};
+            int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
             
 
-		 LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArray, LowLevel.INTEGER_DATA, 0, null);
+		 LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArray, 0, arrayOfSizes);
         }
 
 	    static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DInt array)throws UALException
@@ -47,7 +48,7 @@ public class Wrapper {
 		int dataArr[] =  array.getArray();
 		int arrayOfSizes[] = {	array.getDim()};
 
-		LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, LowLevel.INTEGER_DATA, 1, arrayOfSizes);
+		LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
         }
 
 
@@ -57,7 +58,7 @@ public class Wrapper {
             int dataArr[] =  array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1) };
 
-            LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, LowLevel.INTEGER_DATA, 2, arrayOfSizes);
+            LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, 2, arrayOfSizes);
     
         }
 
@@ -67,26 +68,27 @@ public class Wrapper {
             int dataArr[] =  array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2) };
 
-            LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, LowLevel.INTEGER_DATA, 3, arrayOfSizes);
+            LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, 3, arrayOfSizes);
     
         }
 
 
   	/************************************************************************************************************************************************/
 	static public void writeData(int ctx, String fieldPath, String timeBasePath, double value)throws UALException
-        {
+    {
+        int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
 		double dataArr[] = {value};
 
-		 LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, LowLevel.DOUBLE_DATA, 0, null);
+		 LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
 
-        }
+    }
 
 	static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DDouble array)throws UALException
         {
 		double dataArr[] = array.getArray();
 		int arrayOfSizes[] = {	array.getDim()};
 
-		LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, LowLevel.DOUBLE_DATA, 1, arrayOfSizes);
+		LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
 
         }
 
@@ -96,7 +98,7 @@ public class Wrapper {
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1) };
 
-            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, LowLevel.DOUBLE_DATA, 2, arrayOfSizes);
+            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 2, arrayOfSizes);
     
         }
 	
@@ -106,7 +108,7 @@ public class Wrapper {
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2)  };
 
-            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, LowLevel.DOUBLE_DATA, 3, arrayOfSizes);
+            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 3, arrayOfSizes);
     
         }
 
@@ -116,7 +118,7 @@ public class Wrapper {
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3)   };
 
-            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, LowLevel.DOUBLE_DATA, 4, arrayOfSizes);
+            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 4, arrayOfSizes);
     
         }
 
@@ -126,7 +128,7 @@ public class Wrapper {
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4) };
 
-            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, LowLevel.DOUBLE_DATA, 5, arrayOfSizes);
+            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 5, arrayOfSizes);
     
         }
 
@@ -136,7 +138,7 @@ public class Wrapper {
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4), array.getDim(5) };
 
-            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, LowLevel.DOUBLE_DATA, 6, arrayOfSizes);
+            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 6, arrayOfSizes);
     
         }
 
@@ -146,16 +148,16 @@ public class Wrapper {
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4), array.getDim(5), array.getDim(6) };
 
-            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, LowLevel.DOUBLE_DATA, 7, arrayOfSizes);
+            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 7, arrayOfSizes);
     
         }
 	/************************************************************************************************************************************************/
 
     	static public void writeData(int ctx, String fieldPath, String timeBasePath, String text)throws UALException
         {
-		    int arrayOfSizes[] = {	text.length()};
+		    int arrayOfSizes[] = {text.getBytes().length};
 
-		    LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, text.getBytes(), LowLevel.CHAR_DATA, 1, arrayOfSizes);
+		    LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, text.getBytes(), 1, arrayOfSizes);
         }
 
 
@@ -172,6 +174,10 @@ public class Wrapper {
 
         byte strByteArray[] = null;
         int size;
+        
+        //return on empty array
+        if(numberOfStrings < 1)
+            return;
 
         for(int i = 0; i < numberOfStrings; i++)
         {
@@ -181,6 +187,9 @@ public class Wrapper {
                 maxStringSize = size;
                 
         }
+
+         if(maxStringSize < 1)
+            return;
 
         arrayOfSizes[0] = numberOfStrings; 
         arrayOfSizes[1] = maxStringSize;
@@ -197,7 +206,7 @@ public class Wrapper {
         }
 
 
-            LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, strByteArray, LowLevel.CHAR_DATA, 2, arrayOfSizes);
+            LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, strByteArray, 2, arrayOfSizes);
         }
 
     	/************************************************************************************************************************************************/
@@ -213,7 +222,7 @@ public class Wrapper {
 		double retVal = -1;
 		double dataArr[] = null;
 
-  		dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 0, retSize);
+  		dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, 0, retSize);
 
 		
 		retVal = dataArr[0];
@@ -222,97 +231,100 @@ public class Wrapper {
 	}
 
 
-	static public void readData(int ctx, String fieldPath, String timeBasePath, Vect1DDouble array)throws UALException
+	static public Vect1DDouble readData(int ctx, String fieldPath, String timeBasePath, Vect1DDouble array)throws UALException
         {
 
 		int retSize[] = new int[1];
 		double dataArr[] = null;
 
-  		dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 1, retSize);
+  		dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, 1, retSize);
 
 
-		array.setArray(dataArr, retSize[0]);
+		array = new Vect1DDouble(dataArr);
+        return array;
 	}
 
-    static public void readData(int ctx, String fieldPath, String timeBasePath, Vect2DDouble array)throws UALException
+    static public Vect2DDouble readData(int ctx, String fieldPath, String timeBasePath, Vect2DDouble array)throws UALException
         {
 
         int retSize[] = new int[2];
         double dataArr[] = null;
 
-        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 2, retSize);
+        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, 2, retSize);
 
-        array.setArray(dataArr, retSize[0], retSize[1]);
+        array = new Vect2DDouble(retSize[0], retSize[1], dataArr);
+        return array;
     }
 
 
-  static public void readData(int ctx, String fieldPath, String timeBasePath, Vect3DDouble array)throws UALException
+  static public Vect3DDouble readData(int ctx, String fieldPath, String timeBasePath, Vect3DDouble array)throws UALException
   {
 
         int retSize[] = new int[3];
         double dataArr[] = null;
 
-        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 3, retSize);
+        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, 3, retSize);
 
-        array.setArray(dataArr, retSize[0], retSize[1], retSize[2]);
+        array = new Vect3DDouble(retSize[0], retSize[1], retSize[2], dataArr);
+        return array;
     }
 
-  static public void readData(int ctx, String fieldPath, String timeBasePath, Vect4DDouble array)throws UALException
+  static public Vect4DDouble readData(int ctx, String fieldPath, String timeBasePath, Vect4DDouble array)throws UALException
         {
 
         int retSize[] = new int[4];
         double dataArr[] = null;
 
-        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 4, retSize);
+        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, 4, retSize);
 
 
-        array.setArray(dataArr, retSize[0], retSize[1], retSize[2], retSize[3]);
+        array = new Vect4DDouble(retSize[0], retSize[1], retSize[2], retSize[3], dataArr);
 
-
+        return array;
 
     }
 
-  static public void readData(int ctx, String fieldPath, String timeBasePath, Vect5DDouble array)throws UALException
+  static public Vect5DDouble readData(int ctx, String fieldPath, String timeBasePath, Vect5DDouble array)throws UALException
         {
 
         int retSize[] = new int[5];
         double dataArr[] = null;
 
-        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 5, retSize);
+        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, 5, retSize);
 ;
 
-        array.setArray(dataArr, retSize[0], retSize[1], retSize[2], retSize[3], retSize[4]);
+       array = new  Vect5DDouble(retSize[0], retSize[1], retSize[2], retSize[3], retSize[4], dataArr);
 
-
+        return array;
 
     }
-  static public void readData(int ctx, String fieldPath, String timeBasePath, Vect6DDouble array)throws UALException
+  static public Vect6DDouble readData(int ctx, String fieldPath, String timeBasePath, Vect6DDouble array)throws UALException
         {
 
         int retSize[] = new int[6];
         double dataArr[] = null;
 
-        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 6, retSize);
+        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, 6, retSize);
 
-        array.setArray(dataArr, retSize[0], retSize[1], retSize[2], retSize[3], retSize[4], retSize[5]);
+        array = new Vect6DDouble(retSize[0], retSize[1], retSize[2], retSize[3], retSize[4], retSize[5], dataArr);
 
-
+        return array;
 
     }
 
-  static public void readData(int ctx, String fieldPath, String timeBasePath, Vect7DDouble array)throws UALException
+  static public Vect7DDouble readData(int ctx, String fieldPath, String timeBasePath, Vect7DDouble array)throws UALException
         {
 
         int retSize[] = new int[7];
         double dataArr[] = null;
 
-        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, LowLevel.DOUBLE_DATA, 7, retSize);
+        dataArr = LowLevel.ual_read_data_double(ctx, fieldPath, timeBasePath, 7, retSize);
 
 
-        array.setArray(dataArr, retSize[0], retSize[1], retSize[2], retSize[3], retSize[4], retSize[5], retSize[6]);
+        array = new Vect7DDouble(retSize[0], retSize[1], retSize[2], retSize[3], retSize[4], retSize[5], retSize[6], dataArr);
 
 
-
+        return array;
     }
 
 	/************************************************************************************************************************************************/
@@ -326,7 +338,7 @@ public class Wrapper {
 		int retVal = -1;
 		int dataArr[] = null;
 
-  		LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, LowLevel.INTEGER_DATA, 0, retSize);
+  		dataArr = LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, 0, retSize);
 
 		
 		retVal = dataArr[0];
@@ -334,44 +346,46 @@ public class Wrapper {
 	}
 
 
-	static public void readData(int ctx, String fieldPath, String timeBasePath, Vect1DInt array) throws UALException
+	static public Vect1DInt readData(int ctx, String fieldPath, String timeBasePath, Vect1DInt array) throws UALException
         {
 
         int retSize[]  = new int[1];
 		int dataArr[] = null;
 
-  		dataArr = LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, LowLevel.INTEGER_DATA, 1, retSize);
 
 
-		array.setArray(dataArr, retSize[0]);
+  		dataArr = LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, 1, retSize);
+
+		array = new Vect1DInt(dataArr);
+        return array;
 
 	}
 
-    static public void readData(int ctx, String fieldPath, String timeBasePath, Vect2DInt array) throws UALException
+    static public Vect2DInt readData(int ctx, String fieldPath, String timeBasePath, Vect2DInt array) throws UALException
         {
 
         int retSize[]  = new int[2];
         int dataArr[] = null;
 
-        dataArr = LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, LowLevel.INTEGER_DATA, 2, retSize);
+        dataArr = LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, 2, retSize);
 
 
-        array.setArray(dataArr, retSize[0], retSize[1]);
+        array = new Vect2DInt(retSize[0], retSize[1], dataArr);
 
-
+        return array;
     }
 
-    static public void readData(int ctx, String fieldPath, String timeBasePath, Vect3DInt array) throws UALException
+    static public Vect3DInt readData(int ctx, String fieldPath, String timeBasePath, Vect3DInt array) throws UALException
         {
 
         int retSize[]  = new int[3];
         int dataArr[] = null;
 
-        dataArr = LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, LowLevel.INTEGER_DATA, 3, retSize);
+        dataArr = LowLevel.ual_read_data_int(ctx, fieldPath, timeBasePath, 3, retSize);
 
 
-        array.setArray(dataArr, retSize[0], retSize[1], retSize[2]);
-
+        array = new Vect3DInt(retSize[0], retSize[1], retSize[2], dataArr);
+        return array;
 
     }
 
@@ -387,7 +401,7 @@ public class Wrapper {
         String str = null;
 
 		
-		dataArr = LowLevel.ual_read_data_char(ctx, fieldPath, timeBasePath, LowLevel.CHAR_DATA, 1, retSize);
+		dataArr = LowLevel.ual_read_data_char(ctx, fieldPath, timeBasePath, 1, retSize);
 
 		
 		text = new String(dataArr);
@@ -395,16 +409,16 @@ public class Wrapper {
 
     }
 
-	static public void readData(int ctx, String fieldPath, String timeBasePath, Vect1DString array) throws UALException
+	static public Vect1DString readData(int ctx, String fieldPath, String timeBasePath, Vect1DString array) throws UALException
     {
-        int retSize[] = new int[1]; 
+        int retSize[] = new int[2]; 
         byte dataArr[] = null;
         String strArr[] = null;
 
 		int numberOfStrings = -1;
 		int maxStringSize = -1;
 
-  		dataArr = LowLevel.ual_read_data_char(ctx, fieldPath, timeBasePath, LowLevel.CHAR_DATA, 2, retSize);
+  		dataArr = LowLevel.ual_read_data_char(ctx, fieldPath, timeBasePath, 2, retSize);
  
 
 		numberOfStrings = retSize[0];
@@ -420,7 +434,8 @@ public class Wrapper {
 		}
 
   	
-        array.setArray(strArr, retSize[0]);
+        array = new Vect1DString(strArr);
+        return array;
 	}
 
 
