@@ -74,7 +74,7 @@ public class imas {
 
  public static final int INTERPOLATION = 3, CLOSEST_SAMPLE = 1, PREVIOUS_SAMPLE = 2;
 
- public static final int NON_TIMED = 0, TIMED = 1, TIMED_CLEAR = 2;
+ //public static final int NON_TIMED = 0, TIMED = 1, TIMED_CLEAR = 2;
 
  public static int pulseCtx = -1;
  
@@ -214,10 +214,10 @@ public class imas {
   **/
  static public int createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version) throws UALException
 {
-    System.err.println("WARNING:\n"
+  /*  System.err.println("WARNING:\n"
                         + "\"createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version)\"  is DEPRECATED.\n"
                         + "Please use \"createEnv(int shot, int run, String user, String tokamak, String version)\" instead");
-    return imas.createEnv(shot,  run,  user,  tokamak,  version);
+    */ return imas.createEnv(shot,  run,  user,  tokamak,  version);
 }
 
 static public int createEnv(int shot, int run, String user, String tokamak, String version) throws UALException
@@ -276,10 +276,10 @@ static public int createEnv(int shot, int run, String user, String tokamak, Stri
 
  static public void close(int refIdx) throws UALException
 {
-       System.err.println("WARNING:\n"
+ /*      System.err.println("WARNING:\n"
                         + "\"int close(int refIdx)\"  is DEPRECATED.\n"
                         + "Please use \"close()\" instead");
-   close();
+  */ close();
 }
 
  static public void close(int refIdx, String name, int shot, int run) throws UALException{
@@ -448,10 +448,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
     {
         int iOcurrence = 0;
 
-        System.err.println("WARNING:\n"
+   /*     System.err.println("WARNING:\n"
                         + "\"put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) \"  is DEPRECATED.\n"
                         + "Please use \"put()\" instead");
-
+*/
         if(ids.ids_properties.homogeneous_time == imas.EMPTY_INT)
         {
             System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
@@ -467,6 +467,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
             iOcurrence = Integer.parseInt(tokens[1]);          
         }
 
+        ids.setPulseCtx(pulseCtx);
 	    ids.put(iOcurrence);
     }
 
@@ -510,10 +511,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
         String strNodePath = "";
         String strTimeBasePath = "";
 
-<!--       <xsl:apply-templates select="field" mode="PUT_SINGLE">
+       <xsl:apply-templates select="field" mode="PUT_SINGLE">
             <xsl:with-param name="dynamic_only" select="'no'"/>
         </xsl:apply-templates>
--->
     }
     
        /* ------------------------------------------------------------------------------------------------------------------ */
@@ -597,16 +597,16 @@ public class <xsl:value-of select="@name"/>_IDSBase
         imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
         int iOcurrence = 0;
 
-        System.err.println("WARNING:\n"
+  /*      System.err.println("WARNING:\n"
                         + "\"get(int expIdx, String path)) \"  is DEPRECATED.\n"
                         + "Please use \"get()\" instead");
-
+  */
         if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
         {
             String tokens[] = idsFullName.split("/");
             iOcurrence = Integer.parseInt(tokens[1]);          
         }
-
+        ids.setPulseCtx(expIdx);
         ids.get(iOcurrence);
         return ids;
      }
@@ -787,8 +787,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
         //String   ual_debug = System.getenv("ual_debug");
 	  
     
- <!--        <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> 
-    --> }       
+        <xsl:apply-templates select = "field" mode = "PUT_SINGLE"/> 
+    }       
      <xsl:choose>
     <xsl:when test="not(ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded'])">
    /* ____________________________________________________________________________________________________________ */
@@ -1784,7 +1784,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
             strTimeBasePath = "";
             try{       
                     int tmpArray[] = new int[1];
-                    LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                    aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     arraySize = tmpArray[0];
                     if(arraySize &lt;= 0)
                     {
@@ -1822,7 +1822,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
             strTimeBasePath = "";
                  try{       
                     int tmpArray[] = new int[1];
-                    LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                    aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     arraySize = tmpArray[0];
                     if(arraySize &lt;= 0)
                     {
@@ -1865,7 +1865,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
             </xsl:choose>
                    try{       
                     int tmpArray[] = new int[1];
-                    LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+                    aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     arraySize = tmpArray[0];
                     if(arraySize &lt;= 0)
                     {
@@ -1920,7 +1920,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
                     strTimeBasePath = "";
             </xsl:otherwise>
         </xsl:choose>
-        Wrapper.readData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
+        this.<xsl:value-of select="@name"/> = Wrapper.readData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
 
     </xsl:when>
         <xsl:otherwise>
