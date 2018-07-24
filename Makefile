@@ -18,7 +18,7 @@ IDSSOURCES = $(addprefix src/imasjava/ids/,$(addsuffix _IDSBase.java,$(IDSNAMES)
 GENSOURCES = src/imasjava/imas.java $(IDSSOURCES)
 # Static sources
 STA2SOURCES = $(addprefix src/imasjava/,$(addsuffix .java,UALLowLevel))
-STA1SOURCES = $(addprefix src/imasjava/,$(addsuffix .java,UALException utilities/ImasReflection Vect1DBoolean Vect1DDouble Vect1DFloat Vect1DInt Vect1DString Vect2DDouble Vect2DFloat Vect2DInt Vect3DDouble Vect3DFloat Vect3DInt Vect4DDouble Vect5DDouble Vect6DDouble Vect7DDouble))
+STA1SOURCES = $(addprefix src/imasjava/,$(addsuffix .java,UALException utilities/ImasReflection Vect1DBoolean Vect1DDouble Vect1DFloat Vect1DInt Vect1DString Vect2DDouble Vect2DFloat Vect2DInt Vect3DDouble Vect3DFloat Vect3DInt Vect4DDouble Vect5DDouble Vect6DDouble Vect7DDouble wrapper/Wrapper wrapper/LowLevel ))
 SOURCES = $(GENSOURCES) $(STA2SOURCES) $(STA1SOURCES)
 
 # List of class files (not including derived class files)
