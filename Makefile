@@ -48,7 +48,7 @@ clean:
 clean-src: clean
 	$(RM) $(GENSOURCES)
 
-$(JARFILE): $(CLASSFILE)
+$(JARFILE): $(CLASSES)
 	@$(mkdir_p) $(@D)
 	$(JAR) cf $@ -C ./build .
 
