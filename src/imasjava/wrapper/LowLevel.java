@@ -37,12 +37,12 @@ public final static int  CREATE_PULSE       =  ACCESS_PULSE_0 + 2;
 public final static int  FORCE_CREATE_PULSE =  ACCESS_PULSE_0 + 3;
 public final static int  CLOSE_PULSE        =  ACCESS_PULSE_0 + 4;
 public final static int  ERASE_PULSE        =  ACCESS_PULSE_0 + 5;
-    
+    /*
 public final static int  CHAR_DATA         =   DATA_TYPE_0;
 public final static int  INTEGER_DATA      =   DATA_TYPE_0 + 1;
 public final static int  DOUBLE_DATA       =   DATA_TYPE_0 + 2;
 public final static int  COMPLEX_DATA      =   DATA_TYPE_0 + 3;
-
+*/
 public final static int  UNKNOWN_ERR       =   ERR_0;
 public final static int  CONTEXT_ERR       =   ERR_0 - 1;
 public final static int  BACKEND_ERR       =   ERR_0 - 2;
@@ -228,7 +228,6 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
 		     final String fieldpath,
 		     final String timebasepath,
 		     int[] data,
-		     int datatype,
 		     int dim,
 		     int[] size) throws UALException;
 
@@ -237,7 +236,6 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
              final String fieldpath,
              final String timebasepath,
              double[] data,
-             int datatype,
              int dim,
              int[] size) throws UALException;
 
@@ -247,7 +245,6 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
              final String fieldpath,
              final String timebasepath,
              byte[] data,
-             int datatype,
              int dim,
              int[] size) throws UALException;
 
@@ -282,21 +279,18 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
  public static native int[] ual_read_data_int(int ctx,
 		    final String fieldpath,
 		    final String timebasepath,
-		    int datatype,
 		    int dim,
 		    int[] size) throws UALException;
 
  public static native double[] ual_read_data_double(int ctx,
             final String fieldpath,
             final String timebasepath,
-            int datatype,
             int dim,
             int[] size) throws UALException;
 
  public static native byte[] ual_read_data_char(int ctx,
             final String fieldpath,
             final String timebasepath,
-            int datatype,
             int dim,
             int[] size) throws UALException;
 
