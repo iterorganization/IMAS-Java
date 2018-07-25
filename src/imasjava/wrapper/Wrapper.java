@@ -34,7 +34,9 @@ public class Wrapper {
   
 	static public void writeData(int ctx, String fieldPath, String timeBasePath, int value)throws UALException
         {
-        
+            if(value == LowLevel.EMPTY_INT) 
+                return;
+
             int dataArray[] = {value};
             int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
             
@@ -44,7 +46,8 @@ public class Wrapper {
 
 	    static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DInt array)throws UALException
         {
-        
+            if(array == null) 
+                return;
 		int dataArr[] =  array.getArray();
 		int arrayOfSizes[] = {	array.getDim()};
 
@@ -53,8 +56,9 @@ public class Wrapper {
 
 
         static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect2DInt array)throws UALException
-        {
-           
+        {            
+            if(array == null) 
+                return;
             int dataArr[] =  array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1) };
 
@@ -64,7 +68,9 @@ public class Wrapper {
 
         static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect3DInt array)throws UALException
         {
-           
+            if(array == null) 
+                return;
+
             int dataArr[] =  array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2) };
 
@@ -76,6 +82,9 @@ public class Wrapper {
   	/************************************************************************************************************************************************/
 	static public void writeData(int ctx, String fieldPath, String timeBasePath, double value)throws UALException
     {
+       if(value == LowLevel.EMPTY_DOUBLE) 
+                return;
+
         int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
 		double dataArr[] = {value};
 
@@ -85,6 +94,8 @@ public class Wrapper {
 
 	static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DDouble array)throws UALException
         {
+        if(array == null || array.getArray().length < 1) 
+                return;
 		double dataArr[] = array.getArray();
 		int arrayOfSizes[] = {	array.getDim()};
 
@@ -94,7 +105,8 @@ public class Wrapper {
 
         static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect2DDouble array)throws UALException
         {
-           
+            if(array == null || array.getArray().length < 1) 
+                return;
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1) };
 
@@ -104,7 +116,8 @@ public class Wrapper {
 	
         static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect3DDouble array)throws UALException
         {
-           
+            if(array == null || array.getArray().length < 1) 
+                return;
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2)  };
 
@@ -114,7 +127,9 @@ public class Wrapper {
 
         static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect4DDouble array)throws UALException
         {
-           
+           if(array == null || array.getArray().length < 1) 
+                return;
+
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3)   };
 
@@ -124,7 +139,9 @@ public class Wrapper {
 
         static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect5DDouble array)throws UALException
         {
-           
+            if(array == null || array.getArray().length < 1) 
+                return;
+
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4) };
 
@@ -134,6 +151,8 @@ public class Wrapper {
 
        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect6DDouble array)throws UALException
         {
+            if(array == null || array.getArray().length < 1) 
+                return;
            
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4), array.getDim(5) };
@@ -144,7 +163,9 @@ public class Wrapper {
 
         static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect7DDouble array)throws UALException
         {
-           
+            if(array == null || array.getArray().length < 1) 
+                return;
+
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4), array.getDim(5), array.getDim(6) };
 
@@ -155,6 +176,9 @@ public class Wrapper {
 
     	static public void writeData(int ctx, String fieldPath, String timeBasePath, String text)throws UALException
         {
+            if(text == null || text.length() < 1) 
+                return;
+
 		    int arrayOfSizes[] = {text.getBytes().length};
 
 		    LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, text.getBytes(), 1, arrayOfSizes);
@@ -163,6 +187,9 @@ public class Wrapper {
 
         static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DString array)throws UALException
         {
+            if(array == null || array.getArray().length < 1) 
+                return;
+
             int arrayOfSizes[] = new int[2];
 
         int maxStringSize = -1;
