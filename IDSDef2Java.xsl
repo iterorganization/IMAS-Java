@@ -69,8 +69,7 @@ public class imas {
    System.exit(0);
   }
  }
- public static final int EMPTY_INT = -999999999;
- public static final double EMPTY_DOUBLE = -9.0E40;
+
 
  public static final int INTERPOLATION = 3, CLOSEST_SAMPLE = 1, PREVIOUS_SAMPLE = 2;
 
@@ -452,7 +451,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                         + "\"put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) \"  is DEPRECATED.\n"
                         + "Please use \"put()\" instead");
 */
-        if(ids.ids_properties.homogeneous_time == imas.EMPTY_INT)
+        if(ids.ids_properties.homogeneous_time == LowLevel.EMPTY_INT)
         {
             System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
             return;
@@ -541,7 +540,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                         + "Please use \"putSlice()\" instead");
 
 
-        if(ids.ids_properties.homogeneous_time == imas.EMPTY_INT)
+        if(ids.ids_properties.homogeneous_time == LowLevel.EMPTY_INT)
         {
             System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUTSLICE quits with no action.");
             return;
@@ -657,7 +656,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
  * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
  * missing IDS fields.
  * @return the selected <xsl:value-of select="@name"/> ids. Missing fields are represented by zero sized vectors if not scalars,
- * by imas.EMPTY_INT if integer, imas.EMPTY_DOUBLE if double and empty String is string.
+ * by LowLevel.EMPTY_INT if integer, imas.EMPTY_DOUBLE if double and empty String is string.
  **/
     public static imas.<xsl:value-of select="@name"/>  getSlice(int expIdx, String path, double time, int interpolMode) throws UALException
     {
@@ -1025,7 +1024,7 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
         System.out.println("");
     </xsl:when>
     <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
-        if(<xsl:value-of select = "$currentidxpath"/> != imas.EMPTY_INT)
+        if(<xsl:value-of select = "$currentidxpath"/> != LowLevel.EMPTY_INT)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
@@ -1036,14 +1035,14 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
          System.out.println("");
     </xsl:when>
     <xsl:when test="@name='xs:double'">
-        if(<xsl:value-of select = "$currentidxpath"/> != imas.EMPTY_DOUBLE)
+        if(<xsl:value-of select = "$currentidxpath"/> != LowLevel.EMPTY_DOUBLE)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
         System.out.println("");
     </xsl:when>
     <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
-         if(<xsl:value-of select = "$currentidxpath"/> != imas.EMPTY_DOUBLE)
+         if(<xsl:value-of select = "$currentidxpath"/> != LowLevel.EMPTY_DOUBLE)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
@@ -1222,16 +1221,16 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
       public String <xsl:value-of select = "@name"/>;
     </xsl:when>
     <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
-      public int <xsl:value-of select = "@name"/> = imas.EMPTY_INT;
+      public int <xsl:value-of select = "@name"/> = LowLevel.EMPTY_INT;
     </xsl:when>
     <xsl:when test="@name='xs:boolean'">
       public boolean <xsl:value-of select = "@name"/>;
     </xsl:when>
     <xsl:when test="@name='xs:double'">
-      public double <xsl:value-of select = "@name"/> = imas.EMPTY_DOUBLE;
+      public double <xsl:value-of select = "@name"/> = LowLevel.EMPTY_DOUBLE;
     </xsl:when>
     <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
-      public double <xsl:value-of select = "@name"/> = imas.EMPTY_DOUBLE;
+      public double <xsl:value-of select = "@name"/> = LowLevel.EMPTY_DOUBLE;
     </xsl:when>
 
     <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
@@ -1615,25 +1614,25 @@ UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@nam
         <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
 	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Int</xsl:with-param>
-	<xsl:with-param name="Exception">imas.EMPTY_INT</xsl:with-param>
+	<xsl:with-param name="Exception">LowLevel.EMPTY_INT</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
         <xsl:when test="@name='xs:boolean'">
 	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Boolean</xsl:with-param>
-	<xsl:with-param name="Exception">imas.EMPTY_INT</xsl:with-param>
+	<xsl:with-param name="Exception">LowLevel.EMPTY_INT</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
         <xsl:when test="@name='xs:double'">
 	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Double</xsl:with-param>
-	<xsl:with-param name="Exception">imas.EMPTY_DOUBLE</xsl:with-param>
+	<xsl:with-param name="Exception">LowLevel.EMPTY_DOUBLE</xsl:with-param>
 	</xsl:call-template>
         </xsl:when>
         <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
 	<xsl:call-template name="getVariable"> 
 	<xsl:with-param name="Function">Double</xsl:with-param>
-	<xsl:with-param name="Exception">imas.EMPTY_DOUBLE</xsl:with-param>
+	<xsl:with-param name="Exception">LowLevel.EMPTY_DOUBLE</xsl:with-param>
 	</xsl:call-template>
        </xsl:when>
 

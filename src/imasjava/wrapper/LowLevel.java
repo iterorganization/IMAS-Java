@@ -4,6 +4,11 @@ import imasjava.UALException;
 
 public class LowLevel {
 
+
+public static final int EMPTY_INT           = -999999999;
+public static final double EMPTY_DOUBLE     = -9.0E40;
+
+
 public final static int  MAXDIM             =  7;
 
 public final static int  OP_INTERP_0        =  0;
