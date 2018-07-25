@@ -487,12 +487,13 @@ public class <xsl:value-of select="@name"/>_IDSBase
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
 
-        delete(pulseCtx, idsFullName);
-
+      
+      
         try{
             // Open put context
             ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
 
+            this.deleteRootFields(ctx);
             this.putRootFields(ctx, isIdsHomogeneous);
         }
         finally {
@@ -513,7 +514,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
        <xsl:apply-templates select="field" mode="PUT_SINGLE">
             <xsl:with-param name="dynamic_only" select="'no'"/>
         </xsl:apply-templates>
-    }
+   }
     
        /* ------------------------------------------------------------------------------------------------------------------ */
    /* -----------------------------------        PUT  SLICE     ------------------------------------------------------- */  
@@ -692,27 +693,59 @@ public class <xsl:value-of select="@name"/>_IDSBase
 -->   
  }
 
+
+ /* ------------------------------------------------------------------------------------------------------------ */
+ /* -----------------------------------       DELETE       ----------------------------------------------------- */  
+ /* ------------------------------------------------------------------------------------------------------------ */
  /**
  * Method delete removes all the data associated with a <xsl:value-of select="@name"/> IDS in the open database.
  * @param expIdx The index to the database, returned by imas.open()
  * @param path The path name to the selected data item. By convention, only a single tree level is defined for IDS objects in the database.
  * @exception UALException Issued when data cannot be stored for any reason.
  **/
-    public static void delete(int expIdx, String path) throws UALException
+    public static void delete(int pulseCtx, String idsFullName) throws UALException
     {
-     
-      imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
-      ids.doDelete(expIdx, path);
+
+        imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
+        int iOcurrence = 0;
+
+        if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
+        {
+            String tokens[] = idsFullName.split("/");
+            iOcurrence = Integer.parseInt(tokens[1]);          
+        }
+
+        ids.setPulseCtx(pulseCtx);
+        ids.delete(iOcurrence);
+
      }
 
-   public void doDelete(int expIdx, String path) throws UALException
-    {
-          String strNodePath = "";
-      String        ual_debug = System.getenv("ual_debug");
-  <!--  <xsl:apply-templates select = "field" mode = "DELETE"/>
-     --> }
+   public void delete(int iOccurrence) throws UALException
+    {  
+        String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
+        int ctx = -1;
+ 
+        if(iOccurrence > 0)
+            idsFullName = idsFullName + "/" + iOccurrence;
+
+        try{
+            // Open put context
+            ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
+
+            this.deleteRootFields(ctx);
+        }
+        finally {
+            LowLevel.ual_end_action(ctx);
+        }
+     }
 
 
+   private void deleteRootFields(int ctx) throws UALException
+    {  
+        String strNodePath = "";
+
+        <xsl:apply-templates select = "field" mode = "DELETE"/>
+     }
 
      </xsl:otherwise>
   </xsl:choose>
@@ -887,23 +920,16 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________  */
    /* ________________________________________       DELETE     ___________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */ 
-  <xsl:choose>
-     <xsl:when test="ancestor-or-self::field[@data_type='struct_array' and @maxoccur='unbounded']">
-  //  public void delete(int expIdx, String path, String strParentPath, int idx) throws UALException {}
-  //  		I am descendant of AoS 2/3 so all my data were deleted by (grand)parent and no delete() is needed !!!! ABC
- </xsl:when>
-<xsl:otherwise>
-       public void delete(int expIdx, String path, String strParentPath) throws UALException
+     <xsl:if test="@data_type='structure'">
+       public void delete(int ctx) throws UALException
     {
-      String ual_debug = System.getenv("ual_debug");
-     
-      String strNodePath = strParentPath + "<xsl:value-of select="@name"/>/";
+        String strNodePath = null;
        
-     <!-- <xsl:apply-templates select = "field" mode = "DELETE"/>
+        <xsl:apply-templates select = "field" mode = "DELETE"/>
    
---> }             
-     </xsl:otherwise>
-   </xsl:choose>
+  }           
+ </xsl:if>
+
     
 
 
@@ -960,38 +986,22 @@ public class <xsl:value-of select="@name"/>_IDSBase
 </xsl:template>
     
 <!--=====================================================================================================================================-->
-<!--                  Delete field                                                                                                       -->
+<!--                  Delete fields                                                                                                       -->
 <!--=====================================================================================================================================-->
 
-<xsl:template match="field" mode="DELETE">
-<xsl:param name="variable_path"/>
-<xsl:param name="mds_path"/>
-<xsl:call-template name="COMMENT_NODE"/>
-<xsl:choose>
-        <!--========== Regular structures ==========-->
-<xsl:when test="@data_type='structure'">
-    this.<xsl:value-of select = "@name"/>.delete(expIdx,path,strNodePath);
-</xsl:when>
 
-        <!--========== Arrays of structures ==========-->
-<xsl:when test="@data_type='struct_array' and @maxoccur!='unbounded'">
-this.<xsl:value-of select = "@name"/> = new <xsl:value-of select = "@name"/>Class[1];  // We just need an empty class (allocated to size 1) to reflect the structure of the class
-this.<xsl:value-of select = "@name"/>[0] = new <xsl:value-of select = "@name"/>Class();
-// AoS 1 : systematic delete of all predefined slots in the MDS pulse file 
-for (int i = 0; i &lt; <xsl:value-of select = "@maxoccur"/>; i++){
-   this.<xsl:value-of select = "@name"/>[0].delete(expIdx,path,strNodePath, i + 1);
-}
-UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>/Shape_of");  
- 
-</xsl:when>
-<xsl:otherwise>  
-      <xsl:if test="@data_type='struct_array' and @maxoccur='unbounded'">
-      //AOS 2/3 
-     </xsl:if>
-       UALLowLevel.deleteData(expIdx, path, strNodePath + "<xsl:value-of select = "@name"/>");  
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
+<xsl:template match="field" mode="DELETE">
+    <xsl:call-template name="COMMENT_NODE"/>
+    <xsl:choose>
+        <xsl:when test="@data_type='structure'">
+            this.<xsl:value-of select="@name"/>.delete(ctx);
+        </xsl:when>
+        <xsl:otherwise>
+            strNodePath = "<xsl:value-of select="@path"/>";
+            LowLevel.ual_delete_data(ctx, strNodePath);
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
 
 <!--=================================================-->
 <!--                Display content                  -->
