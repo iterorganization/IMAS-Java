@@ -268,8 +268,8 @@ static public int createEnv(int shot, int run, String user, String tokamak, Stri
         throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
     }
     finally
-    {
-        LowLevel.ual_end_action(imas.pulseCtx);
+    {   if(imas.pulseCtx >= 0)
+            LowLevel.ual_end_action(imas.pulseCtx);
     }
 }
 
@@ -497,7 +497,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
             this.putRootFields(ctx, isIdsHomogeneous);
         }
         finally {
-            LowLevel.ual_end_action(ctx);
+            if(ctx >= 0)
+                LowLevel.ual_end_action(ctx);
         }
     }
 
@@ -578,7 +579,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
             this.putSliceRootFields(ctx, isIdsHomogeneous);
         }
         finally {
-            LowLevel.ual_end_action(ctx);
+            if(ctx >= 0)
+                LowLevel.ual_end_action(ctx);
         }
     }
 
@@ -646,7 +648,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
             this.getRootFields(ctx, isIdsHomogeneous);
         }
         finally {
-            LowLevel.ual_end_action(ctx);
+            if(ctx >= 0)
+                LowLevel.ual_end_action(ctx);
         }
     }
     public void getRootFields(int ctx, boolean isIdsHomogeneous)  throws UALException
@@ -717,7 +720,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
             this.getSliceRootFields(ctx, isIdsHomogeneous);
         }
         finally {
-            LowLevel.ual_end_action(ctx);
+            if(ctx >= 0)
+                LowLevel.ual_end_action(ctx);
         }
     }
 
@@ -775,7 +779,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
             this.deleteRootFields(ctx);
         }
         finally {
-            LowLevel.ual_end_action(ctx);
+            if(ctx >= 0)
+                LowLevel.ual_end_action(ctx);
         }
      }
 
@@ -1420,7 +1425,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
                 }
                     
                 finally { 
-                    LowLevel.ual_end_action(aosCtx);
+                    if(aosCtx >= 0)
+                        LowLevel.ual_end_action(aosCtx);
                 }
             }
         </xsl:when>
@@ -1450,7 +1456,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
                 }
                     
                 finally { 
-                    LowLevel.ual_end_action(aosCtx);
+                    if(aosCtx >= 0)
+                        LowLevel.ual_end_action(aosCtx);
                 }
             }
         </xsl:when>
@@ -1488,7 +1495,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
                 }
                     
                 finally { 
-                    LowLevel.ual_end_action(aosCtx);
+                    if(aosCtx >= 0)
+                        LowLevel.ual_end_action(aosCtx);
                 }
             }
         </xsl:when>
@@ -1585,7 +1593,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     }
                }     
                 finally { 
-                    LowLevel.ual_end_action(aosCtx);
+                    if(aosCtx >= 0)
+                        LowLevel.ual_end_action(aosCtx);
                 }
             
             
@@ -1623,7 +1632,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     }
                }     
                 finally { 
-                    LowLevel.ual_end_action(aosCtx);
+                    if(aosCtx >= 0)
+                        LowLevel.ual_end_action(aosCtx);
                 }
         </xsl:when>
         <xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
@@ -1666,7 +1676,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     }
                }     
                 finally { 
-                    LowLevel.ual_end_action(aosCtx);
+                    if(aosCtx >= 0)
+                        LowLevel.ual_end_action(aosCtx);
                 }
         </xsl:when>
 
