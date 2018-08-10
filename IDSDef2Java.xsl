@@ -1042,17 +1042,6 @@ public class <xsl:value-of select="@name"/>_IDSBase
             System.out.println("Empty");
         System.out.println("");
     </xsl:when>
-    <xsl:when test="@name='xs:boolean'">
-         System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-         System.out.println("");
-    </xsl:when>
-    <xsl:when test="@name='xs:double'">
-        if(<xsl:value-of select = "$currentidxpath"/> != LowLevel.EMPTY_DOUBLE)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
     <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
          if(<xsl:value-of select = "$currentidxpath"/> != LowLevel.EMPTY_DOUBLE)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
@@ -1097,13 +1086,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
             System.out.println("Empty");
         System.out.println("");
     </xsl:when>
-    <xsl:when test="@name='matdbl_type'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
+
     <xsl:when test="@data_type='INT_2D'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
@@ -1126,21 +1109,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
             System.out.println("Empty");
         System.out.println("");
     </xsl:when>
-    <xsl:when test="@name='array3ddbl_type'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
 
-    <xsl:when test="@name='array4ddbl_type'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
     <xsl:when test="@data_type='FLT_4D'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
@@ -1148,21 +1117,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
             System.out.println("Empty");
         System.out.println("");
     </xsl:when>
-    <xsl:when test="@name='array4dint_type'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
 
-    <xsl:when test="@name='array5ddbl_type'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
+
+
     <xsl:when test="@data_type='FLT_5D'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
@@ -1170,29 +1127,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
             System.out.println("Empty");
         System.out.println("");
     </xsl:when>
-    <xsl:when test="@name='array5dint_type'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
 
-    <xsl:when test="@name='array6ddbl_type'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
+
+
     <xsl:when test="@data_type='FLT_6D'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
-            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
-        else
-            System.out.println("Empty");
-        System.out.println("");
-    </xsl:when>
-    <xsl:when test="@name='array6dint_type'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
@@ -1235,12 +1173,6 @@ public class <xsl:value-of select="@name"/>_IDSBase
     <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
       public int <xsl:value-of select = "@name"/> = LowLevel.EMPTY_INT;
     </xsl:when>
-    <xsl:when test="@name='xs:boolean'">
-      public boolean <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <xsl:when test="@name='xs:double'">
-      public double <xsl:value-of select = "@name"/> = LowLevel.EMPTY_DOUBLE;
-    </xsl:when>
     <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
       public double <xsl:value-of select = "@name"/> = LowLevel.EMPTY_DOUBLE;
     </xsl:when>
@@ -1251,18 +1183,11 @@ public class <xsl:value-of select="@name"/>_IDSBase
     <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
       public Vect1DDouble <xsl:value-of select = "@name"/>;
     </xsl:when>
-    <xsl:when test="@name='vecdbl_type'">
-      public Vect1DDouble <xsl:value-of select = "@name"/>;
-    </xsl:when>
     <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
       public Vect1DInt <xsl:value-of select = "@name"/>;
     </xsl:when>
     <!--                       -->
     <xsl:when test="@data_type='FLT_2D'">
-      public Vect2DDouble  <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <!--                       -->
-    <xsl:when test="@name='matdbl_type'">
       public Vect2DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
     <!--                       -->
@@ -1278,49 +1203,18 @@ public class <xsl:value-of select="@name"/>_IDSBase
       public Vect3DInt  <xsl:value-of select = "@name"/>;
     </xsl:when>
     <!--                       -->
-    <xsl:when test="@name='array3ddbl_type'">
-      public Vect3DDouble  <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <!--                       -->
     <xsl:when test="@data_type='FLT_4D'">
-      public Vect4DDouble  <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <xsl:when test="@name='array4dint_type'">
-      public Vect4DInt  <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <xsl:when test="@name='array4ddbl_type'">
       public Vect4DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
     <!--                       -->
     <xsl:when test="@data_type='FLT_5D'">
       public Vect5DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
-    <xsl:when test="@name='array5dint_type'">
-      public Vect5DInt  <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <xsl:when test="@name='array5ddbl_type'">
-      public Vect5DDouble  <xsl:value-of select = "@name"/>;
-    </xsl:when>
       <!--                       -->
     <xsl:when test="@data_type='FLT_6D'">
       public Vect6DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
-    <xsl:when test="@name='array6dint_type'">
-      public Vect6DInt  <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <xsl:when test="@name='array6ddbl_type'">
-      public Vect6DDouble  <xsl:value-of select = "@name"/>;
-    </xsl:when>
 
-    <xsl:when test="@name='array7dflt_type'">
-      public Vect7DDouble  <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <xsl:when test="@name='array7dint_type'">
-      public Vect7DInt  <xsl:value-of select = "@name"/>;
-    </xsl:when>
-    <xsl:when test="@name='array7ddbl_type'">
-      public Vect7DDouble  <xsl:value-of select = "@name"/>;
-    </xsl:when>
     <!--                       -->
     <xsl:when test="@data_type='struct_array'">
       <xsl:variable name="class_name">
