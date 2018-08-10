@@ -638,7 +638,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
 
-        // TO DO: ZERO CONTENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        this.reset();
         try{
             // Open get context
             ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
@@ -712,6 +712,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
   
+
+        this.reset();
         try{
              // Open putSlice context
             ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.READ_OP, time, interpolMode);
@@ -790,6 +792,13 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
         <xsl:apply-templates select = "field" mode = "DELETE"/>
      }
+/* ------------------------------------------------------------------------------------------------------------ */
+ /* -----------------------------------       RESET       ----------------------------------------------------- */  
+ /* ----------------------------------------------------------------------------------------------------------- */
+    private void reset() 
+    {  
+        <xsl:apply-templates select = "field" mode = "RESET"/>
+    }
 
      </xsl:otherwise>
   </xsl:choose>
@@ -814,7 +823,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 </xsl:template>
 
 
-<!--
+
     <xsl:template match="field[@data_type='structure' or @data_type='struct_array']">
         <xsl:variable name="this-name" select="@name"/>
         <xsl:variable name="this-type" select="@data_type"/>
@@ -828,7 +837,6 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
     </xsl:template>
     
-    -->
     
  <!-- ====================================================================================================================================================================== -->
 <!-- ======================================================================================================================================================================= -->
@@ -918,11 +926,11 @@ public class <xsl:value-of select="@name"/>_IDSBase
 }   
     
 
-
+   <xsl:if test="@data_type='structure' and not(ancestor::field[@data_type='struct_array'])">
    /* ____________________________________________________________________________________________________________  */
    /* ________________________________________       DELETE     ___________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */ 
-     <xsl:if test="@data_type='structure'">
+  
        public void delete(int ctx) throws UALException
     {
         String strNodePath = null;
@@ -930,6 +938,14 @@ public class <xsl:value-of select="@name"/>_IDSBase
         <xsl:apply-templates select = "field" mode = "DELETE"/>
    
   }           
+   /* ____________________________________________________________________________________________________________  */
+   /* ________________________________________       RESET     ___________________________________________________ */  
+   /* ____________________________________________________________________________________________________________  */ 
+  
+       public void reset() 
+    {
+        <xsl:apply-templates select = "field" mode = "RESET"/>
+  }      
  </xsl:if>
 
     
@@ -1001,6 +1017,42 @@ public class <xsl:value-of select="@name"/>_IDSBase
         <xsl:otherwise>
             strNodePath = "<xsl:value-of select="@path"/>";
             LowLevel.ual_delete_data(ctx, strNodePath);
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+
+<!--=====================================================================================================================================-->
+<!--                  reset fields content to default values                                                                                                      -->
+<!--=====================================================================================================================================-->
+
+
+<xsl:template match="field" mode="RESET">
+    <xsl:call-template name="COMMENT_NODE"/>
+    <xsl:choose>
+        <xsl:when test="@data_type='structure'">
+            this.<xsl:value-of select="@name"/>.reset();
+        </xsl:when>
+        <xsl:when test="@data_type='int_type' or @data_type='INT_0D'">
+            this.<xsl:value-of select = "@name"/> = LowLevel.EMPTY_INT;
+        </xsl:when>
+        <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
+            this.<xsl:value-of select = "@name"/> = LowLevel.EMPTY_DOUBLE;
+        </xsl:when>
+        <xsl:when test="
+            @data_type='struct_array'
+        or @data_type='str_type' or @data_type='STR_0D'
+        or @data_type='str_1d_type' or @data_type='STR_1D'
+        or @data_type='flt_1d_type' or @data_type='FLT_1D'
+        or @data_type='int_1d_type' or @data_type='INT_1D'
+        or @data_type='FLT_2D' or @data_type='INT_2D'
+        or @data_type='FLT_3D'  or @data_type='INT_3D'
+        or @data_type='FLT_4D'  or @data_type='INT_4D'
+        or @data_type='FLT_5D'or @data_type='INT_5D'
+        or @data_type='FLT_6D'or @data_type='INT_6D'">
+            this.<xsl:value-of select = "@name"/> = null;
+        </xsl:when>
+        <xsl:otherwise>
+            //Doc GET <xsl:value-of select="@path"/> : PROBLEM : UNIDENTIFIED TYPE !!! <!-- for comment only -->
         </xsl:otherwise>
     </xsl:choose>
 </xsl:template>
