@@ -28,20 +28,26 @@ CLASSES = $(subst src/,build/,$(SOURCES:.java=.class))
 CLASSFILE = build/imasjava/imas.class
 JARFILE = lib/imas.jar
 
-all: $(JARFILE)
+all: bindings $(JARFILE)
+
+bindings: 
+	$(MAKE) -C wrapper
 
 sources: $(GENSOURCES)
 sources_install: $(GENSOURCES)
+	$(MAKE) -C wrapper/ $@
 	$(mkdir_p) $(datadir)/src/javainterface/imasjava/{ids,utilities}
 	$(INSTALL_DATA) src/imasjava/*.java $(datadir)/src/javainterface/imasjava
 	$(INSTALL_DATA) src/imasjava/ids/*.java $(datadir)/src/javainterface/imasjava/ids
 	$(INSTALL_DATA) src/imasjava/utilities/*.java $(datadir)/src/javainterface/imasjava/utilities
 
 install: all
+	$(MAKE) -C wrapper/ $@
 	$(mkdir_p) $(prefix)/jar
 	$(INSTALL_DATA) ./lib/imas.jar $(prefix)/jar/
 
 clean:
+	$(MAKE) -C wrapper/ $@
 	$(RM) -r ./build ./lib
 	$(RM) $(JARFILE)
 
