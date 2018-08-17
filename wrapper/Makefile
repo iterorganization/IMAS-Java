@@ -35,7 +35,7 @@ endif
  COMMON_OBJECTS= build/imasjava_wrapper_LowLevel.o
  CPPSRC= imasjava_wrapper_LowLevel.cpp
 
-TARGETS = libimas-java-binding.so libimas-java-binding.a
+TARGETS = lib/libimas-java-binding.so lib/libimas-java-binding.a
 
 
 all: $(TARGETS) 
@@ -73,19 +73,19 @@ clean:
 
 
 build/%.o: %.cpp 
-	@mkdir -p ./build
+	$(mkdir_p)./build
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< 
  
 
 
 
 # dynamic library
-libimas-java-binding.so: $(COMMON_OBJECTS) 	
-	$(mkdir_p) ./lib 
-	$(CXX) -g -o lib/$@ -Wl,-z,defs -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
+lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
+	@$(mkdir_p) ./lib 
+	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
 
 # static library
-libimas-java-binding.a: $(COMMON_OBJECTS) 
-	$(mkdir_p) ./lib 
-	$(AR) rvs lib/$@ $^
+lib/libimas-java-binding.a: $(COMMON_OBJECTS) 
+	@$(mkdir_p) ./lib 
+	$(AR) rvs $@ $^
 
