@@ -37,11 +37,11 @@ import imasjava.ids.*;
 
 public class imas {
  static {
-  String libpath = System.getenv("IMAS_HOME");
+  String libpath = System.getenv("IMAS_PREFIX");
   String imasversion = System.getenv("IMAS_VERSION");
   String ualversion = System.getenv("UAL_VERSION");
   if (libpath == null) {
-   System.err.println("IMAS library not set up in the environment. (IMAS_HOME missing)");
+   System.err.println("IMAS library not set up in the environment. (IMAS_PREFIX missing)");
    System.exit(0);
   }
   if (imasversion == null) {
@@ -52,7 +52,7 @@ public class imas {
    System.err.println("IMAS library not set up in the environment. (UAL_VERSION missing)");
    System.exit(0);
   }
-  libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
+  libpath = libpath + "/lib";
   String imas_library = libpath + "/libimas.so";
   File f = new File(imas_library);
   if (!f.exists()) {
