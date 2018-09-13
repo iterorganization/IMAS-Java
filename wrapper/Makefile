@@ -1,42 +1,61 @@
 # -*- makefile -*- #
 include ../../Makefile.common
 
+export IMAS_PREFIX=$(UAL)
+
+ifeq (,$(wildcard $(IMAS_PREFIX)))
+$(error $$IMAS_PREFIX is unset)
+endif
+
 SHELL=/bin/sh
 
 ## Adding DEBUG=yes to make command to print additional debug info
 DBGFLAGS= -g
 ifeq (${DEBUG},yes)
-DBGFLAGS+= -DDEBUG
+    DBGFLAGS+= -DDEBUG
 endif
 ifeq (${STOPONEXCEPT},yes)
-DBGFLAGS+= -DSOE
+    DBGFLAGS+= -DSOE
 endif
 
 
 ifeq "$(strip $(CC))" "icc"
- ## intel compiler should be >= 13 to meet C++11 requirement
- CXX=icpc
- CFLAGS=-std=c99 -Wall -fPIC -O0 -shared-intel ${DBGFLAGS}
- CXXFLAGS=-std=c++11 -pedantic -Wall -fPIC -O0 -fno-inline-functions -shared-intel ${DBGFLAGS}
- LDF=ifort -lc -lstdc++ 
+    ## intel compiler should be >= 13 to meet C++11 requirement
+    CXX=icpc
+    CFLAGS=-std=c99 -Wall -fPIC -O0 -shared-intel ${DBGFLAGS}
+    CXXFLAGS=-std=c++11 -pedantic -Wall -fPIC -O0 -fno-inline-functions -shared-intel ${DBGFLAGS}
+    LDF=ifort -lc -lstdc++ 
 else
- CXX=g++
- CFLAGS=--std=c99 --pedantic -Wall -fPIC -O0 ${DBGFLAGS}
- CXXFLAGS=--std=c++11 --pedantic -Wall -fPIC -O0  -fno-inline-functions ${DBGFLAGS}
- LDF=gfortran -lc -lstdc++ 
+    CXX=g++
+    CFLAGS=--std=c99 --pedantic -Wall -fPIC -O0 ${DBGFLAGS}
+    CXXFLAGS=--std=c++11 --pedantic -Wall -fPIC -O0  -fno-inline-functions ${DBGFLAGS}
+    LDF=gfortran -lc -lstdc++ 
 endif
 
 
 #-------------- Options for JNI ----------------
 
+ifneq ("no","$(strip $(SYS_WIN))")
+    INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I$(IMAS_PREFIX)/include
+    LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib
+	LIBS+= $(IMAS_PREFIX)/lib/libimas.lib
+	LIBS+= $(MDSPLUS_HOME)/devtools/lib64/mingw/TreeShr.lib
+    LIBS+= $(MDSPLUS_HOME)/devtools/lib64/mingw/TdiShr.lib
+    LIBS+= $(MDSPLUS_HOME)/devtools/lib64/mingw/MdsShr.lib
+    LIBS+= $(MDSPLUS_HOME)/devtools/lib64/mingw/XTreeShr.lib
+    LIBS+= $(MDSPLUS_HOME)/devtools/lib64/mingw/MdsIpShr.lib
+    LIBS+= $(MDSPLUS_HOME)/devtools/lib64/mingw/MdsObjectsCppShr.lib
+    TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
+    CFLAGS+= -DWIN32
+    CXXFLAGS+= -DWIN32
+else
+    INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(IMAS_PREFIX)/include
+    LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib -limas
+    TARGETS= lib/libimas-java-binding.so lib/libimas-java-binding.a
+endif
 
- INCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I../../lowlevel
- LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L../../lowlevel  -limas
- COMMON_OBJECTS= build/imasjava_wrapper_LowLevel.o
- CPPSRC= imasjava_wrapper_LowLevel.cpp
-
-TARGETS = lib/libimas-java-binding.so lib/libimas-java-binding.a
-
+COMMON_OBJECTS= build/imasjava_wrapper_LowLevel.o
+CPPSRC= imasjava_wrapper_LowLevel.cpp
 
 all: $(TARGETS) 
 sources:
@@ -73,8 +92,8 @@ clean:
 
 
 build/%.o: %.cpp 
-	$(mkdir_p) ./build
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< 
+	$(mkdir_p)./build
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< $(LIBS)
  
 
 
@@ -89,3 +108,13 @@ lib/libimas-java-binding.a: $(COMMON_OBJECTS)
 	@$(mkdir_p) ./lib 
 	$(AR) rvs $@ $^
 
+# Windows dynamic library
+lib/libimas-java-binding.dll: $(COMMON_OBJECTS) 
+	@$(mkdir_p) ./lib 
+	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
+
+# Windows static library
+lib/libimas-java-binding.lib: $(COMMON_OBJECTS) 
+	@$(mkdir_p) ./lib 
+	$(AR) rcvsu $@ $^
+	ranlib $@

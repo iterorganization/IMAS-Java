@@ -29,7 +29,7 @@ static void raiseLowLevelException(JNIEnv *env, int errorCode)
  }
 
 
-static void raiseLowLevelException(JNIEnv *env, char* callerName, char* msg)
+static void raiseLowLevelException(JNIEnv *env, const char* callerName, const char* msg)
 {
 
       printf("Throwing EXC");
@@ -49,7 +49,7 @@ static void raiseLowLevelException(JNIEnv *env, char* callerName, char* msg)
     int status = -1;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_print_context(jCtx);
+    status = ual_print_context((int)jCtx);
     if (status < 0)
         raiseLowLevelException( env, status);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
@@ -73,7 +73,7 @@ extern "C" {
  
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_begin_pulse_action(jBackendId, jShot, jRun, user, tokamak, version);
+    status = ual_begin_pulse_action(jBackendId, (int)jShot, (int)jRun, user, tokamak, version);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -99,7 +99,7 @@ extern "C" {
     const char *options = env->GetStringUTFChars(jOptions, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_open_pulse(jCtx, jMode, options);
+    status = ual_open_pulse((int)jCtx, (int)jMode, options);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jOptions, options);
@@ -119,7 +119,7 @@ extern "C" {
     const char *options = env->GetStringUTFChars(jOptions, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_close_pulse(jCtx, jMode, options);
+    status = ual_close_pulse((int)jCtx, (int)jMode, options);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jOptions, options);
@@ -140,7 +140,7 @@ extern "C" {
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_begin_global_action(jCtx, dataObjectName, jRWMode);
+    status = ual_begin_global_action((int)jCtx, dataObjectName, (int)jRWMode);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -164,7 +164,7 @@ extern "C" {
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_begin_slice_action(jCtx, dataObjectName, jRWMode, jTime, jInterpMode);
+    status = ual_begin_slice_action((int)jCtx, dataObjectName, (int)jRWMode, (double)jTime, (int)jInterpMode);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -186,7 +186,7 @@ extern "C" {
     int status = -1;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_end_action(jCtx);
+    status = ual_end_action((int)jCtx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     if (status < 0)
@@ -216,7 +216,7 @@ extern "C" {
         sizeArray = env->GetIntArrayElements(jSizeArray, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_write_data(jCtx, fieldPath, timeBasePath, (void*) dataArray, INTEGER_DATA, jDim, sizeArray);
+    status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) dataArray, INTEGER_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -257,7 +257,7 @@ extern "C" {
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_write_data(jCtx, fieldPath, timeBasePath, (void*) dataArray, DOUBLE_DATA, jDim, sizeArray);
+    status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) dataArray, DOUBLE_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -299,7 +299,7 @@ extern "C" {
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_write_data(jCtx, fieldPath, timeBasePath, dataArray, CHAR_DATA, jDim, sizeArray);
+    status = ual_write_data((int)jCtx, fieldPath, timeBasePath, dataArray, CHAR_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -329,7 +329,7 @@ extern "C" {
     const char *timeBasePath = env->GetStringUTFChars(jTimeBasePath, 0);
     jint *dataArray = NULL;
     jint tmpScalar = 0;
-    jsize len = env->GetArrayLength(jSizeArray);
+    //jsize len = env->GetArrayLength(jSizeArray);
     jint *sizeArray = env->GetIntArrayElements(jSizeArray, 0);
 
 
@@ -340,7 +340,7 @@ extern "C" {
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_read_data(jCtx, fieldPath, timeBasePath, (void**)&dataArray, INTEGER_DATA, jDim, sizeArray);
+    status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, INTEGER_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     for (int i = 0; i < jDim; i++)
@@ -385,7 +385,7 @@ extern "C" {
     }
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_read_data(jCtx, fieldPath, timeBasePath, (void**)&dataArray, DOUBLE_DATA, jDim, sizeArray);
+    status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, DOUBLE_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -432,7 +432,7 @@ extern "C" {
     }
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_read_data(jCtx, fieldPath, timeBasePath, (void**)&dataArray, CHAR_DATA, jDim, sizeArray);
+    status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, CHAR_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -469,7 +469,7 @@ extern "C" {
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_delete_data(jCtx, fieldPath);
+    status = ual_delete_data((int)jCtx, fieldPath);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -492,7 +492,7 @@ extern "C" {
     jint *sizeArray = env->GetIntArrayElements(jSizeArray, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_begin_arraystruct_action(jCtx, fieldPath, timeBasePath, sizeArray);
+    status = ual_begin_arraystruct_action((int)jCtx, fieldPath, timeBasePath, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -515,7 +515,7 @@ extern "C" {
     int status = -1;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_iterate_over_arraystruct(jAoSCtx, jStep);
+    status = ual_iterate_over_arraystruct((int)jAoSCtx, (int)jStep);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 

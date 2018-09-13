@@ -6,8 +6,16 @@ all sources sources_install install clean clean-src:
 	$(warning "Ignoring javainterface (IMAS_JAVA=no).")
 else
 
-JAVAC = javac
-JAR = jar
+ifneq ("no","$(strip $(SYS_WIN))")
+	JAVA = $(JAVA_HOME)/bin/java
+    JAVAC = $(JAVA_HOME)/bin/javac
+    JAR = $(JAVA_HOME)/bin/jar
+else
+    JAVA = java
+    JAVAC = javac
+    JAR = jar
+endif
+
 JFLAGS = -g -Xmaxerrs 10 -sourcepath ./src -d ./build
 
 # Get a list of IDS from IDSDEF file
@@ -63,8 +71,8 @@ $(CLASSES): $(GENSOURCES)
 	$(JAVAC) $(JFLAGS) $(subst build/,src/,$(@:.class=.java))
 
 # Use an intermediate target to enforce nonparallel generation.
-gensources: IDSDef2Java.xsl | saxonicajar
-	java net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$<
+gensources: IDSDef2Java.xsl saxonicajar
+	$(JAVA) net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$<
 
 # Test if all generated sources are found to exist as files to
 # gracefully skip generation if not needed.
