@@ -126,11 +126,16 @@ clean:
 
 build/%.o: %.cpp 
 	$(mkdir_p)./build
+<<<<<<< HEAD
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 <<<<<<< HEAD
 =======
 
 >>>>>>> Add UDA and HDF5 backends
+=======
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< $(LIBS)
+ 
+>>>>>>> First Windows commit
 
 # dynamic library
 lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
@@ -145,7 +150,11 @@ lib/libimas-java-binding.a: $(COMMON_OBJECTS)
 # Windows dynamic library
 lib/libimas-java-binding.dll: $(COMMON_OBJECTS) 
 	@$(mkdir_p) ./lib 
+<<<<<<< HEAD
 	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) -Wl,--out-implib,$@.lib $^ $(LIBS)
+=======
+	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
+>>>>>>> First Windows commit
 
 # Windows static library
 lib/libimas-java-binding.lib: $(COMMON_OBJECTS) 
