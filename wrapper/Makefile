@@ -82,7 +82,7 @@ ifneq ("no","$(strip $(IMAS_HDF5))")
 		LIBS+= $(HDF5_HOME)/lib/libhdf5.a -ldl -lz
 	else
 		LIBS+= -L$(HDF5_HOME)/lib
-		LIBS+= -hdf5 -ldl -lz
+		LIBS+= -lhdf5 -ldl -lz
 	endif
 endif
 
@@ -127,11 +127,6 @@ clean:
 build/%.o: %.cpp 
 	$(mkdir_p)./build
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
-<<<<<<< HEAD
-=======
-
->>>>>>> Add UDA and HDF5 backends
-
 
 
 # dynamic library
