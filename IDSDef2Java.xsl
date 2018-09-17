@@ -748,8 +748,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
             <xsl:value-of select="@name"/>_IDSBase.setHomogeneous(homogeneous_time == 1);
             
           } catch(Exception exc)
-          {
-          	throw new UALException("Fatal error: value of homogeneous_time cannot be read: " + exc.getMessage());  
+          { 
+          	System.err.println("ERROR: value of homogeneous_time cannot be read. GETSLICE returns an EMPTY *<xsl:value-of select="@name"/>* IDS:\n" + exc.getMessage());  
+            UALLowLevel.endIDSGetSlice(expIdx, path);
+            return ids;
           }
       
       
