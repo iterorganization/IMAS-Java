@@ -131,6 +131,7 @@ build/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> Add UDA and HDF5 backends
@@ -144,6 +145,12 @@ build/%.o: %.cpp
 =======
 
 >>>>>>> Add UDA and HDF5 backends
+=======
+
+=======
+ 
+>>>>>>> Fix to compile and execute correctly lowlevel with static and shared MDSplus libraries
+>>>>>>> Fix to compile and execute correctly lowlevel with static and shared MDSplus libraries
 
 # dynamic library
 lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
