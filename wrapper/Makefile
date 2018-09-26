@@ -127,6 +127,7 @@ clean:
 build/%.o: %.cpp 
 	$(mkdir_p)./build
 <<<<<<< HEAD
+<<<<<<< HEAD
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 <<<<<<< HEAD
 =======
@@ -134,6 +135,9 @@ build/%.o: %.cpp
 >>>>>>> Add UDA and HDF5 backends
 =======
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< $(LIBS)
+=======
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
+>>>>>>> Fix to compile and execute correctly lowlevel with static and shared MDSplus libraries
  
 >>>>>>> First Windows commit
 
@@ -151,10 +155,14 @@ lib/libimas-java-binding.a: $(COMMON_OBJECTS)
 lib/libimas-java-binding.dll: $(COMMON_OBJECTS) 
 	@$(mkdir_p) ./lib 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) -Wl,--out-implib,$@.lib $^ $(LIBS)
 =======
 	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
 >>>>>>> First Windows commit
+=======
+	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) -Wl,--out-implib,$@.lib $^ $(LIBS)
+>>>>>>> Fix to compile and execute correctly lowlevel with static and shared MDSplus libraries
 
 # Windows static library
 lib/libimas-java-binding.lib: $(COMMON_OBJECTS) 
