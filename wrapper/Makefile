@@ -130,7 +130,6 @@ build/%.o: %.cpp
 
 
 
-
 # dynamic library
 lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
 	@$(mkdir_p) ./lib 
