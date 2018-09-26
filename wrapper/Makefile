@@ -39,9 +39,24 @@ ifneq ("no","$(strip $(SYS_WIN))")
 	INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I$(IMAS_PREFIX)/include
 	LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib
 	LIBS+= $(IMAS_PREFIX)/lib/libimas.lib
+<<<<<<< HEAD
 	TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
 	CFLAGS+= -DWIN32
 	CXXFLAGS+= -DWIN32
+=======
+ 	LIBS+= $(MDSPLUS_DIR)/lib/MdsMisc.a
+	LIBS+= $(MDSPLUS_DIR)/lib/XTreeShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/MdsObjectsCppShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/MdsIpShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/MdsLib.a
+	LIBS+= $(MDSPLUS_DIR)/lib/TdiShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/TreeShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/MdsShr.a
+	LIBS+= -lxml2 -lws2_32 -ldl -liphlpapi
+    TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
+    CFLAGS+= -DWIN32
+    CXXFLAGS+= -DWIN32
+>>>>>>> Fix to compile and execute correctly lowlevel with static and shared MDSplus libraries
 else
 	INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(IMAS_PREFIX)/include
 	LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib -limas
@@ -127,7 +142,11 @@ clean:
 build/%.o: %.cpp 
 	$(mkdir_p)./build
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
+<<<<<<< HEAD
 
+=======
+ 
+>>>>>>> Fix to compile and execute correctly lowlevel with static and shared MDSplus libraries
 
 # dynamic library
 lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
