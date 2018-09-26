@@ -39,13 +39,15 @@ ifneq ("no","$(strip $(SYS_WIN))")
     INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I$(IMAS_PREFIX)/include
     LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib
 	LIBS+= $(IMAS_PREFIX)/lib/libimas.lib
-	#LIBS+= $(MDSPLUS_HOME)/lib/TreeShr.a
-    #LIBS+= $(MDSPLUS_HOME)/lib/TdiShr.a
-    #LIBS+= $(MDSPLUS_HOME)/lib/MdsShr.a
-    #LIBS+= $(MDSPLUS_HOME)/lib/XTreeShr.a
-    #LIBS+= $(MDSPLUS_HOME)/lib/MdsIpShr.a
-    #LIBS+= $(MDSPLUS_HOME)/lib/MdsObjectsCppShr.a
-    LIBS+= -lTreeShr -lTdiShr -lMdsShr -lXTreeShr -lMdsIpShr -lMdsObjectsCppShr
+ 	LIBS+= $(MDSPLUS_DIR)/lib/MdsMisc.a
+	LIBS+= $(MDSPLUS_DIR)/lib/XTreeShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/MdsObjectsCppShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/MdsIpShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/MdsLib.a
+	LIBS+= $(MDSPLUS_DIR)/lib/TdiShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/TreeShr.a
+	LIBS+= $(MDSPLUS_DIR)/lib/MdsShr.a
+	LIBS+= -lxml2 -lws2_32 -ldl -liphlpapi
     TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
     CFLAGS+= -DWIN32
     CXXFLAGS+= -DWIN32
@@ -94,7 +96,7 @@ clean:
 
 build/%.o: %.cpp 
 	$(mkdir_p)./build
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< $(LIBS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
  
 
 
@@ -112,7 +114,7 @@ lib/libimas-java-binding.a: $(COMMON_OBJECTS)
 # Windows dynamic library
 lib/libimas-java-binding.dll: $(COMMON_OBJECTS) 
 	@$(mkdir_p) ./lib 
-	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
+	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) -Wl,--out-implib,$@.lib $^ $(LIBS)
 
 # Windows static library
 lib/libimas-java-binding.lib: $(COMMON_OBJECTS) 
