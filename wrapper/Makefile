@@ -127,6 +127,10 @@ clean:
 build/%.o: %.cpp 
 	$(mkdir_p)./build
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
+<<<<<<< HEAD
+=======
+
+>>>>>>> Add UDA and HDF5 backends
 
 # dynamic library
 lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
