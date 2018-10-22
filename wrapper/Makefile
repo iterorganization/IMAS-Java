@@ -39,8 +39,17 @@ ifneq ("no","$(strip $(SYS_WIN))")
 	INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I$(IMAS_PREFIX)/include
 	LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib
 	LIBS+= $(IMAS_PREFIX)/lib/libimas.lib
-	ifneq ("no","$(strip $(IMAS_MDSPLUS))")
-		#LIBS+= -lTreeShr -lTdiShr -lMdsShr -lXTreeShr -lMdsIpShr -lMdsObjectsCppShr
+	TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
+	CFLAGS+= -DWIN32
+	CXXFLAGS+= -DWIN32
+else
+	INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(IMAS_PREFIX)/include
+	LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib -limas
+	TARGETS= lib/libimas-java-binding.so lib/libimas-java-binding.a
+endif
+
+ifneq ("no","$(strip $(IMAS_MDSPLUS))")
+	ifneq ("no","$(strip $(SYS_WIN))")
 		LIBS+= $(MDSPLUS_DIR)/lib/MdsMisc.a
 		LIBS+= $(MDSPLUS_DIR)/lib/XTreeShr.a
 		LIBS+= $(MDSPLUS_DIR)/lib/MdsObjectsCppShr.a
@@ -50,25 +59,33 @@ ifneq ("no","$(strip $(SYS_WIN))")
 		LIBS+= $(MDSPLUS_DIR)/lib/TreeShr.a
 		LIBS+= $(MDSPLUS_DIR)/lib/MdsShr.a
 		LIBS+= -lxml2 -lws2_32 -ldl -liphlpapi
+	else
+		LIBS+= -L$(MDSPLUS_DIR)/lib
+		LIBS+= -lTreeShr -lTdiShr -lMdsShr -lMdsIpShr -lXTreeShr
 	endif
-	ifneq ("no","$(strip $(IMAS_UDA))")
+endif
+
+ifneq ("no","$(strip $(IMAS_UDA))")
+	ifneq ("no","$(strip $(SYS_WIN))")
 		LIBS+= -L$(UDA_HOME)/lib
 		LIBS+= $(UDA_HOME)/lib/libuda_cpp.a
 		LIBS+= $(UDA_HOME)/lib/libportablexdr.a
 		LIBS+= -lws2_32 -lssl -lcrypto
+	else
+		LIBS+= `pkg-config --libs uda-cpp`
 	endif
-	ifneq ("no","$(strip $(IMAS_HDF5))")
+endif
+
+ifneq ("no","$(strip $(IMAS_HDF5))")
+	ifneq ("no","$(strip $(SYS_WIN))")
 		LIBS+= -L$(HDF5_HOME)/lib
 		LIBS+= $(HDF5_HOME)/lib/libhdf5.a -ldl -lz
+	else
+		LIBS+= -L$(HDF5_HOME)/lib
+		LIBS+= -hdf5 -ldl -lz
 	endif
-	TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
-	CFLAGS+= -DWIN32
-	CXXFLAGS+= -DWIN32
-else
-	INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(IMAS_PREFIX)/include
-	LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib -limas
-	TARGETS= lib/libimas-java-binding.so lib/libimas-java-binding.a
 endif
+
 
 COMMON_OBJECTS= build/imasjava_wrapper_LowLevel.o
 CPPSRC= imasjava_wrapper_LowLevel.cpp
