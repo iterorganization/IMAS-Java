@@ -57,7 +57,7 @@ $(CLASSES): $(GENSOURCES)
 	$(JAVAC) $(JFLAGS) $(subst build/,src/,$(@:.class=.java))
 
 # Use an intermediate target to enforce nonparallel generation.
-gensources: IDSDef2Java.xsl saxonicajar
+gensources: IDSDef2Java.xsl | saxonicajar
 	java net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$<
 
 # Test if all generated sources are found to exist as files to
@@ -68,12 +68,6 @@ else
 $(GENSOURCES): gensources
 endif
 
-# Test for saxon
-# Check that "saxon9he.jar" utility is set in CLASSPATH and existst
-SAXONICAJAR=$(wildcard $(filter %saxon9he.jar,$(subst :, ,$(CLASSPATH))))
-saxonicajar:
-ifeq (,$(SAXONICAJAR))
-	$(error Invalid /path/to/saxon9he.jar in CLASSPATH. Forgot to load module?)
-endif
-
+#----------------------- classpath deps ---------------------
+include ../Makefile.classpath
 endif # IMAS_JAVA=no?
