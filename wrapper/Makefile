@@ -73,6 +73,7 @@ ifneq ("no","$(strip $(IMAS_UDA))")
 		LIBS+= -lws2_32 -lssl -lcrypto
 	else
 		LIBS+= `pkg-config --libs uda-cpp`
+		LIBS+= -lssl -lcrypto
 	endif
 endif
 
