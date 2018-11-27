@@ -133,6 +133,7 @@ build/%.o: %.cpp
 lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
 	@$(mkdir_p) ./lib 
 	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
+	cd lib && ln -s $(notdir $@) $(notdir $@).$(IMAS_MAJOR).$(IMAS_MINOR)
 
 # static library
 lib/libimas-java-binding.a: $(COMMON_OBJECTS) 
