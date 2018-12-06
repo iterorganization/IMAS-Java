@@ -73,7 +73,7 @@ clean:
 
 
 build/%.o: %.cpp 
-	$(mkdir_p)./build
+	$(mkdir_p) ./build
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< 
  
 
