@@ -50,13 +50,11 @@ endif
 
 ifneq ("no","$(strip $(IMAS_MDSPLUS))")
 	ifneq ("no","$(strip $(SYS_WIN))")
-		LIBS+= $(MDSPLUS_DIR)/lib/MdsMisc.a
 		LIBS+= $(MDSPLUS_DIR)/lib/XTreeShr.a
 		LIBS+= $(MDSPLUS_DIR)/lib/MdsObjectsCppShr.a
-		LIBS+= $(MDSPLUS_DIR)/lib/MdsIpShr.a
-		LIBS+= $(MDSPLUS_DIR)/lib/MdsLib.a
 		LIBS+= $(MDSPLUS_DIR)/lib/TdiShr.a
 		LIBS+= $(MDSPLUS_DIR)/lib/TreeShr.a
+		LIBS+= $(MDSPLUS_DIR)/lib/MdsIpShr.a
 		LIBS+= $(MDSPLUS_DIR)/lib/MdsShr.a
 		LIBS+= -lxml2 -lws2_32 -ldl -liphlpapi
 	else
@@ -101,9 +99,9 @@ install: all sources_install
 	$(mkdir_p) $(libdir) $(includedir) 
 	cd lib && for OBJECT in *.so; do \
 		$(INSTALL_DATA) -T $$OBJECT $(libdir)/$$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO); \
-		ln -svfT $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR); \
-		ln -svfT $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT.$(IMAS_MAJOR); \
-		ln -svfT $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT; \
+		$(ln_s) $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR); \
+		$(ln_s) $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT.$(IMAS_MAJOR); \
+		$(ln_s) $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT; \
 	done
 #	$(INSTALL_DATA) imasjava_wrapper_LowLevel.h $(includedir)
 
@@ -133,7 +131,7 @@ build/%.o: %.cpp
 lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
 	@$(mkdir_p) ./lib 
 	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
-	cd lib && ln -s $(notdir $@) $(notdir $@).$(IMAS_MAJOR).$(IMAS_MINOR)
+	cd lib && $(ln_s) $(notdir $@) $(notdir $@).$(IMAS_MAJOR).$(IMAS_MINOR)
 
 # static library
 lib/libimas-java-binding.a: $(COMMON_OBJECTS) 
