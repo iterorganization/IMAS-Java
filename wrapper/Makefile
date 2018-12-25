@@ -40,26 +40,17 @@ TARGETS = lib/libimas-java-binding.so lib/libimas-java-binding.a
 
 all: $(TARGETS) 
 sources:
-sources_install: $(wildcard *.c *.h)
-	$(mkdir_p) $(datadir)/src/javainterface/wrapper
+sources_install: $(wildcard *.c *.h) | $(datadir)/src/javainterface/wrapper
 	$(INSTALL_DATA) $^ $(datadir)/src/javainterface/wrapper
 
-install: all sources_install
-	$(mkdir_p) $(libdir) $(includedir) 
-	cd lib && for OBJECT in *.so; do \
-		$(INSTALL_DATA) -T $$OBJECT $(libdir)/$$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO); \
-	   	ln -svfT $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR); \
-	   	ln -svfT $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT.$(IMAS_MAJOR); \
-	   	ln -svfT $$OBJECT.$(IMAS_MAJOR).$(IMAS_MINOR).$(IMAS_MICRO) $(libdir)/$$OBJECT; \
-	done
+$(libdir) $(includedir) $(datadir)/src/javainterface/wrapper ./build ./lib:
+	$(mkdir_p) $@
+
+install: all sources_install lib/libimas-java-binding.so_install lib/libimas-java-binding.a_install | $(includedir)
 #	$(INSTALL_DATA) imasjava_wrapper_LowLevel.h $(includedir)
-
-
 
 clean: 
 	$(RM) -r ./build ./lib  *.d
-
-
 
 # Creates dependency files
 %.d: %.cpp
@@ -71,21 +62,26 @@ clean:
 # Includes all dependency files
 -include $(CPPSRC:.cpp=.d)
 
-
-build/%.o: %.cpp 
-	$(mkdir_p) ./build
+build/%.o: %.cpp | ./build
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< 
- 
 
+# Dynamic library
+lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so.$(UAL_EPOCH): $(COMMON_OBJECTS) | ./lib
+	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@ $^ $(LIBS)
+lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so: %:%.$(UAL_EPOCH)
+	ln -svfT $(<F) $@
+lib/libimas-java-binding.so:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so
+	ln -svfT $(<F) $@
+lib/libimas-java-binding.so_install: %.so_install:%-$(DD_GIT_DESCRIBE).so.$(UAL_EPOCH) | $(libdir)
+	$(INSTALL_DATA) $< $(libdir)
+	ln -svfT $(<F) $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so
+	ln -svfT $(<F) $(libdir)/$(*F).so
 
-
-# dynamic library
-lib/libimas-java-binding.so: $(COMMON_OBJECTS) 	
-	@$(mkdir_p) ./lib 
-	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@.$(IMAS_MAJOR).$(IMAS_MINOR) $^ $(LIBS)
-
-# static library
-lib/libimas-java-binding.a: $(COMMON_OBJECTS) 
-	@$(mkdir_p) ./lib 
+# Static library
+lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a: $(COMMON_OBJECTS) | ./lib
 	$(AR) rvs $@ $^
-
+lib/libimas-java-binding.a:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a
+	ln -svfT $(<F) $@
+lib/libimas-java-binding.a_install: %.a_install:%-$(DD_GIT_DESCRIBE).a | $(libdir)
+	$(INSTALL_DATA) $< $(libdir)
+	ln -svfT $(<F) $(libdir)/$(*F).a

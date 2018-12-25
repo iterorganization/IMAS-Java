@@ -54,7 +54,7 @@ public class imas {
    System.exit(0);
   }
   libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
-  String imas_library = libpath + "/libimas-java-binding.so";
+  String imas_library = libpath + "/libimas-java-binding-" + imasversion + ".so";
   File f = new File(imas_library);
   if (!f.exists()) {
    System.err.println("IMAS library not set up in the environment. (libimas-java-binding.so missing)");
