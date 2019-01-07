@@ -8,12 +8,12 @@ else
 
 ifneq ("no","$(strip $(SYS_WIN))")
 	JAVA = $(JAVA_HOME)/bin/java
-    JAVAC = $(JAVA_HOME)/bin/javac
-    JAR = $(JAVA_HOME)/bin/jar
+	JAVAC = $(JAVA_HOME)/bin/javac
+	JAR = $(JAVA_HOME)/bin/jar
 else
-    JAVA = java
-    JAVAC = javac
-    JAR = jar
+	JAVA = java
+	JAVAC = javac
+	JAR = jar
 endif
 
 JFLAGS = -g -Xmaxerrs 10 -sourcepath ./src -d ./build
