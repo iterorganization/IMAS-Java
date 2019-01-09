@@ -9,6 +9,10 @@ endif
 
 SHELL=/bin/sh
 
+# Trick from Python: add links lib, include to lowlevel
+LN_LIB:=$(shell cd $(UAL) && test ! -d lib && $(ln_s) lowlevel lib)
+LN_INC:=$(shell cd $(UAL) && test ! -d include && $(ln_s) lowlevel include)
+
 ## Adding DEBUG=yes to make command to print additional debug info
 DBGFLAGS= -g
 ifeq (${DEBUG},yes)
