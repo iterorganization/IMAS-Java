@@ -1,6 +1,15 @@
 # -*- makefile -*- #
 include ../../Makefile.common
 
+# Library interface number (used as soname suffix)
+# If any interfaces have been added, removed, or changed since the last update,
+# increment this number. Do not increment if it is certain the changes retain
+# ABI compatibility. This may be possible if the changes are only in the
+# implementation and do not change any function signatures or data structures.
+# N.B. this number is not tied to the AL major version number whatsoever.
+SO_NUM=4
+
+
 SHELL=/bin/sh
 
 ## Adding DEBUG=yes to make command to print additional debug info
@@ -66,13 +75,13 @@ build/%.o: %.cpp | ./build
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $< 
 
 # Dynamic library
-lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so.$(UAL_EPOCH): $(COMMON_OBJECTS) | ./lib
+lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so.$(SO_NUM): $(COMMON_OBJECTS) | ./lib
 	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@ $^ $(LIBS)
-lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so: %:%.$(UAL_EPOCH)
+lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so: %:%.$(SO_NUM)
 	ln -svfT $(<F) $@
 lib/libimas-java-binding.so:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so
 	ln -svfT $(<F) $@
-lib/libimas-java-binding.so_install: %.so_install:%-$(DD_GIT_DESCRIBE).so.$(UAL_EPOCH) | $(libdir)
+lib/libimas-java-binding.so_install: %.so_install:%-$(DD_GIT_DESCRIBE).so.$(SO_NUM) | $(libdir)
 	$(INSTALL_DATA) $< $(libdir)
 	ln -svfT $(<F) $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so
 	ln -svfT $(<F) $(libdir)/$(*F).so
