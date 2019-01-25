@@ -78,19 +78,19 @@ build/%.o: %.cpp | ./build
 lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so.$(SO_NUM): $(COMMON_OBJECTS) | ./lib
 	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@ $^ $(LIBS)
 lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so: %:%.$(SO_NUM)
-	ln -svfT $(<F) $@
+	$(LN_S) $(<F) $@
 lib/libimas-java-binding.so:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so
-	ln -svfT $(<F) $@
+	$(LN_S) $(<F) $@
 lib/libimas-java-binding.so_install: %.so_install:%-$(DD_GIT_DESCRIBE).so.$(SO_NUM) | $(libdir)
 	$(INSTALL_DATA) $< $(libdir)
-	ln -svfT $(<F) $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so
-	ln -svfT $(<F) $(libdir)/$(*F).so
+	$(LN_S) $(<F) $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so
+	$(LN_S) $(<F) $(libdir)/$(*F).so
 
 # Static library
 lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a: $(COMMON_OBJECTS) | ./lib
 	$(AR) rvs $@ $^
 lib/libimas-java-binding.a:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a
-	ln -svfT $(<F) $@
+	$(LN_S) $(<F) $@
 lib/libimas-java-binding.a_install: %.a_install:%-$(DD_GIT_DESCRIBE).a | $(libdir)
 	$(INSTALL_DATA) $< $(libdir)
-	ln -svfT $(<F) $(libdir)/$(*F).a
+	$(LN_S) $(<F) $(libdir)/$(*F).a
