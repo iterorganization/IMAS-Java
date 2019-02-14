@@ -60,11 +60,11 @@ $(JARFILE): $(CLASSFILE) | lib
 $(CLASSFILE): build/%.class:src/%.java | build
 	$(JAVAC) $(JFLAGS) $^ 
 
-# saxon.transform compiles all at once so use intermediate target,
-# which does nothing if gotallfiles.
+# Use an intermediate target to enforce nonparallel generation.
+# Gracefully skip generation of sources if not needed.
 $(GENSOURCES): gensources
 gensources: IDSDef2Java.xsl | saxonicajar
-	$(if $(call gotallfiles,$(GENSOURCES)),, java net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< )
+	$(if $(call allnewerthan,$(GENSOURCES),$^),, java net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< )
 
 #----------------------- identifiers ---------------------
 include ../Makefile.identifiers
