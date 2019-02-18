@@ -27,8 +27,8 @@ DBGFLAGS+= -DSOE
 endif
 
 # Trick from Python: add links lib, include to lowlevel
-LN_LIB:=$(shell cd $(UAL) && test ! -d lib && $(LN_S) lowlevel lib)
-LN_INC:=$(shell cd $(UAL) && test ! -d include && $(LN_S) lowlevel include)
+LN_LIB:=$(shell cd $(UAL) && test ! -d lib && $(LN_SD) lowlevel lib)
+LN_INC:=$(shell cd $(UAL) && test ! -d include && $(LN_SD) lowlevel include)
 
 
 ifeq "$(strip $(CC))" "icc"
@@ -151,11 +151,13 @@ lib/libimas-java-binding.a_install: %.a_install:%-$(DD_GIT_DESCRIBE).a | $(libdi
 lib/libimas-java-binding.dll: $(COMMON_OBJECTS) | ./lib
 	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(SO_NUM) -Wl,--out-implib,$@.lib $^ $(LIBS)
 lib/libimas-java-binding.dll_install: %_install:%
-	# FIXME: No installation defined for $@
+	$(mkdir_p) $(packagedir)/javainterface/lib
+	cp $< $(packagedir)/javainterface/lib
 
 # Windows static library
 lib/libimas-java-binding.lib: $(COMMON_OBJECTS) | ./lib
 	$(AR) rcvsu $@ $^
 	ranlib $@
 lib/libimas-java-binding.lib_install: %_install:%
-	# FIXME: No installation defined for $@
+	$(mkdir_p) $(packagedir)/javainterface/lib
+	cp $< $(packagedir)/javainterface/lib

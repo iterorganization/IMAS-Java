@@ -53,8 +53,13 @@ public class imas {
    System.err.println("IMAS library not set up in the environment. (UAL_VERSION missing)");
    System.exit(0);
   }
+  <xsl:if test="environment-variable('OS') != 'Windows_NT'">
   libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
-  String imas_library = libpath + "/libimas-java-binding-" + imasversion + ".so"; // FIXME: not platform independent (fail for windows build)
+  String imas_library = libpath + "/libimas-java-binding-" + imasversion + ".so";
+  </xsl:if>
+  <xsl:if test="environment-variable('OS') = 'Windows_NT'">
+  String imas_library = libpath + "/javainterface/lib/libimas-java-binding.dll";
+  </xsl:if>
   File f = new File(imas_library);
   if (!f.exists()) {
    System.err.println("IMAS library not set up in the environment. (libimas-java-binding.so missing)");
