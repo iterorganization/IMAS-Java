@@ -87,7 +87,7 @@ $(CLASSFILE): build/%.class:src/%.java | build
 # Gracefully skip generation of sources if not needed.
 $(GENSOURCES): gensources
 gensources: IDSDef2Java.xsl | saxonicajar
-	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(JAVA) net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< )
+	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(JAVA) net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< SYS_WIN=$(SYS_WIN))
 
 #----------------------- identifiers ---------------------
 include ../Makefile.identifiers

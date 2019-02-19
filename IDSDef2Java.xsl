@@ -17,6 +17,7 @@
        extension-element-prefixes="yaslt exsl func">
 
 -->
+  <xsl:param name="SYS_WIN" as="xs:string" required="yes"/>
   <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
   <!-- MODE can be set to get or put in the 2 transformations for generating the subroutines, this reduced editing requirements
   it could also be done with 2 xslt operations on a single file, but this might be overkill ??
@@ -53,13 +54,12 @@ public class imas {
    System.err.println("IMAS library not set up in the environment. (UAL_VERSION missing)");
    System.exit(0);
   }
-  <xsl:if test="environment-variable('OS') != 'Windows_NT'">
+  <xsl:choose><xsl:when test="$SYS_WIN = 'no'">
   libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
   String imas_library = libpath + "/libimas-java-binding-" + imasversion + ".so";
-  </xsl:if>
-  <xsl:if test="environment-variable('OS') = 'Windows_NT'">
+  </xsl:when><xsl:otherwise>
   String imas_library = libpath + "/javainterface/lib/libimas-java-binding.dll";
-  </xsl:if>
+  </xsl:otherwise></xsl:choose>
   File f = new File(imas_library);
   if (!f.exists()) {
    System.err.println("IMAS library not set up in the environment. (libimas-java-binding.so missing)");
