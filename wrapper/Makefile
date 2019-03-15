@@ -26,10 +26,6 @@ ifeq (${STOPONEXCEPT},yes)
 DBGFLAGS+= -DSOE
 endif
 
-# Trick from Python: add links lib, include to lowlevel
-LN_LIB:=$(shell cd $(UAL) && test ! -d lib && $(LN_SD) lowlevel lib)
-LN_INC:=$(shell cd $(UAL) && test ! -d include && $(LN_SD) lowlevel include)
-
 
 ifeq "$(strip $(CC))" "icc"
 ## intel compiler should be >= 13 to meet C++11 requirement
@@ -48,15 +44,15 @@ endif
 #-------------- Options for JNI ----------------
 
 ifneq ("no","$(strip $(SYS_WIN))")
-INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I$(IMAS_PREFIX)/include
-LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib
-LIBS+= $(IMAS_PREFIX)/lib/libimas.lib
+INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I$(IMAS_PREFIX)/lowlevel
+LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lowlevel
+LIBS+= $(IMAS_PREFIX)/lowlevel/libimas.lib
 TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
 CFLAGS+= -DWIN32
 CXXFLAGS+= -DWIN32
 else
-INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(IMAS_PREFIX)/include
-LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lib -limas
+INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(IMAS_PREFIX)/lowlevel
+LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lowlevel -limas
 TARGETS= lib/libimas-java-binding.so lib/libimas-java-binding.a
 endif
 COMMON_OBJECTS= build/imasjava_wrapper_LowLevel.o
