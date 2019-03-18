@@ -163,7 +163,7 @@ public class imas {
 
 
  /**
-  *Creates a new database instance.
+  *Opens database instance.
   * @param name Name of the database (by convention imas).
   * @param shot Shot number.
   * @param run Run Number.
@@ -173,27 +173,66 @@ public class imas {
   * @exception UALException is thrown if the database cannot be open.
   **/
 
- static public int openEnv(String name, int shot, int run, String user, String tokamak, String version) throws UALException
+ static public int openEnv(int shot, int run, String user, String tokamak, String version) throws UALException
+{
+  return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
+}
+
+/**
+  * Opens database instance.
+  * @param backendType Type of the backend to be used
+  * @param name Name of the database (by convention imas).
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param refShot Shot number of the reference database.
+  * @param runRun Run Number of the reference database.
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open.
+  **/
+
+static public int openEnv(int shot, int run, String user, String tokamak, String version, int backendType) throws UALException
 {
     int pulseCtx;
-   try{ 
-    
-    pulseCtx = LowLevel.ual_begin_pulse_action(LowLevel.MDSPLUS_BACKEND, shot, run, user, tokamak, version); 
-    }
-    catch(Exception exc){
-        throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
-   
+
+    if( LowLevel.isBackendTypeValid( backendType ) != true ) {
+      throw new UALException(  "[ual_begin_pulse_action]: Error opening pulse file: " 
+                             + user 
+			     + "/" 
+			     + tokamak 
+			     + "/" 
+			     + version 
+			     + "/"
+			     + shot 
+			     + "/" 
+			     + run 
+			     + ":\n" 
+			     + "Incorrect backend type: " 
+			     + backendType
+			     + "\n" );
     }
 
     try{ 
-    
-    LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, "");
-   }
-    catch(Exception exc){
-        throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
-   
+      pulseCtx = LowLevel.ual_begin_pulse_action(backendType, shot, run, user, tokamak, version); 
+    } catch(Exception exc) {
+      throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: "
+                             + user 
+			     + "/" 
+			     + tokamak 
+			     + "/" 
+			     + version 
+			     + "/"
+			     + shot 
+			     + "/" 
+			     + run 
+			     + ":\n" 
+			     + exc.getMessage()  );
     }
 
+    try{ 
+      LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, "");
+    } catch(Exception exc) {
+      throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
+    }
 
     imas.shot = shot;
     imas.run = run;
@@ -207,42 +246,63 @@ public class imas {
 
  /**
   *Creates a new database instance.
-  * @param name Name of the database (by convention imas).
   * @param shot Shot number.
   * @param run Run Number.
-  * @param refShot Shot number of the reference database.
-  * @param runRun Run Number of the reference database.
+  * @param user User name
+  * @param tokamak Name of the machine
+  * @param version Database version
   * @return the database index to be used in subsequent get/put calls
   * @exception UALException is thrown if the database cannot be open.
   **/
- static public int createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version) throws UALException
+
+static public int createEnv(int shot, int run, String user, String tokamak, String version ) throws UALException
 {
-  /*  System.err.println("WARNING:\n"
-                        + "\"createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version)\"  is DEPRECATED.\n"
-                        + "Please use \"createEnv(int shot, int run, String user, String tokamak, String version)\" instead");
-    */ return imas.createEnv(shot,  run,  user,  tokamak,  version);
+  return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
 }
 
-static public int createEnv(int shot, int run, String user, String tokamak, String version) throws UALException
+ /**
+  *Creates a new database instance.
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param user User name
+  * @param tokamak Name of the machine
+  * @param version Database version
+  * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open.
+  **/
+
+static public int createEnv(int shot, int run, String user, String tokamak, String version, int backendType ) throws UALException
 {
     int pulseCtx = -1;
 
-    try{ 
-    
-    pulseCtx = LowLevel.ual_begin_pulse_action(LowLevel.MDSPLUS_BACKEND, shot, run, user, tokamak, version); 
+    if( LowLevel.isBackendTypeValid( backendType ) != true ) {
+      throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: " 
+                             + user 
+			     + "/" 
+			     + tokamak 
+			     + "/" 
+			     + version 
+			     + "/"
+			     + shot 
+			     + "/" 
+			     + run 
+			     + ":\n" 
+			     + "Incorrect backend type: "
+			     + backendType 
+			     + "\n" );
     }
-    catch(Exception exc){
-        throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
-   
+
+    try { 
+      pulseCtx = LowLevel.ual_begin_pulse_action(backendType, shot, run, user, tokamak, version); 
+    } catch(Exception exc){
+      throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
     }
 
     try{ 
-    
-    LowLevel.ual_open_pulse(pulseCtx, LowLevel.FORCE_CREATE_PULSE, "");
-   }
-    catch(Exception exc){
-        throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
-   
+      LowLevel.ual_open_pulse(pulseCtx, LowLevel.FORCE_CREATE_PULSE, "");
+    } catch(Exception exc) {
+      throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
     }
 
     imas.shot = shot;
