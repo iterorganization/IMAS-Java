@@ -354,18 +354,4 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
 
   public static native int ual_get_backendID(int backendId) throws UALException;
 
-  public static boolean isBackendTypeValid(int backendType) {
-
-    if(    backendType != NO_BACKEND 
-        && backendType != ASCII_BACKEND
-	&& backendType != MDSPLUS_BACKEND
-	&& backendType != HDF5_BACKEND
-	&& backendType != MEMORY_BACKEND
-	&& backendType != UDA_BACKEND ) {
-
-      return false;
-    } else {
-      return true;
-    }
-  }
 }

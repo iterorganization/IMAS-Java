@@ -194,38 +194,10 @@ static public int openEnv(int shot, int run, String user, String tokamak, String
 {
     int pulseCtx;
 
-    if( LowLevel.isBackendTypeValid( backendType ) != true ) {
-      throw new UALException(  "[ual_begin_pulse_action]: Error opening pulse file: " 
-                             + user 
-			     + "/" 
-			     + tokamak 
-			     + "/" 
-			     + version 
-			     + "/"
-			     + shot 
-			     + "/" 
-			     + run 
-			     + ":\n" 
-			     + "Incorrect backend type: " 
-			     + backendType
-			     + "\n" );
-    }
-
     try{ 
       pulseCtx = LowLevel.ual_begin_pulse_action(backendType, shot, run, user, tokamak, version); 
     } catch(Exception exc) {
-      throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: "
-                             + user 
-			     + "/" 
-			     + tokamak 
-			     + "/" 
-			     + version 
-			     + "/"
-			     + shot 
-			     + "/" 
-			     + run 
-			     + ":\n" 
-			     + exc.getMessage()  );
+      throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + ":\n" + exc.getMessage()  );
     }
 
     try{ 
@@ -275,23 +247,6 @@ static public int createEnv(int shot, int run, String user, String tokamak, Stri
 static public int createEnv(int shot, int run, String user, String tokamak, String version, int backendType ) throws UALException
 {
     int pulseCtx = -1;
-
-    if( LowLevel.isBackendTypeValid( backendType ) != true ) {
-      throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: " 
-                             + user 
-			     + "/" 
-			     + tokamak 
-			     + "/" 
-			     + version 
-			     + "/"
-			     + shot 
-			     + "/" 
-			     + run 
-			     + ":\n" 
-			     + "Incorrect backend type: "
-			     + backendType 
-			     + "\n" );
-    }
 
     try { 
       pulseCtx = LowLevel.ual_begin_pulse_action(backendType, shot, run, user, tokamak, version); 
