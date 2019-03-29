@@ -277,35 +277,29 @@ static public int createEnv(int shot, int run, String user, String tokamak, Stri
   *Closes the currently open database.
   * @param refIdx database index, returned by create or open.
   **/
- static public void close() throws UALException
+static public void close() throws UALException
 {
-    try{
-        LowLevel.ual_close_pulse(imas.pulseCtx, LowLevel.CLOSE_PULSE, "");
-    }
-    catch (Exception exc)
-    {
-        throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
-    }
-    finally
-    {   if(imas.pulseCtx >= 0)
-            LowLevel.ual_end_action(imas.pulseCtx);
-    }
+  close(imas.pulseCtx);
 }
 
- static public void close(int refIdx) throws UALException
-{
- /*      System.err.println("WARNING:\n"
-                        + "\"int close(int refIdx)\"  is DEPRECATED.\n"
-                        + "Please use \"close()\" instead");
-  */ close();
+static public void close(int refIdx, String name, int shot, int run) throws UALException{
+  System.err.println(  "WARNING:\n"
+                     + "\"int close(int refIdx, String name, int shot, int run)\"  is DEPRECATED.\n"
+                     + "Please use \"close()\" instead");
+  close(refIdx);
 }
 
- static public void close(int refIdx, String name, int shot, int run) throws UALException{
-    System.err.println("WARNING:\n"
-                        + "\"int close(int refIdx, String name, int shot, int run)\"  is DEPRECATED.\n"
-                        + "Please use \"close()\" instead");
-   close();
- }
+static public void close(int refIdx) throws UALException
+{
+  try{
+    LowLevel.ual_close_pulse(refIdx, LowLevel.CLOSE_PULSE, "");
+  } catch (Exception exc) {
+    throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
+  } finally {
+    if(imas.pulseCtx >= 0)
+      LowLevel.ual_end_action(imas.pulseCtx);
+  }
+}
 
  /**
   *Get the time base of a ids.
