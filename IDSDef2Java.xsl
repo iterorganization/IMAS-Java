@@ -39,11 +39,11 @@ import imasjava.wrapper.LowLevel;
 
 public class imas {
  static {
-  String libpath = System.getenv("IMAS_HOME");
+  String libpath = System.getenv("IMAS_PREFIX");
   String imasversion = System.getenv("IMAS_VERSION");
   String ualversion = System.getenv("UAL_VERSION");
   if (libpath == null) {
-   System.err.println("IMAS library not set up in the environment. (IMAS_HOME missing)");
+   System.err.println("IMAS library not set up in the environment. (IMAS_PREFIX missing)");
    System.exit(0);
   }
   if (imasversion == null) {
@@ -55,9 +55,10 @@ public class imas {
    System.exit(0);
   }
   <xsl:choose><xsl:when test="$SYS_WIN = 'no'">
-  libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
-  String imas_library = libpath + "/libimas-java-binding-" + imasversion + ".so";
-  </xsl:when><xsl:otherwise>
+  libpath = libpath + "/lib";
+  String imas_library = libpath + "/libimas-java-binding.so";
+ 
+ </xsl:when><xsl:otherwise>
   String imas_library = libpath + "/javainterface/lib/libimas-java-binding.dll";
   </xsl:otherwise></xsl:choose>
   File f = new File(imas_library);
