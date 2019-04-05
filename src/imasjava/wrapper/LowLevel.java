@@ -52,7 +52,6 @@ public final static int  UNKNOWN_ERR       =   ERR_0;
 public final static int  CONTEXT_ERR       =   ERR_0 - 1;
 public final static int  BACKEND_ERR       =   ERR_0 - 2;
 public final static int  LOWLEVEL_ERR      =   ERR_0 - 3;
-public final static int  NODATA_ERR        =   ERR_0 - 4;
 
 
 public final static int NO_BACKEND         = BACKEND_ID_0;
@@ -351,5 +350,7 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
   */
   public static native void ual_iterate_over_arraystruct(int aosctx, 
 				   int step) throws UALException;
+
+  public static native int ual_get_backendID(int backendId) throws UALException;
 
 }

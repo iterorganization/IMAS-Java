@@ -523,4 +523,18 @@ extern "C" {
         raiseLowLevelException( env, status);
 
 }
+
+void JNICALL Java_imasjava_wrapper_LowLevel_ual_1get_1backendID
+  (JNIEnv *env, jclass jWrapperClass, jint backendID)
+{
+    int status = -1;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    status = ual_get_backendID(backendID);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (status < 0)
+      raiseLowLevelException( env, status );
+}
+
 } //extern "C"

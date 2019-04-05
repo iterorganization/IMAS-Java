@@ -39,11 +39,11 @@ import imasjava.wrapper.LowLevel;
 
 public class imas {
  static {
-  String libpath = System.getenv("IMAS_HOME");
+  String libpath = System.getenv("IMAS_PREFIX");
   String imasversion = System.getenv("IMAS_VERSION");
   String ualversion = System.getenv("UAL_VERSION");
   if (libpath == null) {
-   System.err.println("IMAS library not set up in the environment. (IMAS_HOME missing)");
+   System.err.println("IMAS library not set up in the environment. (IMAS_PREFIX missing)");
    System.exit(0);
   }
   if (imasversion == null) {
@@ -55,9 +55,10 @@ public class imas {
    System.exit(0);
   }
   <xsl:choose><xsl:when test="$SYS_WIN = 'no'">
-  libpath = libpath + "/core/imas/" + imasversion + "/ual/" + ualversion + "/lib";
-  String imas_library = libpath + "/libimas-java-binding-" + imasversion + ".so";
-  </xsl:when><xsl:otherwise>
+  libpath = libpath + "/lib";
+  String imas_library = libpath + "/libimas-java-binding.so";
+ 
+ </xsl:when><xsl:otherwise>
   String imas_library = libpath + "/javainterface/lib/libimas-java-binding.dll";
   </xsl:otherwise></xsl:choose>
   File f = new File(imas_library);
@@ -163,7 +164,7 @@ public class imas {
 
 
  /**
-  *Creates a new database instance.
+  *Opens database instance.
   * @param name Name of the database (by convention imas).
   * @param shot Shot number.
   * @param run Run Number.
@@ -173,27 +174,38 @@ public class imas {
   * @exception UALException is thrown if the database cannot be open.
   **/
 
- static public int openEnv(String name, int shot, int run, String user, String tokamak, String version) throws UALException
+ static public int openEnv(int shot, int run, String user, String tokamak, String version) throws UALException
+{
+  return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
+}
+
+/**
+  * Opens database instance.
+  * @param backendType Type of the backend to be used
+  * @param name Name of the database (by convention imas).
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param refShot Shot number of the reference database.
+  * @param runRun Run Number of the reference database.
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open.
+  **/
+
+static public int openEnv(int shot, int run, String user, String tokamak, String version, int backendType) throws UALException
 {
     int pulseCtx;
-   try{ 
-    
-    pulseCtx = LowLevel.ual_begin_pulse_action(LowLevel.MDSPLUS_BACKEND, shot, run, user, tokamak, version); 
-    }
-    catch(Exception exc){
-        throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
-   
+
+    try{ 
+      pulseCtx = LowLevel.ual_begin_pulse_action(backendType, shot, run, user, tokamak, version); 
+    } catch(Exception exc) {
+      throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
     }
 
     try{ 
-    
-    LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, "");
-   }
-    catch(Exception exc){
-        throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
-   
+      LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, "");
+    } catch(Exception exc) {
+      throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
     }
-
 
     imas.shot = shot;
     imas.run = run;
@@ -207,42 +219,46 @@ public class imas {
 
  /**
   *Creates a new database instance.
-  * @param name Name of the database (by convention imas).
   * @param shot Shot number.
   * @param run Run Number.
-  * @param refShot Shot number of the reference database.
-  * @param runRun Run Number of the reference database.
+  * @param user User name
+  * @param tokamak Name of the machine
+  * @param version Database version
   * @return the database index to be used in subsequent get/put calls
   * @exception UALException is thrown if the database cannot be open.
   **/
- static public int createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version) throws UALException
+
+static public int createEnv(int shot, int run, String user, String tokamak, String version ) throws UALException
 {
-  /*  System.err.println("WARNING:\n"
-                        + "\"createEnv(String name, int shot, int run, int refShot, int refRun, String user, String tokamak, String version)\"  is DEPRECATED.\n"
-                        + "Please use \"createEnv(int shot, int run, String user, String tokamak, String version)\" instead");
-    */ return imas.createEnv(shot,  run,  user,  tokamak,  version);
+  return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
 }
 
-static public int createEnv(int shot, int run, String user, String tokamak, String version) throws UALException
+ /**
+  *Creates a new database instance.
+  * @param shot Shot number.
+  * @param run Run Number.
+  * @param user User name
+  * @param tokamak Name of the machine
+  * @param version Database version
+  * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
+  * @return the database index to be used in subsequent get/put calls
+  * @exception UALException is thrown if the database cannot be open.
+  **/
+
+static public int createEnv(int shot, int run, String user, String tokamak, String version, int backendType ) throws UALException
 {
     int pulseCtx = -1;
 
-    try{ 
-    
-    pulseCtx = LowLevel.ual_begin_pulse_action(LowLevel.MDSPLUS_BACKEND, shot, run, user, tokamak, version); 
-    }
-    catch(Exception exc){
-        throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
-   
+    try { 
+      pulseCtx = LowLevel.ual_begin_pulse_action(backendType, shot, run, user, tokamak, version); 
+    } catch(Exception exc){
+      throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
     }
 
     try{ 
-    
-    LowLevel.ual_open_pulse(pulseCtx, LowLevel.FORCE_CREATE_PULSE, "");
-   }
-    catch(Exception exc){
-        throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
-   
+      LowLevel.ual_open_pulse(pulseCtx, LowLevel.FORCE_CREATE_PULSE, "");
+    } catch(Exception exc) {
+      throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
     }
 
     imas.shot = shot;
@@ -262,35 +278,29 @@ static public int createEnv(int shot, int run, String user, String tokamak, Stri
   *Closes the currently open database.
   * @param refIdx database index, returned by create or open.
   **/
- static public void close() throws UALException
+static public void close() throws UALException
 {
-    try{
-        LowLevel.ual_close_pulse(imas.pulseCtx, LowLevel.CLOSE_PULSE, "");
-    }
-    catch (Exception exc)
-    {
-        throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
-    }
-    finally
-    {   if(imas.pulseCtx >= 0)
-            LowLevel.ual_end_action(imas.pulseCtx);
-    }
+  close(imas.pulseCtx);
 }
 
- static public void close(int refIdx) throws UALException
-{
- /*      System.err.println("WARNING:\n"
-                        + "\"int close(int refIdx)\"  is DEPRECATED.\n"
-                        + "Please use \"close()\" instead");
-  */ close();
+static public void close(int refIdx, String name, int shot, int run) throws UALException{
+  System.err.println(  "WARNING:\n"
+                     + "\"int close(int refIdx, String name, int shot, int run)\"  is DEPRECATED.\n"
+                     + "Please use \"close()\" instead");
+  close(refIdx);
 }
 
- static public void close(int refIdx, String name, int shot, int run) throws UALException{
-    System.err.println("WARNING:\n"
-                        + "\"int close(int refIdx, String name, int shot, int run)\"  is DEPRECATED.\n"
-                        + "Please use \"close()\" instead");
-   close();
- }
+static public void close(int refIdx) throws UALException
+{
+  try{
+    LowLevel.ual_close_pulse(refIdx, LowLevel.CLOSE_PULSE, "");
+  } catch (Exception exc) {
+    throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
+  } finally {
+    if(imas.pulseCtx >= 0)
+      LowLevel.ual_end_action(imas.pulseCtx);
+  }
+}
 
  /**
   *Get the time base of a ids.

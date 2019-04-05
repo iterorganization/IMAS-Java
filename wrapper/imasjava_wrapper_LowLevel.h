@@ -75,8 +75,6 @@ extern "C" {
 #define imasjava_wrapper_LowLevel_BACKEND_ERR -3L
 #undef imasjava_wrapper_LowLevel_LOWLEVEL_ERR
 #define imasjava_wrapper_LowLevel_LOWLEVEL_ERR -4L
-#undef imasjava_wrapper_LowLevel_NODATA_ERR
-#define imasjava_wrapper_LowLevel_NODATA_ERR -5L
 #undef imasjava_wrapper_LowLevel_NO_BACKEND
 #define imasjava_wrapper_LowLevel_NO_BACKEND 10L
 #undef imasjava_wrapper_LowLevel_ASCII_BACKEND
