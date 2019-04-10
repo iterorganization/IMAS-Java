@@ -9,14 +9,6 @@ include ../../Makefile.common
 # N.B. this number is not tied to the AL major version number whatsoever.
 SO_NUM=4
 
-export IMAS_PREFIX=$(UAL)
-
-ifeq (,$(wildcard $(IMAS_PREFIX)))
-$(error $$IMAS_PREFIX is unset)
-endif
-
-SHELL=/bin/sh
-
 ## Adding DEBUG=yes to make command to print additional debug info
 DBGFLAGS= -g
 ifeq (${DEBUG},yes)
@@ -25,7 +17,6 @@ endif
 ifeq (${STOPONEXCEPT},yes)
 DBGFLAGS+= -DSOE
 endif
-
 
 ifeq "$(strip $(CC))" "icc"
 ## intel compiler should be >= 13 to meet C++11 requirement
@@ -40,59 +31,17 @@ CXXFLAGS=--std=c++11 --pedantic -Wall -fPIC -O0  -fno-inline-functions ${DBGFLAG
 LDF=gfortran -lc -lstdc++
 endif
 
-
 #-------------- Options for JNI ----------------
 
-ifneq ("no","$(strip $(SYS_WIN))")
-INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I$(IMAS_PREFIX)/lowlevel
-LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lowlevel
-LIBS+= $(IMAS_PREFIX)/lowlevel/libimas.lib
-TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
-CFLAGS+= -DWIN32
-CXXFLAGS+= -DWIN32
-else
-INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(IMAS_PREFIX)/lowlevel
-LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L$(IMAS_PREFIX)/lowlevel -limas
-TARGETS= lib/libimas-java-binding.so lib/libimas-java-binding.a
-endif
 COMMON_OBJECTS= build/imasjava_wrapper_LowLevel.o
 CPPSRC= imasjava_wrapper_LowLevel.cpp
 
-
-ifneq ("no","$(strip $(IMAS_MDSPLUS))")
-ifneq ("no","$(strip $(SYS_WIN))")
-LIBS+= $(MDSPLUS_DIR)/lib/XTreeShr.a
-LIBS+= $(MDSPLUS_DIR)/lib/MdsObjectsCppShr.a
-LIBS+= $(MDSPLUS_DIR)/lib/TdiShr.a
-LIBS+= $(MDSPLUS_DIR)/lib/TreeShr.a
-LIBS+= $(MDSPLUS_DIR)/lib/MdsIpShr.a
-LIBS+= $(MDSPLUS_DIR)/lib/MdsShr.a
-LIBS+= -lxml2 -lws2_32 -ldl -liphlpapi
+# Include OS-specific Makefile, if exists.
+ifneq (,$(wildcard Makefile.$(SYSTEM)))
+include Makefile.$(SYSTEM)
 else
-#LIBS+= -L$(MDSPLUS_DIR)/lib
-#LIBS+= -lTreeShr -lTdiShr -lMdsShr -lMdsIpShr -lXTreeShr
-endif
-endif
-
-ifneq ("no","$(strip $(IMAS_UDA))")
-ifneq ("no","$(strip $(SYS_WIN))")
-LIBS+= -L$(UDA_HOME)/lib
-LIBS+= $(UDA_HOME)/lib/libuda_cpp.a
-LIBS+= $(UDA_HOME)/lib/libportablexdr.a
-LIBS+= -lws2_32 -lssl -lcrypto
-else
-#LIBS+= `pkg-config --libs uda-cpp`
-#LIBS+= -lssl -lcrypto
-endif
-endif
-ifneq ("no","$(strip $(IMAS_HDF5))")
-ifneq ("no","$(strip $(SYS_WIN))")
-LIBS+= -L$(HDF5_HOME)/lib
-LIBS+= $(HDF5_HOME)/lib/libhdf5.a -ldl -lz
-else
-#LIBS+= -L$(HDF5_HOME)/lib
-#LIBS+= -lhdf5 -ldl -lz
-endif
+sources_install install:
+	$(error No Makefile.$(SYSTEM) found for this system: $(UNAME_S))
 endif
 
 all: $(TARGETS)
@@ -122,38 +71,4 @@ clean:
 build/%.o: %.cpp | ./build
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
-# Dynamic library
-lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so.$(SO_NUM): $(COMMON_OBJECTS) | ./lib
-	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@ $^ $(LIBS)
-lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so: %:%.$(SO_NUM)
-	$(LN_S) $(<F) $@
-lib/libimas-java-binding.so:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so
-	$(LN_S) $(<F) $@
-lib/libimas-java-binding.so_install: %.so_install:%-$(DD_GIT_DESCRIBE).so.$(SO_NUM) | $(libdir)
-	$(INSTALL_DATA) $< $(libdir)
-	$(LN_S) $(<F) $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so
-	$(LN_S) $(<F) $(libdir)/$(*F).so
 
-# Static library
-lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a: $(COMMON_OBJECTS) | ./lib
-	$(AR) rvs $@ $^
-lib/libimas-java-binding.a:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a
-	$(LN_S) $(<F) $@
-lib/libimas-java-binding.a_install: %.a_install:%-$(DD_GIT_DESCRIBE).a | $(libdir)
-	$(INSTALL_DATA) $< $(libdir)
-	$(LN_S) $(<F) $(libdir)/$(*F).a
-
-# Windows dynamic library
-lib/libimas-java-binding.dll: $(COMMON_OBJECTS) | ./lib
-	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(SO_NUM) -Wl,--out-implib,$@.lib $^ $(LIBS)
-lib/libimas-java-binding.dll_install: %_install:%
-	$(mkdir_p) $(packagedir)/javainterface/lib
-	cp $< $(packagedir)/javainterface/lib
-
-# Windows static library
-lib/libimas-java-binding.lib: $(COMMON_OBJECTS) | ./lib
-	$(AR) rcvsu $@ $^
-	ranlib $@
-lib/libimas-java-binding.lib_install: %_install:%
-	$(mkdir_p) $(packagedir)/javainterface/lib
-	cp $< $(packagedir)/javainterface/lib

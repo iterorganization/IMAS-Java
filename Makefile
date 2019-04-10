@@ -6,16 +6,6 @@ all sources sources_install install clean clean-src:
 	$(warning "Ignoring javainterface (IMAS_JAVA=no).")
 else
 
-ifneq ("no","$(strip $(SYS_WIN))")
-JAVA = $(JAVA_HOME)/bin/java
-JAVAC = $(JAVA_HOME)/bin/javac
-JAR = $(JAVA_HOME)/bin/jar
-else
-JAVA = java
-JAVAC = javac
-JAR = jar
-endif
-
 JFLAGS = -g -Xmaxerrs 10 -sourcepath ./src -d ./build
 
 # Get a list of IDS from IDSDEF file
@@ -40,29 +30,13 @@ bindings:
 	$(MAKE) -C wrapper
 
 sources: $(GENSOURCES) id_java_sources
-ifeq ("no","$(strip $(SYS_WIN))")
-sources_install: $(GENSOURCES) id_java_sources_install | $(addprefix $(datadir)/src/javainterface/imasjava/,ids utilities)
-	$(MAKE) -C wrapper/ $@
-	$(INSTALL_DATA) src/imasjava/*.java $(datadir)/src/javainterface/imasjava
-	$(INSTALL_DATA) src/imasjava/ids/*.java $(datadir)/src/javainterface/imasjava/ids
-	$(INSTALL_DATA) src/imasjava/utilities/*.java $(datadir)/src/javainterface/imasjava/utilities
-else
-sources_install: $(GENSOURCES) id_java_sources_install
-endif
 
-ifeq ("no","$(strip $(SYS_WIN))")
-install: all id_java_install | $(prefix)/jar
-	$(MAKE) -C wrapper/ $@
-	$(INSTALL_DATA) ./lib/imas.jar $(prefix)/jar/
+# Include OS-specific Makefile, if exists.
+ifneq (,$(wildcard Makefile.$(SYSTEM)))
+include Makefile.$(SYSTEM)
 else
-install: all id_java_install
-	$(mkdir_p) $(packagedir)/javainterface/lib
-	$(mkdir_p) $(packagedir)/javainterface/jar
-	$(mkdir_p) $(packagedir)/fortraninterface/lib
-	for OBJECT in `find ./wrapper/lib -type f \( -name "*.lib" -or -name "*.dll" \)`; do \
-		cp $$OBJECT $(packagedir)/javainterface/lib; \
-	done
-	cp ./lib/imas.jar $(packagedir)/javainterface/jar
+sources_install install:
+	$(error No Makefile.$(SYSTEM) found for this system: $(UNAME_S))
 endif
 
 clean: id_java_clean
@@ -87,7 +61,7 @@ $(CLASSFILE): build/%.class:src/%.java | build
 # Gracefully skip generation of sources if not needed.
 $(GENSOURCES): gensources
 gensources: IDSDef2Java.xsl | saxonicajar
-	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(JAVA) net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< SYS_WIN=$(SYS_WIN))
+	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(JAVA) net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< SYSTEM=$(SYSTEM))
 
 #----------------------- identifiers ---------------------
 include ../Makefile.identifiers
