@@ -464,13 +464,6 @@ public class <xsl:value-of select="@name"/>_IDSBase
                         + "\"put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) \"  is DEPRECATED.\n"
                         + "Please use \"put()\" instead");
 */
-        if(ids.ids_properties.homogeneous_time == LowLevel.EMPTY_INT)
-        {
-            System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
-            return;
-        }
-    	<xsl:value-of select="@name"/>_IDSBase.setHomogeneous(ids.ids_properties.homogeneous_time == 1);
-	
 	    //<xsl:value-of select="@name"/>_IDSBase.setIdsTime(ids.time);
 	
         if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
@@ -495,12 +488,25 @@ public class <xsl:value-of select="@name"/>_IDSBase
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
  
 
-        boolean isIdsHomogeneous = this.isHomogeneous();
+        boolean isIdsHomogeneous = false;
 
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
 
       
+        if(this.ids_properties.homogeneous_time == LowLevel.EMPTY_INT)
+        {
+            System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
+            return;
+        }
+        
+        isIdsHomogeneous = (this.ids_properties.homogeneous_time == 1);
+        this.setHomogeneous( isIdsHomogeneous);
+
+        if(isIdsHomogeneous &amp;&amp; (this.time != null || (this.time == null || this.time.getDim() &lt; 1)))
+        {
+            throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
+        }
       
         try{
             // Open put context
@@ -548,15 +554,6 @@ public class <xsl:value-of select="@name"/>_IDSBase
         System.err.println("WARNING:\n"
                         + "\"putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) \"  is DEPRECATED.\n"
                         + "Please use \"putSlice()\" instead");
-
-
-        if(ids.ids_properties.homogeneous_time == LowLevel.EMPTY_INT)
-        {
-            System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUTSLICE quits with no action.");
-            return;
-        }
-	  	
-        <xsl:value-of select="@name"/>_IDSBase.setHomogeneous(ids.ids_properties.homogeneous_time == 1);
     
     
         if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
@@ -580,10 +577,26 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
         sliceTime = this.time.getElementAt(0);
 
-        boolean isIdsHomogeneous = this.isHomogeneous();
+        boolean isIdsHomogeneous = false;
 
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
+
+
+       if(this.ids_properties.homogeneous_time == LowLevel.EMPTY_INT)
+        {
+            System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUTSLICE quits with no action.");
+            return;
+        }
+        
+
+        isIdsHomogeneous = (this.ids_properties.homogeneous_time == 1);
+        this.setHomogeneous( isIdsHomogeneous);
+
+        if(isIdsHomogeneous &amp;&amp; (this.time != null || (this.time == null || this.time.getDim() &lt; 1)))
+        {
+            throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
+        }
   
         try{
              // Open putSlice context
