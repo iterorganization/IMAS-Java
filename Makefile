@@ -60,12 +60,23 @@ $(CLASSFILE): build/%.class:src/%.java | build
 # Use an intermediate target to enforce nonparallel generation.
 # Gracefully skip generation of sources if not needed.
 $(GENSOURCES): gensources
+	$(if $(wildcard $@~),@echo Correcting indentation of $@ ; $(BEAUTIFY) $@ && $(RM) $@~)
 gensources: IDSDef2Java.xsl | saxonicajar
-	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(JAVA) net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< SYSTEM=$(SYSTEM))
+	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(JAVA) net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< SYSTEM=$(SYSTEM) && \
+	  touch $(addsuffix ~,$(GENSOURCES)) )
+beautify: $(GENSOURCES) | javaformatjar
+	$(JAVA) com.google.googlejavaformat.java.Main -i $^
 
 #----------------------- identifiers ---------------------
 include ../Makefile.identifiers
 
 #----------------------- classpath deps ---------------------
 include ../Makefile.classpath
+# Check existence of the utility to get a clean Java format
+ifeq ("","$(wildcard $(JAVAFORMATJAR))")
+BEAUTIFY = echo Skipped
+else
+BEAUTIFY = $(JAVA) com.google.googlejavaformat.java.Main -i
+endif
+
 endif # IMAS_JAVA=no?
