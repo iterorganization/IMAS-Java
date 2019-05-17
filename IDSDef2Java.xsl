@@ -852,8 +852,6 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
         <xsl:otherwise>
         imas.<xsl:value-of select="@name"/> outIDS = new imas.<xsl:value-of select="@name"/> ();
-  
-        <xsl:for-each select="descendant-or-self::field[@appendable_by_appender_actor='yes' ]">
 
         //Sanity check - array size 
         if(idsArray.length &lt; 1)
