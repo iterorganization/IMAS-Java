@@ -503,7 +503,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
         isIdsHomogeneous = (this.ids_properties.homogeneous_time == 1);
         this.setHomogeneous( isIdsHomogeneous);
 
-        if(isIdsHomogeneous &amp;&amp; (this.time != null || (this.time == null || this.time.getDim() &lt; 1)))
+        if(isIdsHomogeneous &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
         {
             throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
         }
@@ -593,7 +593,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
         isIdsHomogeneous = (this.ids_properties.homogeneous_time == 1);
         this.setHomogeneous( isIdsHomogeneous);
 
-        if(isIdsHomogeneous &amp;&amp; (this.time != null || (this.time == null || this.time.getDim() &lt; 1)))
+        if(isIdsHomogeneous &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
         {
             throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
         }
