@@ -341,6 +341,10 @@ public static class <xsl:value-of select="@name"/> extends <xsl:value-of select=
 
 package imasjava.ids;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import imasjava.wrapper.*;
 import imasjava.*;
 
@@ -847,10 +851,25 @@ public class <xsl:value-of select="@name"/>_IDSBase
         </xsl:when>
 
         <xsl:otherwise>
-         imas.<xsl:value-of select="@name"/> outIDS = new imas.<xsl:value-of select="@name"/> ();
+        imas.<xsl:value-of select="@name"/> outIDS = new imas.<xsl:value-of select="@name"/> ();
   
         <xsl:for-each select="descendant-or-self::field[@appendable_by_appender_actor='yes' ]">
 
+        //Sanity check - array size 
+        if(idsArray.length &lt; 1)
+              throw new UALException("IDS '<xsl:value-of select="@name"/>': appendIDSes cannot append an empty array!");
+
+        //homogeneous time check
+        for(imas.<xsl:value-of select="@name"/> inIDS : idsArray)
+        {
+            if (inIDS.ids_properties.homogeneous_time != 1)
+                throw new UALException("Heterogeneous IDSes cannot be appended!");
+        }
+        imas.<xsl:value-of select="@name"/> outIDS = new imas.<xsl:value-of select="@name"/> ();
+        outIDS.ids_properties.homogeneous_time = 1;
+        outIDS.time = idsArray[0].time;
+        <xsl:for-each select="descendant-or-self::field[@appendable_by_appender_actor='yes' ]">
+ 
         <xsl:variable name="idsName" select="ancestor::IDS/@name"/>
         <xsl:variable name="fieldName" select="translate(@path,'/','_')"/>
         <xsl:variable name="className" select="concat('imas.', $idsName,'.', replace(@path,'/','Class.'), 'Class')"/>
