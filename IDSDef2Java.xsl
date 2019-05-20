@@ -863,7 +863,6 @@ public class <xsl:value-of select="@name"/>_IDSBase
             if (inIDS.ids_properties.homogeneous_time != 1)
                 throw new UALException("Heterogeneous IDSes cannot be appended!");
         }
-        imas.<xsl:value-of select="@name"/> outIDS = new imas.<xsl:value-of select="@name"/> ();
         outIDS.ids_properties.homogeneous_time = 1;
         outIDS.time = idsArray[0].time;
         <xsl:for-each select="descendant-or-self::field[@appendable_by_appender_actor='yes' ]">
