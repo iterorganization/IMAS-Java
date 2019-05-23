@@ -572,15 +572,11 @@ public class <xsl:value-of select="@name"/>_IDSBase
 }
     public void putSlice(int iOccurrence) throws UALException
     {
-        double sliceTime = -1.0;
         int pulseCtx = this.pulseCtx;
         int ctx = -1;
         int aosCtx = -1;
         int arraySize = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
-
-        sliceTime = this.time.getElementAt(0);
-
         boolean isIdsHomogeneous = false;
 
         if(iOccurrence > 0)
@@ -604,7 +600,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
   
         try{
              // Open putSlice context
-            ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, sliceTime, LowLevel.UNDEFINED_INTERP);
+            ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, LowLevel.UNDEFINED_TIME, LowLevel.UNDEFINED_INTERP);
 
             this.putSliceRootFields(ctx, isIdsHomogeneous);
         }
