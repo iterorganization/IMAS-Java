@@ -296,8 +296,8 @@ static public void close(int refIdx) throws UALException
   } catch (Exception exc) {
     throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
   } finally {
-    if(imas.pulseCtx >= 0)
-      LowLevel.ual_end_action(imas.pulseCtx);
+    if(refIdx >= 0)
+      LowLevel.ual_end_action(refIdx);
   }
 }
 
