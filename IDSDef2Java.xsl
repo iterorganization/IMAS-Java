@@ -1123,17 +1123,21 @@ public class <xsl:value-of select="@name"/>_IDSBase
         <xsl:when test="@data_type='flt_type' or @data_type='FLT_0D'">
             this.<xsl:value-of select = "@name"/> = LowLevel.EMPTY_DOUBLE;
         </xsl:when>
+        <xsl:when test="@data_type='cpx_type' or @data_type='CPX_0D'">
+            this.<xsl:value-of select = "@name"/> = LowLevel.EMPTY_COMPLEX;
+        </xsl:when>
         <xsl:when test="
-            @data_type='struct_array'
+           @data_type='struct_array'
         or @data_type='str_type' or @data_type='STR_0D'
         or @data_type='str_1d_type' or @data_type='STR_1D'
         or @data_type='flt_1d_type' or @data_type='FLT_1D'
+        or @data_type='cpx_1d_type' or @data_type='CPX_1D'
         or @data_type='int_1d_type' or @data_type='INT_1D'
-        or @data_type='FLT_2D' or @data_type='INT_2D'
-        or @data_type='FLT_3D'  or @data_type='INT_3D'
-        or @data_type='FLT_4D'  or @data_type='INT_4D'
-        or @data_type='FLT_5D'or @data_type='INT_5D'
-        or @data_type='FLT_6D'or @data_type='INT_6D'">
+        or @data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D'
+        or @data_type='FLT_3D' or @data_type='INT_3D' or @data_type='CPX_3D'
+        or @data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D'
+        or @data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D'
+        or @data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D'">
             this.<xsl:value-of select = "@name"/> = null;
         </xsl:when>
         <xsl:otherwise>
@@ -1187,6 +1191,14 @@ public class <xsl:value-of select="@name"/>_IDSBase
         System.out.println("");
     </xsl:when>
 
+    <xsl:when test="@data_type='cpx_type' or @data_type='CPX_0D'">
+         if(<xsl:value-of select = "$currentidxpath"/> != LowLevel.EMPTY_COMPLEX)
+            System.out.println(<xsl:value-of select = "$currentidxpath"/>);
+        else
+            System.out.println("Empty");
+        System.out.println("");
+    </xsl:when>
+
     <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
@@ -1201,13 +1213,15 @@ public class <xsl:value-of select="@name"/>_IDSBase
             System.out.println("Empty");
         System.out.println("");
    </xsl:when>
-    <xsl:when test="@name='vecdbl_type'">
-        if(<xsl:value-of select = "$currentidxpath"/> != null)
+
+    <xsl:when test="@data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='CPX_2D' or @data_type='CPX_3D' or @data_type='CPX_4D' or @data_type='CPX_5D' or @data_type='CPX_6D'">
+         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
         else
             System.out.println("Empty");
         System.out.println("");
-    </xsl:when>
+   </xsl:when>
+
     <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
         if(<xsl:value-of select = "$currentidxpath"/> != null)
             System.out.println(<xsl:value-of select = "$currentidxpath"/>);
@@ -1314,18 +1328,31 @@ public class <xsl:value-of select="@name"/>_IDSBase
       public double <xsl:value-of select = "@name"/> = LowLevel.EMPTY_DOUBLE;
     </xsl:when>
 
+    <xsl:when test="@data_type='cpx_type' or @data_type='CPX_0D'">
+      public Complex <xsl:value-of select = "@name"/> = LowLevel.EMPTY_COMPLEX;
+    </xsl:when>
+
     <xsl:when test="@data_type='str_1d_type' or @data_type='STR_1D'">
       public Vect1DString <xsl:value-of select = "@name"/>;
     </xsl:when>
     <xsl:when test="@data_type='flt_1d_type' or @data_type='FLT_1D'">
       public Vect1DDouble <xsl:value-of select = "@name"/>;
     </xsl:when>
+
+    <xsl:when test="@data_type='cpx_1d_type' or @data_type='CPX_1D'">
+      public Vect1DComplex <xsl:value-of select = "@name"/>;
+    </xsl:when>
+
     <xsl:when test="@data_type='int_1d_type' or @data_type='INT_1D'">
       public Vect1DInt <xsl:value-of select = "@name"/>;
     </xsl:when>
     <!--                       -->
     <xsl:when test="@data_type='FLT_2D'">
       public Vect2DDouble  <xsl:value-of select = "@name"/>;
+    </xsl:when>
+    <!--                       -->
+    <xsl:when test="@data_type='CPX_2D'">
+      public Vect2DComplex  <xsl:value-of select = "@name"/>;
     </xsl:when>
     <!--                       -->
     <xsl:when test="@data_type='INT_2D'">
@@ -1336,6 +1363,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
       public Vect3DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
     <!--                       -->
+    <xsl:when test="@data_type='CPX_3D'">
+      public Vect3DComplex  <xsl:value-of select = "@name"/>;
+    </xsl:when>
+    <!--                       -->
     <xsl:when test="@data_type='INT_3D'">
       public Vect3DInt  <xsl:value-of select = "@name"/>;
     </xsl:when>
@@ -1344,13 +1375,26 @@ public class <xsl:value-of select="@name"/>_IDSBase
       public Vect4DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
     <!--                       -->
+    <xsl:when test="@data_type='CPX_4D'">
+      public Vect4DComplex  <xsl:value-of select = "@name"/>;
+    </xsl:when>
+    <!--                       -->
     <xsl:when test="@data_type='FLT_5D'">
       public Vect5DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
       <!--                       -->
+    <xsl:when test="@data_type='CPX_5D'">
+      public Vect5DComplex  <xsl:value-of select = "@name"/>;
+    </xsl:when>
+    <!--                       -->
     <xsl:when test="@data_type='FLT_6D'">
       public Vect6DDouble  <xsl:value-of select = "@name"/>;
     </xsl:when>
+    <!--                       -->
+    <xsl:when test="@data_type='CPX_6D'">
+      public Vect6DComplex  <xsl:value-of select = "@name"/>;
+    </xsl:when>
+    <!--                       -->
 
     <!--                       -->
     <xsl:when test="@data_type='struct_array'">
@@ -1535,15 +1579,14 @@ public class <xsl:value-of select="@name"/>_IDSBase
     <xsl:when test="
            @data_type='str_type' or @data_type='STR_0D'
         or @data_type='str_1d_type' or @data_type='STR_1D'
-        or @data_type='int_type' or @data_type='INT_0D'
-        or @data_type='flt_type' or @data_type='FLT_0D' 
         or @data_type='flt_1d_type' or @data_type='FLT_1D'
+        or @data_type='cpx_1d_type' or @data_type='CPX_1D'
         or @data_type='int_1d_type' or @data_type='INT_1D'
-        or @data_type='FLT_2D' or @data_type='INT_2D'
-        or @data_type='FLT_3D'  or @data_type='INT_3D'
-        or @data_type='FLT_4D'  or @data_type='INT_4D'
-        or @data_type='FLT_5D'or @data_type='INT_5D'
-        or @data_type='FLT_6D'or @data_type='INT_6D'">
+        or @data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D'
+        or @data_type='FLT_3D' or @data_type='INT_3D' or @data_type='CPX_3D'
+        or @data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D'
+        or @data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D'
+        or @data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D'">
         <xsl:choose>
             <xsl:when test="ancestor::field[@data_type='struct_array']">
                 strNodePath = &quot;<xsl:call-template  name="printAosRelativePath"/>&quot;;
@@ -1715,15 +1758,14 @@ public class <xsl:value-of select="@name"/>_IDSBase
     <xsl:when test="
            @data_type='str_type' or @data_type='STR_0D'
         or @data_type='str_1d_type' or @data_type='STR_1D'
-        or @data_type='int_type' or @data_type='INT_0D'
-        or @data_type='flt_type' or @data_type='FLT_0D' 
         or @data_type='flt_1d_type' or @data_type='FLT_1D'
+        or @data_type='cpx_1d_type' or @data_type='CPX_1D'
         or @data_type='int_1d_type' or @data_type='INT_1D'
-        or @data_type='FLT_2D' or @data_type='INT_2D'
-        or @data_type='FLT_3D'  or @data_type='INT_3D'
-        or @data_type='FLT_4D'  or @data_type='INT_4D'
-        or @data_type='FLT_5D'or @data_type='INT_5D'
-        or @data_type='FLT_6D'or @data_type='INT_6D'">
+        or @data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D'
+        or @data_type='FLT_3D' or @data_type='INT_3D' or @data_type='CPX_3D'
+        or @data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D'
+        or @data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D'
+        or @data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D'">
         <xsl:choose>
             <xsl:when test="ancestor::field[@data_type='struct_array']">
                 strNodePath = &quot;<xsl:call-template  name="printAosRelativePath"/>&quot;;

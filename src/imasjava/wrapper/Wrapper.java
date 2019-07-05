@@ -172,8 +172,89 @@ public class Wrapper {
             LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 7, arrayOfSizes);
     
         }
-	/************************************************************************************************************************************************/
+    /************************************************************************************************************************************************/
+    static public void writeData(int ctx, String fieldPath, String timeBasePath, Complex value)throws UALException
+    {
+       if(value == LowLevel.EMPTY_COMPLEX) 
+                return;
 
+        int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
+        Complex dataArr[] = {value};
+
+         LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
+
+    }
+
+    static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DComplex array)throws UALException
+        {
+        if(array == null || array.getArray().length < 1) 
+                return;
+        Complex dataArr[] = array.getArray();
+        int arrayOfSizes[] = {  array.getDim()};
+
+        LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
+
+        }
+
+        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect2DComplex array)throws UALException
+        {
+            if(array == null || array.getArray().length < 1) 
+                return;
+            Complex dataArr[] = array.getArray();
+            int arrayOfSizes[] = {  array.getDim(0), array.getDim(1) };
+
+            LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 2, arrayOfSizes);
+    
+        }
+    
+        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect3DComplex array)throws UALException
+        {
+            if(array == null || array.getArray().length < 1) 
+                return;
+            Complex dataArr[] = array.getArray();
+            int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2)  };
+
+            LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 3, arrayOfSizes);
+    
+        }
+
+        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect4DComplex array)throws UALException
+        {
+           if(array == null || array.getArray().length < 1) 
+                return;
+
+            Complex dataArr[] = array.getArray();
+            int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3)   };
+
+            LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 4, arrayOfSizes);
+    
+        }
+
+        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect5DComplex array)throws UALException
+        {
+            if(array == null || array.getArray().length < 1) 
+                return;
+
+            Complex dataArr[] = array.getArray();
+            int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4) };
+
+            LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 5, arrayOfSizes);
+    
+        }
+
+       static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect6DComplex array)throws UALException
+        {
+            if(array == null || array.getArray().length < 1) 
+                return;
+           
+            Complex dataArr[] = array.getArray();
+            int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4), array.getDim(5) };
+
+            LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 6, arrayOfSizes);
+    
+        }
+
+    /************************************************************************************************************************************************/
     	static public void writeData(int ctx, String fieldPath, String timeBasePath, String text)throws UALException
         {
             if(text == null || text.length() < 1) 
@@ -357,7 +438,106 @@ public class Wrapper {
 	/************************************************************************************************************************************************/
 	/************************************************************************************************************************************************/
 	/************************************************************************************************************************************************/
+    static public Complex readData(int ctx, String fieldPath, String timeBasePath, Complex value)throws UALException
+        {
 
+        int retSize[]  = new int[1];
+        Complex retVal;
+        Complex dataArr[] = null;
+
+        dataArr = LowLevel.ual_read_data_complex(ctx, fieldPath, timeBasePath, 0, retSize);
+
+        
+        retVal = dataArr[0];
+
+        return retVal;
+    }
+
+
+    static public Vect1DComplex readData(int ctx, String fieldPath, String timeBasePath, Vect1DComplex array)throws UALException
+        {
+
+        int retSize[] = new int[1];
+        Complex dataArr[] = null;
+
+        dataArr = LowLevel.ual_read_data_complex(ctx, fieldPath, timeBasePath, 1, retSize);
+
+
+        array = new Vect1DComplex(dataArr);
+        return array;
+    }
+
+    static public Vect2DComplex readData(int ctx, String fieldPath, String timeBasePath, Vect2DComplex array)throws UALException
+        {
+
+        int retSize[] = new int[2];
+        Complex dataArr[] = null;
+
+        dataArr = LowLevel.ual_read_data_complex(ctx, fieldPath, timeBasePath, 2, retSize);
+
+        array = new Vect2DComplex(retSize[0], retSize[1], dataArr);
+        return array;
+    }
+
+
+  static public Vect3DComplex readData(int ctx, String fieldPath, String timeBasePath, Vect3DComplex array)throws UALException
+  {
+
+        int retSize[] = new int[3];
+        Complex dataArr[] = null;
+
+        dataArr = LowLevel.ual_read_data_complex(ctx, fieldPath, timeBasePath, 3, retSize);
+
+        array = new Vect3DComplex(retSize[0], retSize[1], retSize[2], dataArr);
+        return array;
+    }
+
+  static public Vect4DComplex readData(int ctx, String fieldPath, String timeBasePath, Vect4DComplex array)throws UALException
+        {
+
+        int retSize[] = new int[4];
+        Complex dataArr[] = null;
+
+        dataArr = LowLevel.ual_read_data_complex(ctx, fieldPath, timeBasePath, 4, retSize);
+
+
+        array = new Vect4DComplex(retSize[0], retSize[1], retSize[2], retSize[3], dataArr);
+
+        return array;
+
+    }
+
+  static public Vect5DComplex readData(int ctx, String fieldPath, String timeBasePath, Vect5DComplex array)throws UALException
+        {
+
+        int retSize[] = new int[5];
+        Complex dataArr[] = null;
+
+        dataArr = LowLevel.ual_read_data_complex(ctx, fieldPath, timeBasePath, 5, retSize);
+
+       array = new  Vect5DComplex(retSize[0], retSize[1], retSize[2], retSize[3], retSize[4], dataArr);
+
+        return array;
+
+    }
+
+    static public Vect6DComplex readData(int ctx, String fieldPath, String timeBasePath, Vect6DComplex array)throws UALException
+    {
+
+        int retSize[] = new int[6];
+        Complex dataArr[] = null;
+
+        dataArr = LowLevel.ual_read_data_complex(ctx, fieldPath, timeBasePath, 6, retSize);
+
+        array = new Vect6DComplex(retSize[0], retSize[1], retSize[2], retSize[3], retSize[4], retSize[5], dataArr);
+
+        return array;
+
+    }
+
+    /************************************************************************************************************************************************/
+    /************************************************************************************************************************************************/
+    /************************************************************************************************************************************************/
 	static public int readData(int ctx, String fieldPath, String timeBasePath, int  value) throws UALException
         {
 

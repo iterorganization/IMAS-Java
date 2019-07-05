@@ -9,6 +9,7 @@ public class LowLevel {
 
 public static final int EMPTY_INT           = -999999999;
 public static final double EMPTY_DOUBLE     = -9.0E40;
+public static final Complex EMPTY_COMPLEX = new Complex(EMPTY_DOUBLE, EMPTY_DOUBLE);
 
 
 public final static int  MAXDIM             =  7;
