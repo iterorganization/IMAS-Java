@@ -1,6 +1,8 @@
 package imasjava.wrapper;
 
 import imasjava.UALException;
+import imasjava.Complex;
+
 
 public class LowLevel {
 
@@ -243,7 +245,12 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
              int dim,
              int[] size) throws UALException;
 
-
+  public static native void ual_write_data_complex(int ctx,
+             final String fieldpath,
+             final String timebasepath,
+             Complex[] data,
+             int dim,
+             int[] size) throws UALException;
 
   public static native void ual_write_data_char(int ctx,
              final String fieldpath,
@@ -291,6 +298,13 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
             final String timebasepath,
             int dim,
             int[] size) throws UALException;
+
+ public static native Complex[] ual_read_data_complex(int ctx,
+            final String fieldpath,
+            final String timebasepath,
+            int dim,
+            int[] size) throws UALException;
+
 
  public static native byte[] ual_read_data_char(int ctx,
             final String fieldpath,
