@@ -576,23 +576,20 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
     jint *sizeArray = env->GetIntArrayElements(jSizeArray, 0);
 
     if(jDim == 0)
-    {
         cppDataArray = &tmpScalar;
-    }
-
+   
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
     status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
-
     for (int i = 0; i < jDim; i++)
        retArraySize = retArraySize * sizeArray[i];
 
-
-
     jData = convertToJavaComplexArray(env, retArraySize, cppDataArray);
 
-    delete cppDataArray;
+
+    if(jDim > 0)
+     delete cppDataArray;
 
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
