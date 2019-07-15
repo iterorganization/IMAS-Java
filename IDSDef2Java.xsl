@@ -893,11 +893,11 @@ public class <xsl:value-of select="@name"/>_IDSBase
   public void dump()
   {
     System.out.println("***** <xsl:value-of select="@name"/> *****");
-<!--    <xsl:apply-templates select = "field" mode = "DUMP">
+    <xsl:apply-templates select = "field" mode = "DUMP">
       <xsl:with-param name="level">0</xsl:with-param>
       <xsl:with-param name="idxpath"></xsl:with-param>
     </xsl:apply-templates>
-  -->  System.out.println("******************");
+  System.out.println("******************");
   }
   
   
@@ -1578,6 +1578,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
     <xsl:when test="
            @data_type='str_type' or @data_type='STR_0D'
+        or @data_type='int_type' or @data_type='INT_0D'
+        or @data_type='flt_type' or @data_type='FLT_0D' 
+        or @data_type='cpx_type' or @data_type='CPX_0D' 
         or @data_type='str_1d_type' or @data_type='STR_1D'
         or @data_type='flt_1d_type' or @data_type='FLT_1D'
         or @data_type='cpx_1d_type' or @data_type='CPX_1D'
@@ -1757,6 +1760,9 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
     <xsl:when test="
            @data_type='str_type' or @data_type='STR_0D'
+        or @data_type='int_type' or @data_type='INT_0D'
+        or @data_type='flt_type' or @data_type='FLT_0D' 
+        or @data_type='cpx_type' or @data_type='CPX_0D' 
         or @data_type='str_1d_type' or @data_type='STR_1D'
         or @data_type='flt_1d_type' or @data_type='FLT_1D'
         or @data_type='cpx_1d_type' or @data_type='CPX_1D'
