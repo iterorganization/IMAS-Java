@@ -635,7 +635,7 @@ public class Wrapper {
 
 		for(int i=0; i < numberOfStrings; i++)
 		{
-            byte buffer[] = Arrays.copyOfRange(dataArr, i * maxStringSize, maxStringSize);
+            byte buffer[] = Arrays.copyOfRange(dataArr, i * maxStringSize, (i + 1) * maxStringSize);
 			String str = new String(buffer);
 			strArr[i] = str; 	
 		}
