@@ -176,12 +176,12 @@
         <xsl:text>&#9;&#9;&#9;{&#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;&#9;</xsl:text><xsl:value-of select="@name"/><xsl:text>_setStatic(ids);&#10;</xsl:text> 
         <xsl:text>&#9;&#9;&#9;&#9;</xsl:text><xsl:value-of select="@name"/><xsl:text>_setDynamic(ids, j);&#10;</xsl:text> 
-        <xsl:text>&#9;&#9;&#9;imas.</xsl:text><xsl:value-of select="@name"/><xsl:text>.put(idx, occurrence, ids);&#10;</xsl:text>
+        <xsl:text>&#9;&#9;&#9;&#9;imas.</xsl:text><xsl:value-of select="@name"/><xsl:text>.put(idx, occurrence, ids);&#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;}&#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;else&#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;{&#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;&#9;</xsl:text><xsl:value-of select="@name"/><xsl:text>_setDynamic(ids, j);&#10;</xsl:text> 
-        <xsl:text>&#9;&#9;&#9;imas.</xsl:text><xsl:value-of select="@name"/><xsl:text>.putSlice(idx, occurrence, ids);&#10;</xsl:text>
+        <xsl:text>&#9;&#9;&#9;&#9;imas.</xsl:text><xsl:value-of select="@name"/><xsl:text>.putSlice(idx, occurrence, ids);&#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;}&#10;</xsl:text>
         <xsl:text>&#9;&#9;}&#10;</xsl:text>
         <xsl:text>}&#10;</xsl:text>
@@ -227,13 +227,10 @@
         <xsl:text>&#9;&#9;&#9;imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids = imas.</xsl:text><xsl:value-of select="@name"/><xsl:text>.getSlice(idx, occurrence, time, imas.CLOSEST_SAMPLE);&#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;if (j == 0)&#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;{&#10;</xsl:text>
-        <xsl:text> &#10;</xsl:text>
-        <xsl:text>&#9;&#9;&#9;// ======================== GET STATIC DATA (ONCE) =====================  &#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;&#9;</xsl:text><xsl:value-of select="@name"/><xsl:text>_getStatic(ids);&#10;</xsl:text> 
         <xsl:text>&#9;&#9;&#9;}&#10;</xsl:text>
-        <xsl:text>&#9;&#9;// ======================== GET DYNAMIC DATA (LOOP) =====================  &#10;</xsl:text>
         <xsl:text>&#9;&#9;&#9;&#9;</xsl:text><xsl:value-of select="@name"/><xsl:text>_getDynamic(ids, j);&#10;</xsl:text> 
-        <xsl:text>&#9;&#9;&#9;}&#10;</xsl:text>
+        <xsl:text>&#9;&#9;}&#10;</xsl:text>
         <!--      <xsl:text>&#9;}&#10;</xsl:text>
      --> 
         <xsl:text>&#9;&#10;</xsl:text>
