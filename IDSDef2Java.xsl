@@ -1603,7 +1603,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
             if (isIdsHomogeneous) 
             strTimeBasePath="/time";
             else
-                strTimeBasePath=&quot;<xsl:value-of select="@strTimeBasePath"/>&quot;;
+                strTimeBasePath=&quot;<xsl:value-of select="@timebasepath"/>&quot;;
             </xsl:when>
             <xsl:otherwise>
                     strTimeBasePath = "";
