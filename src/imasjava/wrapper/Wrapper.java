@@ -5,25 +5,18 @@ import imasjava.*;
 
 public class Wrapper {
 
-
-        void setArray(Vect1DInt array,int dataArr[], int dim1)
+        static public int ualBeginPulseAction(int backendID, int shot, int run, String user, String tokamak, String version) throws UALException
         {
-       /*    Vect1DInt newArray(arrayPtr, shape(dim1), duplicateData);
-            array.resize(newArray.shape());
-            array = newArray;
-       */ }
+            int pulseCtx = -1;
 
-        void setArray(Vect1DDouble array,double dataArr[], int dim1)
-        {
-    /*        Vect1DDouble array =     public Vect7DDouble(int dim1, int dim2, int dim3, int dim4, int dim5, int dim6, int dim7, double array[])(arrayPtr, shape(dim1), duplicateData);
-            array.resize(newArray.shape());
-            array = newArray;
-      */  }
-       
+            user = user.trim();
+            tokamak = tokamak.trim();
+            version = version.trim();
 
+            pulseCtx = LowLevel.ual_begin_pulse_action(backendID, shot, run, user, tokamak, version);
 
-
-     
+            return pulseCtx;
+        }
 
 
     	/************************************************************************************************************************************************/

@@ -36,6 +36,7 @@ import java.lang.reflect.*;
 import imasjava.utilities.ImasReflection;
 import imasjava.ids.*;
 import imasjava.wrapper.LowLevel;
+import imasjava.wrapper.Wrapper;
 
 public class imas {
  static {
@@ -195,7 +196,7 @@ static public int openEnv(int shot, int run, String user, String tokamak, String
     int pulseCtx;
 
     try{ 
-      pulseCtx = LowLevel.ual_begin_pulse_action(backendType, shot, run, user, tokamak, version); 
+      pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version); 
     } catch(Exception exc) {
       throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
     }
@@ -249,7 +250,7 @@ static public int createEnv(int shot, int run, String user, String tokamak, Stri
     int pulseCtx = -1;
 
     try { 
-      pulseCtx = LowLevel.ual_begin_pulse_action(backendType, shot, run, user, tokamak, version); 
+      pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version); 
     } catch(Exception exc){
       throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
     }
