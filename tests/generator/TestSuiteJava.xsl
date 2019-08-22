@@ -546,6 +546,11 @@
         <xsl:when test="@name='homogeneous_time'">
             <xsl:text>&#9;&#9;// NOT TESTED: ids.</xsl:text><xsl:value-of select="@path"/><xsl:text> = 1;&#10;</xsl:text>
         </xsl:when>
+        <xsl:when test="@path='ids_properties/version_put/data_dictionary'
+                     or @path='ids_properties/version_put/access_layer'
+                     or @path='ids_properties/version_put/access_layer_language'">
+            <xsl:text>&#9;&#9;// Provenance data are not tested;&#10;</xsl:text>
+        </xsl:when>
         <xsl:when test="@name='time' and @type='dynamic' and (@data_type='flt_1d_type' or @data_type='FLT_1D') ">
             <xsl:choose>
                 <xsl:when test="$slice and @type='dynamic' and not(ancestor::field[@data_type='struct_array' and @maxoccur='unbounded'])  ">
@@ -591,6 +596,11 @@
     <xsl:choose>
         <xsl:when test="@name='homogeneous_time'">
             <xsl:text>&#9;&#9;ids.</xsl:text><xsl:value-of select="$path"/><xsl:text> = 1;&#10;</xsl:text>
+        </xsl:when>
+        <xsl:when test="@path='ids_properties/version_put/data_dictionary'
+                     or @path='ids_properties/version_put/access_layer'
+                     or @path='ids_properties/version_put/access_layer_language'">
+             <xsl:text>&#9;&#9;// Provenance data are not tested;&#10;</xsl:text>
         </xsl:when>
         <xsl:when test="@name='time' and @type='dynamic' and (@data_type='flt_1d_type' or @data_type='FLT_1D') ">
             <xsl:choose>
