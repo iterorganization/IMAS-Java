@@ -3,6 +3,8 @@ include ../../../Makefile.common
 IDSDEF= ../../../xml/IDSDef.xml
 TESTDIR = ../testsuite
 
+# Ensure _JAVA_OPTIONS does not override/conflict with JFLAGS
+_JAVA_OPTIONS =
 JFLAGS = -g -Xmaxerrs 10 -sourcepath ./src -d ./build
 
 # Include OS-specific Makefile, if exists.

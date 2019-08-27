@@ -6,8 +6,9 @@ all sources sources_install install clean clean-src:
 	$(warning "Ignoring javainterface (IMAS_JAVA=no).")
 else
 
-_JAVA_OPTIONS = -Xmx1g
-JFLAGS = -g -Xmaxerrs 10 -sourcepath ./src -d ./build
+# Ensure _JAVA_OPTIONS does not override/conflict with JFLAGS
+_JAVA_OPTIONS =
+JFLAGS = -g -Xmaxerrs 10 -J-Xmx1g -sourcepath ./src -d ./build
 
 # Get a list of IDS from IDSDEF file
 IDSDEF = ../xml/IDSDef.xml
