@@ -18,6 +18,9 @@
 
 -->
   <xsl:param name="SYSTEM" as="xs:string" required="yes"/>
+  <xsl:param name="DD_VERSION" as="xs:string" required="yes"/>
+  <xsl:param name="AL_VERSION" as="xs:string" required="yes"/>
+
   <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
   <!-- MODE can be set to get or put in the 2 transformations for generating the subroutines, this reduced editing requirements
   it could also be done with 2 xslt operations on a single file, but this might be overkill ??
@@ -1610,7 +1613,20 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     strTimeBasePath = "";
             </xsl:otherwise>
         </xsl:choose>
-        Wrapper.writeData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
+        <xsl:choose>
+          <xsl:when test="@path='ids_properties/version_put/data_dictionary'">
+          Wrapper.writeData(ctx, strNodePath, strTimeBasePath, "<xsl:value-of select="$DD_VERSION"/>" );
+          </xsl:when>
+          <xsl:when test="@path='ids_properties/version_put/access_layer'">
+          Wrapper.writeData(ctx, strNodePath, strTimeBasePath, "<xsl:value-of select="$AL_VERSION"/>" );
+          </xsl:when>
+          <xsl:when test="@path='ids_properties/version_put/access_layer_language'">
+          Wrapper.writeData(ctx, strNodePath, strTimeBasePath, "java");
+          </xsl:when>
+          <xsl:otherwise>
+          Wrapper.writeData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
+          </xsl:otherwise>
+        </xsl:choose>
     </xsl:when>
         <xsl:otherwise>
             //Doc Put <xsl:value-of select="@path"/> : PROBLEM : UNIDENTIFIED TYPE !!! <!-- for comment only -->
