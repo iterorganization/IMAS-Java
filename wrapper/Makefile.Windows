@@ -14,12 +14,22 @@ LIBS+= $(MDSPLUS_DIR)/lib/MdsIpShr.a
 LIBS+= $(MDSPLUS_DIR)/lib/MdsShr.a
 LIBS+= -lxml2 -lws2_32 -ldl -liphlpapi
 endif
+
 ifneq ("no","$(strip $(IMAS_UDA))")
+ifeq ("fat","$(strip $(IMAS_UDA))")
+LIBS+= -L$(UDA_HOME)/lib
+LIBS+= $(UDA_HOME)/lib/libfatuda_cpp.a
+LIBS+= $(UDA_HOME)/lib/libportablexdr.a
+LIBS+= $(PostgresSQL_ROOT)/lib/libpq.a
+LIBS+= -lws2_32 -lssl -lcrypto -lxml2
+else
 LIBS+= -L$(UDA_HOME)/lib
 LIBS+= $(UDA_HOME)/lib/libuda_cpp.a
 LIBS+= $(UDA_HOME)/lib/libportablexdr.a
 LIBS+= -lws2_32 -lssl -lcrypto
 endif
+endif
+
 ifneq ("no","$(strip $(IMAS_HDF5))")
 LIBS+= -L$(HDF5_HOME)/lib
 LIBS+= $(HDF5_HOME)/lib/libhdf5.a -ldl -lz
@@ -33,7 +43,7 @@ lib/libimas-java-binding.dll: $(COMMON_OBJECTS) | ./lib
 	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(SO_NUM) -Wl,--out-implib,$@.lib $^ $(LIBS)
 lib/libimas-java-binding.dll_install: %_install:%
 	$(mkdir_p) $(packagedir)/javainterface/lib
-	cp $< $(packagedir)/javainterface/lib
+	$(CP) $< $(packagedir)/javainterface/lib
 
 # Windows static library
 lib/libimas-java-binding.lib: $(COMMON_OBJECTS) | ./lib
@@ -41,4 +51,4 @@ lib/libimas-java-binding.lib: $(COMMON_OBJECTS) | ./lib
 	ranlib $@
 lib/libimas-java-binding.lib_install: %_install:%
 	$(mkdir_p) $(packagedir)/javainterface/lib
-	cp $< $(packagedir)/javainterface/lib
+	$(CP) $< $(packagedir)/javainterface/lib
