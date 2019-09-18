@@ -3,6 +3,9 @@
 #include "ual_const.h"
 
 
+
+typedef std::complex < double > std_complex_t;
+
 static bool isErrorCritical(int errorCode)
 {  
     if (errorCode > -1)
@@ -29,7 +32,7 @@ static void raiseLowLevelException(JNIEnv *env, int errorCode)
  }
 
 
-static void raiseLowLevelException(JNIEnv *env, const char* callerName, const char* msg)
+static void raiseException(JNIEnv *env, const char* callerName, const char* msg)
 {
 
       printf("Throwing EXC");
@@ -37,6 +40,111 @@ static void raiseLowLevelException(JNIEnv *env, const char* callerName, const ch
     printf("Throwing EXC");
     env->ThrowNew(exc, msg);
  }
+
+static std_complex_t convertToCppComplex(JNIEnv * env, jobject jComplex)
+{
+    std_complex_t cppComplex;
+    jclass jComplexClass = env->FindClass("imasjava/Complex" );
+    if(jComplexClass == NULL)
+    {
+        raiseException(env, "", "No class found: imasjava.Complex");
+    } 
+    
+    jmethodID jmGetReal = env->GetMethodID(jComplexClass, "getReal","()D");
+    if(jmGetReal == NULL)
+    {
+        raiseException(env, "", "No method found: getReal() of imasjava.Complex");
+    } 
+    jdouble jdReal = env->CallDoubleMethod(jComplex, jmGetReal);
+    
+    
+    jmethodID jmGetImaginary = env->GetMethodID(jComplexClass, "getImaginary","()D");
+    if(jmGetImaginary == NULL)
+    {
+        raiseException(env, "", "No method found: getImaginary() of imasjava.Complex");
+    } 
+    jdouble jdImaginary = env->CallDoubleMethod(jComplex, jmGetImaginary);
+    
+    cppComplex = std_complex_t (jdReal, jdImaginary);
+    
+    return cppComplex;
+}
+
+
+static jobject convertToJavaComplex(JNIEnv * env, std_complex_t cppComplex)
+{
+    jclass jComplexClass = env->FindClass("imasjava/Complex" );
+    if(jComplexClass == NULL)
+    {
+        raiseException(env, "", "No class found: Complex");
+    } 
+    
+    jmethodID jmConstructor = env->GetMethodID(jComplexClass, "<init>", "(DD)V");
+    if(jmConstructor == NULL)
+    {
+        raiseException(env, "", "No constructor found for Complex");
+    } 
+    
+    jobject newObj = env->NewObject(jComplexClass, jmConstructor, cppComplex.real(), cppComplex.imag());
+    
+    
+    return newObj;
+}
+
+static std_complex_t* convertToCppComplexArray(JNIEnv * env, jobjectArray jComplexArray)
+{
+    jobject jComplex;
+    std_complex_t cppComplex;
+
+        
+    jint sizeOfArray =  env->GetArrayLength(jComplexArray);
+    
+    std_complex_t* cppComplexArray = new std_complex_t[sizeOfArray];
+    
+    for(int i = 0; i < sizeOfArray; ++i )
+    {
+        jComplex = env->GetObjectArrayElement( jComplexArray, i );
+        
+        cppComplex = convertToCppComplex(env, jComplex);
+    
+        cppComplexArray[i] = cppComplex;
+    }
+    
+    return cppComplexArray;
+}
+
+static jobjectArray convertToJavaComplexArray(JNIEnv * env, int iArraySize, std_complex_t* cppComplexArray)
+{
+    std_complex_t cppComplex;
+    
+    jclass jComplexClass = env->FindClass("imasjava/Complex" );
+    if(jComplexClass == NULL)
+    {
+        raiseException(env, "", "No class found: Complex");
+    } 
+        
+    jobjectArray javaArray;
+    
+    javaArray = env->NewObjectArray(iArraySize, jComplexClass, NULL);
+    if (javaArray == NULL) 
+    {
+        raiseException(env, "", "Create javaArray failed.");
+    }
+                     
+
+    for (int i = 0; i < iArraySize; i++) 
+    {
+        cppComplex = cppComplexArray[i];
+        jobject newObj = convertToJavaComplex(env, cppComplex);
+    
+        env->SetObjectArrayElement(javaArray, i, newObj);
+    }
+
+    
+    return javaArray;
+
+}
+
 
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -272,6 +380,46 @@ extern "C" {
     if (status < 0)
         raiseLowLevelException( env, status);
 }
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    ual_write_data_complex
+ * Signature: (ILjava/lang/String;Ljava/lang/String;[Limasjava/Complex;I[I)V
+ */
+JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jobjectArray jComplexArray, jint jDim, jintArray jSizeArray)
+{
+    int status = -1;
+
+    const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
+    const char *timeBasePath = env->GetStringUTFChars(jTimeBasePath, 0);
+    std_complex_t *cppDataArray = NULL; 
+    jint *sizeArray = NULL;
+
+    if(jComplexArray != NULL)
+        cppDataArray = convertToCppComplexArray(env, jComplexArray);
+
+    if(jSizeArray != NULL)
+        sizeArray = env->GetIntArrayElements(jSizeArray, 0);
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    env->ReleaseStringUTFChars(jFieldPath, fieldPath);
+    env->ReleaseStringUTFChars(jTimeBasePath, timeBasePath);
+
+    if(cppDataArray != NULL)
+       delete cppDataArray;
+
+    if(sizeArray != NULL)
+        env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
+
+    if (status < 0)
+        raiseLowLevelException( env, status);
+}
+
+
 /*
  * Class:     imasjava_wrapper_LowLevel
  * Method:    ual_write_data_char
@@ -348,8 +496,8 @@ extern "C" {
 
     jData = env->NewIntArray(retArraySize);
     if (jData == NULL) {
-        raiseLowLevelException( env, "Wrapper", "Out of memory error");
-     return NULL; /* out of memory error thrown */
+        raiseException( env, "Wrapper", "Out of memory error");
+        return NULL; /* out of memory error thrown */
     }
     env->SetIntArrayRegion(jData, 0, retArraySize, dataArray);
 
@@ -409,6 +557,51 @@ extern "C" {
 
     return jData;
 }
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    ual_read_data_complex
+ * Signature: (ILjava/lang/String;Ljava/lang/String;I[I)[Limasjava/Complex;
+ */
+JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1complex
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jint jDim, jintArray jSizeArray)
+{
+    int status = -1;
+    jsize retArraySize = 1;
+    jobjectArray jData = NULL;
+    const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
+    const char *timeBasePath = env->GetStringUTFChars(jTimeBasePath, 0);
+    std_complex_t *cppDataArray = NULL;
+    std_complex_t tmpScalar = 0;
+    jint *sizeArray = env->GetIntArrayElements(jSizeArray, 0);
+
+    if(jDim == 0)
+        cppDataArray = &tmpScalar;
+   
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    for (int i = 0; i < jDim; i++)
+       retArraySize = retArraySize * sizeArray[i];
+
+    jData = convertToJavaComplexArray(env, retArraySize, cppDataArray);
+
+
+    if(jDim > 0)
+     delete cppDataArray;
+
+
+    env->ReleaseStringUTFChars(jFieldPath, fieldPath);
+    env->ReleaseStringUTFChars(jTimeBasePath, timeBasePath);
+    env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
+
+    if (status < 0)
+        raiseLowLevelException( env, status);
+
+    return jData;
+}
+
 /*
  * Class:     imasjava_wrapper_LowLevel
  * Method:    ual_read_data_char
