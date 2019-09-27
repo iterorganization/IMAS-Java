@@ -3,3 +3,6 @@ lib/
 src/imasjava/ids/
 src/imasjava/imas.java
 wrapper/imasjava_wrapper_LowLevel.d
+gensources
+id_java_classes
+tests/testsuite/
