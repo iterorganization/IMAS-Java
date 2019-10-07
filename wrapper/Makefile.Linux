@@ -25,3 +25,11 @@ lib/libimas-java-binding.a:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a
 lib/libimas-java-binding.a_install: %.a_install:%-$(DD_GIT_DESCRIBE).a | $(libdir)
 	$(INSTALL_DATA) $< $(libdir)
 	$(LN_S) $(<F) $(libdir)/$(*F).a
+
+lib/libimas-java-binding.a_uninstall: %.a_uninstall
+	-rm -f $(libdir)/$(*F).a
+	-rm -f $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).a
+lib/libimas-java-binding.so_uninstall: %.so_uninstall
+	-rm -f $(libdir)/$(*F).so
+	-rm -f $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so
+	-rm -f $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so.$(SO_NUM)

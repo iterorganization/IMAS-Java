@@ -44,6 +44,7 @@ lib/libimas-java-binding.dll: $(COMMON_OBJECTS) | ./lib
 lib/libimas-java-binding.dll_install: %_install:%
 	$(mkdir_p) $(packagedir)/javainterface/lib
 	$(CP) $< $(packagedir)/javainterface/lib
+lib/libimas-java-binding.dll_uninstall:
 
 # Windows static library
 lib/libimas-java-binding.lib: $(COMMON_OBJECTS) | ./lib
@@ -52,3 +53,4 @@ lib/libimas-java-binding.lib: $(COMMON_OBJECTS) | ./lib
 lib/libimas-java-binding.lib_install: %_install:%
 	$(mkdir_p) $(packagedir)/javainterface/lib
 	$(CP) $< $(packagedir)/javainterface/lib
+lib/libimas-java-binding.lib_uninstall:

@@ -40,7 +40,7 @@ CPPSRC= imasjava_wrapper_LowLevel.cpp
 ifneq (,$(wildcard Makefile.$(SYSTEM)))
 include Makefile.$(SYSTEM)
 else
-sources_install install:
+sources_install install uninstall:
 	$(error No Makefile.$(SYSTEM) found for this system: $(UNAME_S))
 endif
 

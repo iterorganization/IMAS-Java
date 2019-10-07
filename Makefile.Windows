@@ -4,6 +4,7 @@ JAVAC = $(JAVA_HOME)/bin/javac
 JAR = $(JAVA_HOME)/bin/jar
 
 sources_install: $(GENSOURCES) id_java_sources_install
+sources_uninstall: id_java_sources_uninstall
 
 install: all id_java_install
 	$(mkdir_p) $(packagedir)/javainterface/lib
@@ -13,3 +14,5 @@ install: all id_java_install
 		$(CP) $$OBJECT $(packagedir)/javainterface/lib; \
 	done
 	$(CP) ./lib/imas.jar $(packagedir)/javainterface/jar
+
+uninstall: id_java_uninstall
