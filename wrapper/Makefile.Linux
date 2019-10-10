@@ -7,7 +7,7 @@ all_:all
 
 # Dynamic library
 lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so.$(SO_NUM): $(COMMON_OBJECTS) | ./lib
-	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,-soname,$@ $^ $(LIBS)
+	$(CXX) -g -o $@ -Wl,-z,defs -shared -Wl,$(SONAME_OPT),$@ $^ $(LIBS)
 lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so: %:%.$(SO_NUM)
 	$(LN_S) $(<F) $@
 lib/libimas-java-binding.so:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so

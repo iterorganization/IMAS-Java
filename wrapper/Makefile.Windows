@@ -40,7 +40,7 @@ all_:all
 
 # Windows dynamic library
 lib/libimas-java-binding.dll: $(COMMON_OBJECTS) | ./lib
-	$(CXX) -g -o $@ -shared -Wl,-soname,$@.$(SO_NUM) -Wl,--out-implib,$@.lib $^ $(LIBS)
+	$(CXX) -g -o $@ -shared -Wl,$(SONAME_OPT),$@.$(SO_NUM) -Wl,--out-implib,$@.lib $^ $(LIBS)
 lib/libimas-java-binding.dll_install: %_install:%
 	$(mkdir_p) $(packagedir)/javainterface/lib
 	$(CP) $< $(packagedir)/javainterface/lib

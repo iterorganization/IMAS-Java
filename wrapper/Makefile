@@ -25,7 +25,11 @@ CFLAGS=-std=c99 -Wall -fPIC -O0 -shared-intel ${DBGFLAGS}
 CXXFLAGS=-std=c++11 -pedantic -Wall -fPIC -O0 -fno-inline-functions -shared-intel ${DBGFLAGS}
 LDF=ifort -lc -lstdc++
 else
+ifneq ($(SYSTEM),MacOS)
 CXX=g++
+else
+CXX=clang++
+endif
 CFLAGS=-std=c11 -pedantic -Wall -fPIC -O0 ${DBGFLAGS}
 CXXFLAGS=-std=c++11 -pedantic -Wall -fPIC -O0  -fno-inline-functions ${DBGFLAGS}
 LDF=gfortran -lc -lstdc++
