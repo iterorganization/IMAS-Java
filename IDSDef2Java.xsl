@@ -851,11 +851,12 @@ public class <xsl:value-of select="@name"/>_IDSBase
         </xsl:when>
 
         <xsl:otherwise>
+        int listSize = -1;
         imas.<xsl:value-of select="@name"/> outIDS = new imas.<xsl:value-of select="@name"/> ();
 
         //Sanity check - array size 
         if(idsArray.length &lt; 1)
-              throw new UALException("IDS '<xsl:value-of select="@name"/>': appendIDSes cannot append an empty array!");
+              throw new UALException("IDS '<xsl:value-of select="@name"/>': appendIDSes called with an empty array of IDSes!");
 
         //homogeneous time check
         for(imas.<xsl:value-of select="@name"/> inIDS : idsArray)
@@ -878,15 +879,19 @@ public class <xsl:value-of select="@name"/>_IDSBase
         for(imas.<xsl:value-of select="$idsName"/> inIDS : idsArray)
         {
             <xsl:value-of select="$fieldName"/>Array = inIDS.<xsl:value-of select="translate(@path,'/','.')"/>;
-            Collections.addAll(<xsl:value-of select="$fieldName"/>List, <xsl:value-of select="$fieldName"/>Array); 
+            if(<xsl:value-of select="$fieldName"/>Array != null)
+                Collections.addAll(<xsl:value-of select="$fieldName"/>List, <xsl:value-of select="$fieldName"/>Array); 
         }
 
-        <xsl:value-of select="$fieldName"/>Array =  new <xsl:value-of select="$className"/>[<xsl:value-of select="$fieldName"/>List.size()] ;
-        outIDS.<xsl:value-of select="translate(@path,'/','.')"/> = <xsl:value-of select="$fieldName"/>List.toArray(<xsl:value-of select="$fieldName"/>Array);
+        listSize = <xsl:value-of select="$fieldName"/>List.size();
+        if(listSize > 0)
+        {
+            <xsl:value-of select="$fieldName"/>Array =  new <xsl:value-of select="$className"/>[listSize] ;
+            outIDS.<xsl:value-of select="translate(@path,'/','.')"/> = <xsl:value-of select="$fieldName"/>List.toArray(<xsl:value-of select="$fieldName"/>Array);
+        }
         </xsl:for-each>
 
         return outIDS;
-
         </xsl:otherwise>
     </xsl:choose>
     }
