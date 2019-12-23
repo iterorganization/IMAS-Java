@@ -1,5 +1,6 @@
 package imasjava;
-public class Vect1DDouble
+
+public class Vect1DDouble extends SummaryString
 {
     double array[] = null;
     
@@ -7,6 +8,7 @@ public class Vect1DDouble
     {
         array = new double[dim];
     }
+
     public Vect1DDouble(double array[])
     {
         this.array = array;
@@ -24,18 +26,33 @@ public class Vect1DDouble
         this.array = array;
     }
 
-    public String toString()
-    {
-        String retStr = "[";
+    // negative number mens that we don't limit the size
+    // of the string
+    public String toSummaryString(int length) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("[");
+        loop:
         for(int i = 0; i < array.length; i++)
         {
             if(i < array.length - 1)
-                retStr += ""+array[i]+",";
+                if(addString(sb, ""+array[i]+",", length))
+                  break loop;
             else
-                retStr += ""+array[i];
+                sb.append(array[i]);
         }
-        retStr += "]";
-        return retStr;
+        sb.append("]");
+        return sb.toString();
+
+    }
+
+    public String toSummaryString() {
+      return toSummaryString(-1);
+    }
+
+    public String toString()
+    {
+      return toSummaryString();
     }
 }
 
