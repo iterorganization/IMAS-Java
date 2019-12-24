@@ -2,20 +2,21 @@ package imasjava;
 
 public abstract class SummaryString {
 
-
-  protected boolean addString(StringBuilder sb, String s, int limit) {
+  // we have to have this "ugly" method here :(
+  // Ideally, we would have our own StringBuilder with size limit, but we can't make
+  // it an easy way - StringBuilder is final and we can't extend it.
+  //
+  protected void addString(StringBuilder sb, String s, int limit) throws StringLimitException {
     sb.append(s);
     if(limit > 0 && sb.length() > limit) {
-      return true;
+      throw new StringLimitException();
     }
-    return false;
   }
 
   // Returns String that represents the object
   // The length of the String is truncated to the
   // size equal length
   public abstract String toSummaryString(int length);
-  public abstract String toSummaryString();
 
 }
 

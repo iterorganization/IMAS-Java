@@ -29,30 +29,42 @@ public class Vect1DDouble extends SummaryString
     // negative number mens that we don't limit the size
     // of the string
     public String toSummaryString(int length) {
-        StringBuilder sb = new StringBuilder();
         
-        sb.append("[");
-        loop:
-        for(int i = 0; i < array.length; i++)
-        {
+        if(length < 0) {
+          return toString();
+        } 
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+          addString(sb, "[", length);
+          for(int i = 0; i < array.length; i++)
+          {
             if(i < array.length - 1)
-                if(addString(sb, ""+array[i]+",", length))
-                  break loop;
+              addString(sb, ""+array[i]+",", length);
             else
-                sb.append(array[i]);
+              addString(sb, String.valueOf(array[i]), length);
+          }
+          addString(sb, "]", length);
+        } catch(StringLimitException ex) {
+
         }
-        sb.append("]");
         return sb.toString();
 
     }
 
-    public String toSummaryString() {
-      return toSummaryString(-1);
-    }
-
     public String toString()
     {
-      return toSummaryString();
+        String retStr = "[";
+        for(int i = 0; i < array.length; i++)
+        {
+            if(i < array.length - 1)
+                retStr += ""+array[i]+",";
+            else
+                retStr += ""+array[i];
+        }
+        retStr += "]";
+        return retStr;
     }
 }
 

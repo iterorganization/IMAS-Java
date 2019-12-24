@@ -1,6 +1,6 @@
 package imasjava;
 
-public class Vect7DDouble
+public class Vect7DDouble extends SummaryString
 {
     int dim1;
     int dim2;
@@ -82,6 +82,57 @@ public class Vect7DDouble
         this.dim7 = dim7;
     }
 
+    public String toSummaryString(int length)
+    {
+      if(length < 0) {
+        return toString();
+      }
+
+      StringBuilder sb = new StringBuilder();
+
+      try {
+        addString(sb, "[", length);
+        for(int i = 0; i < dim1; i++)
+        {
+            addString(sb, "[", length);
+            for(int j = 0; j < dim2; j++)
+            {
+                addString(sb, "[", length);
+                for(int k = 0; k < dim3; k++)
+                {
+                    addString(sb, "[", length);
+                    for(int h = 0; h < dim4; h++)
+                    {
+                        addString(sb, "[", length);
+                        for(int l = 0; l < dim5; l++)
+                        {
+                            addString(sb, "[", length);
+                            for(int m = 0; m < dim6; m++)
+                            {
+                              	for(int n = 0; n < dim7; m++)
+                              	{
+                                     if(n < dim7 - 1)
+                                    	addString(sb, ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6]+",", length);
+                                     else
+                                    	addString(sb, ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6], length);
+				}
+                            }
+                        }
+                    }
+                    addString(sb, "]", length);
+               }
+               addString(sb, "]", length);
+            }
+            addString(sb, "]", length);
+       }
+       addString(sb, "]", length);
+      } catch(StringLimitException ex) { 
+      }
+
+      return sb.toString();
+    }
 
     public String toString()
     {

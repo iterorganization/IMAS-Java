@@ -1,6 +1,6 @@
 package imasjava;
 
-public class Vect3DDouble
+public class Vect3DDouble extends SummaryString
 {
     int dim1;
     int dim2;
@@ -56,6 +56,40 @@ public class Vect3DDouble
         this.dim3 = dim3;
     }
 
+    public String toSummaryString(int length)
+    {
+      if(length < 0) {
+        return toString(); 
+      }
+
+      StringBuilder sb = new StringBuilder();
+
+      try {
+
+        addString(sb, "[", length);
+        for(int i = 0; i < dim1; i++)
+        {
+            addString(sb, "[", length);
+            for(int j = 0; j < dim2; j++)
+            {
+                addString(sb, "[", length);
+                for(int k = 0; k < dim3; k++)
+                {
+                    if(k < dim3 - 1)
+                        addString(sb, ""+array[i+j*dim1+k*dim1*dim2]+",", length);
+                    else
+                        addString(sb, ""+array[i+j*dim1+k*dim1*dim2], length);
+                }
+                addString(sb, "]", length);
+            }
+            addString(sb, "]", length);
+       }
+       addString(sb, "]", length);
+      } catch(StringLimitException ex) {
+      }
+      return sb.toString();
+    }
+    
     public String toString()
     {
         String retStr = "[";

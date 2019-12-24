@@ -1,5 +1,5 @@
 package imasjava;
-public class Vect2DDouble
+public class Vect2DDouble extends SummaryString
 {
     int dim1;
     int dim2;
@@ -51,9 +51,38 @@ public class Vect2DDouble
         this.dim2 = dim2;
     }
 
+    public String toSummaryString(int length) {
+        if(length < 0) {
+          return toString();
+        } 
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+          addString(sb, "[", length);
+          int i = 0;
+          int j = 0;
+          for(i = 0; i < dim1 && i < 5; i++)
+          {
+              addString(sb, "[", length);
+              for(j = 0; j < dim2 && i < 5; j++)
+              {
+                  if(j < dim2 - 1)
+                      addString(sb, ""+array[i+j*dim1]+",", length);
+                  else
+                      addString(sb, ""+array[i+j*dim1], length);
+              }
+              addString(sb, "]", length);
+         }
+         addString(sb, "]", length);
+       } catch(StringLimitException ex) {
+       }
+       return sb.toString();
+    }
+
     public String toString()
     {
-        String retStr = "[";
+      String retStr = "[";
         for(int i = 0; i < dim1; i++)
         {
             retStr += "[";
