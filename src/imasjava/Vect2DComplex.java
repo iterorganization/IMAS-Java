@@ -45,28 +45,83 @@ public class Vect2DComplex extends VectComplex
     {
     	array[i+j*dim1] = element;
     }
+
+    public String toSummaryString(int length) {
+        if(length < 0) {
+          return toString();
+        } 
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+          addString(sb, "[", length);
+          for(int i = 0; i < dim1 && i < 5; i++)
+          {
+              addString(sb, "[", length);
+              for(int j = 0; j < dim2 && i < 5; j++)
+              {
+                  if(j < dim2 - 1)
+                      addString(sb, ""+array[i+j*dim1]+",", length);
+                  else
+                      addString(sb, ""+array[i+j*dim1], length);
+              }
+              addString(sb, "]", length);
+         }
+         addString(sb, "]", length);
+       } catch(StringLimitException ex) {
+       }
+       return sb.toString();
+    }
+
+    public String toSummaryStringElements(int elements)
+    {
+
+      String retStr = "[";
+      int i = 0;
+      for(i = 0; i < dim1 && i < elements; i++)
+      {
+        retStr += "[";
+        int j = 0;
+        for(j = 0; j < dim2 && j < elements; j++)
+        {
+          if(j < dim2 - 1)
+            retStr += ""+array[i + j*dim1]+",";
+          else
+            retStr += ""+array[i+j*dim1];
+        }
+        if( j < dim2 ) {
+          retStr += "...";
+        }
+        retStr += "]";
+      }
+      if( i < dim1 ) {
+        retStr += "...";
+      }
+      retStr += "]";
+      return retStr;
+    }
+
     public String toString()
     {
-	if (getSize() > maxPrintSize) {
-	    return toSummary();
-	}
-	else {   
-	    String retStr = "[";
-	    for(int i = 0; i < dim1; i++)
-		{
-		    retStr += "[";
-		    for(int j = 0; j < dim2; j++)
-			{
-			    if(j < dim2 - 1)
-				retStr += ""+array[i + j*dim1].toString()+",";
-			    else
-				retStr += ""+array[i + j*dim1].toString();
-			}
-		    retStr += "]";
-		}
-	    retStr += "]";
-	    return retStr;
-	}
+	    if (getSize() > maxPrintSize) {
+	      return toSummary();
+	    } else {   
+	      String retStr = "[";
+	      for(int i = 0; i < dim1; i++)
+		    {
+		      retStr += "[";
+		      for(int j = 0; j < dim2; j++)
+			    {
+			      if(j < dim2 - 1)
+				      retStr += ""+array[i + j*dim1].toString()+",";
+			      else
+				      retStr += ""+array[i + j*dim1].toString();
+			    }
+		      retStr += "]";
+		    }
+	      retStr += "]";
+	      return retStr;
+	    }
     }
 }
 

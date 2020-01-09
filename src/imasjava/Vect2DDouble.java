@@ -1,4 +1,5 @@
 package imasjava;
+
 public class Vect2DDouble extends SummaryString
 {
     int dim1;
@@ -60,12 +61,10 @@ public class Vect2DDouble extends SummaryString
 
         try {
           addString(sb, "[", length);
-          int i = 0;
-          int j = 0;
-          for(i = 0; i < dim1 && i < 5; i++)
+          for(int i = 0; i < dim1 && i < 5; i++)
           {
               addString(sb, "[", length);
-              for(j = 0; j < dim2 && i < 5; j++)
+              for(int j = 0; j < dim2 && i < 5; j++)
               {
                   if(j < dim2 - 1)
                       addString(sb, ""+array[i+j*dim1]+",", length);
@@ -80,23 +79,51 @@ public class Vect2DDouble extends SummaryString
        return sb.toString();
     }
 
+    public String toSummaryStringElements(int elements)
+    {
+
+      String retStr = "[";
+      int i = 0;
+      for(i = 0; i < dim1 && i < elements; i++)
+      {
+        retStr += "[";
+        int j = 0;
+        for(j = 0; j < dim2 && j < elements; j++)
+        {
+          if(j < dim2 - 1)
+            retStr += ""+array[i + j*dim1]+",";
+          else
+            retStr += ""+array[i+j*dim1];
+        }
+        if( j < dim2 ) {
+          retStr += "...";
+        }
+        retStr += "]";
+      }
+      if( i < dim1 ) {
+        retStr += "...";
+      }
+      retStr += "]";
+      return retStr;
+    }
+
     public String toString()
     {
       String retStr = "[";
-        for(int i = 0; i < dim1; i++)
+      for(int i = 0; i < dim1; i++)
+      {
+        retStr += "[";
+        for(int j = 0; j < dim2; j++)
         {
-            retStr += "[";
-            for(int j = 0; j < dim2; j++)
-            {
-                if(j < dim2 - 1)
-                    retStr += ""+array[i + j*dim1]+",";
-                else
-                    retStr += ""+array[i+j*dim1];
-            }
-            retStr += "]";
-       }
-       retStr += "]";
-       return retStr;
+          if(j < dim2 - 1)
+            retStr += ""+array[i + j*dim1]+",";
+          else
+            retStr += ""+array[i+j*dim1];
+        }
+        retStr += "]";
+      }
+      retStr += "]";
+      return retStr;
     }
 }
 

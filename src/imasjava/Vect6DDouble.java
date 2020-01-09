@@ -109,7 +109,9 @@ public class Vect6DDouble extends SummaryString
                                 else
                                     addString(sb, ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4+m*dim1*dim2*dim3*dim4*dim5], length);
                             }
+                            addString(sb, "]", length);
                         }
+                        addString(sb, "]", length);
                     }
                     addString(sb, "]", length);
                }
@@ -123,6 +125,67 @@ public class Vect6DDouble extends SummaryString
       return sb.toString();
     }
 
+    public String toSummaryStringElements(int elements)
+    {
+      String retStr = "[";
+      int i = 0;
+      for(i = 0; i < dim1 && i < elements; i++)
+      {
+        retStr += "[";
+        int j = 0;
+        for(j = 0; j < dim2 && j < elements; j++)
+        {
+          retStr += "[";
+          int k = 0;
+          for(k = 0; k < dim3 && k < elements; k++)
+          {
+            retStr += "[";
+            int h = 0;
+            for(h = 0; h < dim4 && h < elements; h++)
+            {
+              retStr += "[";
+              int l = 0;
+              for(l = 0; l < dim5 && l < elements; l++)
+              {
+                retStr += "[";
+                int m = 0;
+                for(m = 0; m < dim6 && m < elements; m++)
+                {
+                  if(m < dim6 - 1)
+                    retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4+m*dim1*dim2*dim3*dim4*dim5]+",";
+                  else
+                    retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4+m*dim1*dim2*dim3*dim4*dim5];
+                }
+                if(m < dim6) {
+                  retStr += "...";
+                }
+              }
+              if(l < dim5) {
+                retStr += "...";
+              }
+            }
+            if(h < dim4) {
+              retStr += "...";
+            }
+            retStr += "]";
+          }
+          if(k < dim3) {
+            retStr += "...";
+          }
+          retStr += "]";
+        }
+        if(j < dim2) {
+          retStr += "...";
+        }
+        retStr += "]";
+      }
+      if(i < dim1) {
+        retStr += "...";
+      }
+      retStr += "]";
+      return retStr;
+    }    
+    
     public String toString()
     {
         String retStr = "[";

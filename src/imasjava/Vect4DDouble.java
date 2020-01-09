@@ -98,6 +98,53 @@ public class Vect4DDouble extends SummaryString
       return sb.toString();
     }
 
+    public String toSummaryStringElements(int elements)
+    {
+
+      String retStr = "[";
+      int i = 0;
+      for(i = 0; i < dim1 && i < elements; i++)
+      {
+        retStr += "[";
+        int j = 0;
+        for(j = 0; j < dim2 && j < elements; j++)
+        {
+          retStr += "[";
+          int k = 0;
+          for(k = 0; k < dim3 && k < elements; k++)
+          {
+            retStr += "[";
+            int h = 0;
+            for(h = 0; h < dim4 && h < elements; h++)
+            {
+              if(h < dim4 - 1)
+                retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3]+",";
+              else
+                retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3];
+            }
+            if(h < dim4) {
+              retStr += "...";
+            }
+            retStr += "]";
+          }
+          if(k < dim3) {
+            retStr += "...";
+          }
+          retStr += "]";
+        }
+        if(j < dim2) {
+          retStr += "...";
+        }
+        retStr += "]";
+      }
+      if( i < dim1 ) {
+        retStr += "...";
+      }
+      retStr += "]";
+      return retStr;
+
+    }
+
     public String toString()
     {
         String retStr = "[";

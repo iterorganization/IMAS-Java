@@ -48,32 +48,103 @@ public class Vect3DComplex extends VectComplex
     {
     	array[i+j*dim1+k*dim1*dim2] = element;
     }
+
+    public String toSummaryString(int length)
+    {
+      if(length < 0) {
+        return toString(); 
+      }
+
+      StringBuilder sb = new StringBuilder();
+
+      try {
+
+        addString(sb, "[", length);
+        for(int i = 0; i < dim1; i++)
+        {
+            addString(sb, "[", length);
+            for(int j = 0; j < dim2; j++)
+            {
+                addString(sb, "[", length);
+                for(int k = 0; k < dim3; k++)
+                {
+                    if(k < dim3 - 1)
+                        addString(sb, ""+array[i+j*dim1+k*dim1*dim2]+",", length);
+                    else
+                        addString(sb, ""+array[i+j*dim1+k*dim1*dim2], length);
+                }
+                addString(sb, "]", length);
+            }
+            addString(sb, "]", length);
+       }
+       addString(sb, "]", length);
+      } catch(StringLimitException ex) {
+      }
+      return sb.toString();
+    }
+    
+    public String toSummaryStringElements(int elements)
+    {
+
+      String retStr = "[";
+      int i = 0;
+      for(i = 0; i < dim1 && i < elements; i++)
+      {
+        retStr += "[";
+        int j = 0;
+        for(j = 0; j < dim2 && j < elements; j++)
+        {
+          retStr += "[";
+          int k = 0;
+          for(k = 0; k < dim3 && k < elements; k++)
+          {
+            if(k < dim3 - 1)
+              retStr += ""+array[i+j*dim1+k*dim1*dim2]+",";
+            else
+              retStr += ""+array[i+j*dim1+k*dim1*dim2];
+          }
+          if( k < dim3 ) {
+            retStr += "...";
+          }
+          retStr += "]";
+        }
+        if( j < dim2 ) {
+          retStr += "...";
+        }
+        retStr += "]";
+      }
+      if( i < dim1 ) {
+        retStr += "...";
+      }
+      retStr += "]";
+      return retStr;
+    }
+
     public String toString()
     {
-	if (getSize() > maxPrintSize) {
-	    return toSummary();
-	}
-	else {
-	    String retStr = "[";
-	    for(int i = 0; i < dim1; i++)
-		{
-		    retStr += "[";
-		    for(int j = 0; j < dim2; j++)
-			{
-			    retStr += "[";
-			    for(int k = 0; k < dim3; k++)
-				{
-				    if(k < dim3 - 1)
-					retStr += ""+array[i+j*dim1+k*dim1*dim2]+",";
-				    else
-					retStr += ""+array[i+j*dim1+k*dim1*dim2];
-				}
-			    retStr += "]";
-			}
-		    retStr += "]";
-		}
-	    retStr += "]";
-	    return retStr;
-	}
+      if (getSize() > maxPrintSize) {
+        return toSummary();
+      } else {
+        String retStr = "[";
+        for(int i = 0; i < dim1; i++)
+        {
+          retStr += "[";
+          for(int j = 0; j < dim2; j++)
+          {
+            retStr += "[";
+            for(int k = 0; k < dim3; k++)
+            {
+              if(k < dim3 - 1)
+                retStr += ""+array[i+j*dim1+k*dim1*dim2]+",";
+              else
+                retStr += ""+array[i+j*dim1+k*dim1*dim2];
+            }
+            retStr += "]";
+          }
+          retStr += "]";
+        }
+        retStr += "]";
+        return retStr;
+      }
     }
 }

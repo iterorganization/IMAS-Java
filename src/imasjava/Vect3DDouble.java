@@ -90,6 +90,43 @@ public class Vect3DDouble extends SummaryString
       return sb.toString();
     }
     
+    public String toSummaryStringElements(int elements)
+    {
+
+      String retStr = "[";
+      int i = 0;
+      for(i = 0; i < dim1 && i < elements; i++)
+      {
+        retStr += "[";
+        int j = 0;
+        for(j = 0; j < dim2 && j < elements; j++)
+        {
+          retStr += "[";
+          int k = 0;
+          for(k = 0; k < dim3 && k < elements; k++)
+          {
+            if(k < dim3 - 1)
+              retStr += ""+array[i+j*dim1+k*dim1*dim2]+",";
+            else
+              retStr += ""+array[i+j*dim1+k*dim1*dim2];
+          }
+          if( k < dim3 ) {
+            retStr += "...";
+          }
+          retStr += "]";
+        }
+        if( j < dim2 ) {
+          retStr += "...";
+        }
+        retStr += "]";
+      }
+      if( i < dim1 ) {
+        retStr += "...";
+      }
+      retStr += "]";
+      return retStr;
+    }
+
     public String toString()
     {
         String retStr = "[";

@@ -26,7 +26,7 @@ public class Vect1DDouble extends SummaryString
         this.array = array;
     }
 
-    // negative number mens that we don't limit the size
+    // negative number means that we don't limit the size
     // of the string
     public String toSummaryString(int length) {
         
@@ -51,6 +51,24 @@ public class Vect1DDouble extends SummaryString
         }
         return sb.toString();
 
+    }
+
+    public String toSummaryStringElements(int elements)
+    {
+        String retStr = "[";
+        int i = 0;
+        for(i = 0; i < array.length && i < elements; i++)
+        {
+          if(i < array.length - 1)
+            retStr += ""+array[i]+",";
+          else
+            retStr += ""+array[i];
+        }
+        if( i < array.length) {
+          retStr += "...";
+        }
+        retStr += "]";
+        return retStr;
     }
 
     public String toString()

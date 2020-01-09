@@ -17,6 +17,8 @@ public abstract class SummaryString {
   // The length of the String is truncated to the
   // size equal length
   public abstract String toSummaryString(int length);
+  
+  public abstract String toSummaryStringElements(int elements);
 
 }
 

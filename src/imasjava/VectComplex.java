@@ -2,28 +2,24 @@ package imasjava;
 import java.util.Arrays;
 
 
-public abstract class VectComplex implements VectGeneric {
+public abstract class VectComplex extends SummaryString implements VectGeneric {
 
     Complex array[];
 
     public int getSize() {
-	return array.length;
+	    return array.length;
     }
     public Complex[] getArray() {
-	return array;
+	    return array;
     }
     public String arrayToString() {
-	return Arrays.toString(array);
+	    return Arrays.toString(array);
     }
 
     public abstract int[] getDims();
     public abstract String toString();
 
-    public String toSummary()
-    {
-	String retStr = "[dim="+Arrays.toString(getDims())+", elt=";
-	for (int i=0; i<10; i++)
-	    retStr += array[i]+", ";
-	return retStr+", ...]";
+    public String toSummary() {
+      return toSummaryString(100);
     }
 }
