@@ -88,50 +88,52 @@ public class Vect7DDouble extends SummaryString
         return toString();
       }
 
-      StringBuilder sb = new StringBuilder();
+      LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(length);
 
       try {
-        addString(sb, "[", length);
+        sb.append( "[" );
         for(int i = 0; i < dim1; i++)
         {
-            addString(sb, "[", length);
+            sb.append( "[" );
             for(int j = 0; j < dim2; j++)
             {
-                addString(sb, "[", length);
+                sb.append( "[" );
                 for(int k = 0; k < dim3; k++)
                 {
-                    addString(sb, "[", length);
+                    sb.append( "[" );
                     for(int h = 0; h < dim4; h++)
                     {
-                        addString(sb, "[", length);
+                        sb.append( "[" );
                         for(int l = 0; l < dim5; l++)
                         {
-                            addString(sb, "[", length);
+                            sb.append( "[" );
                             for(int m = 0; m < dim6; m++)
                             {
                               	for(int n = 0; n < dim7; m++)
                               	{
                                      if(n < dim7 - 1)
-                                    	addString(sb, ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
-				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6]+",", length);
+                                    	sb.append( ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6]+"," );
                                      else
-                                    	addString(sb, ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
-				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6], length);
+                                    	sb.append( ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6] );
 				                        }
-                                addString(sb, "]", length);
+                                sb.append( "]" );
                             }
-                            addString(sb, "]", length);
+                            sb.append( "]" );
                         }
-                        addString(sb, "]", length);
+                        sb.append( "]" );
                     }
-                    addString(sb, "]", length);
+                    sb.append( "]" );
                }
-               addString(sb, "]", length);
+               sb.append( "]" );
             }
-            addString(sb, "]", length);
+            sb.append( "]" );
        }
-       addString(sb, "]", length);
+       sb.append( "]" );
       } catch(StringLimitException ex) { 
+        // This might happen, eventually
+        // but it's not an error       
       }
 
       return sb.toString();

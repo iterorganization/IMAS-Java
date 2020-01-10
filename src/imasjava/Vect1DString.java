@@ -30,20 +30,22 @@ public class Vect1DString extends SummaryString
           return toString();
         } 
 
-        StringBuilder sb = new StringBuilder();
+        LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(length);
 
         try {
-          addString(sb, "[", length);
+          sb.append( "[" );
           for(int i = 0; i < array.length; i++)
           {
             if(i < array.length - 1)
-              addString(sb, ""+array[i]+",", length);
+              sb.append( ""+array[i]+"," );
             else
-              addString(sb, String.valueOf(array[i]), length);
+              sb.append( String.valueOf(array[i]) );
           }
-          addString(sb, "]", length);
+          sb.append( "]" );
         } catch(StringLimitException ex) {
-
+          // This might happen, eventually
+          // but it's not an error
+ 
         }
         return sb.toString();
 

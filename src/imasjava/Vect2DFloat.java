@@ -48,24 +48,26 @@ public class Vect2DFloat extends SummaryString
           return toString();
         } 
 
-        StringBuilder sb = new StringBuilder();
+        LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(length);
 
         try {
-          addString(sb, "[", length);
+          sb.append( "[" );
           for(int i = 0; i < dim1 && i < 5; i++)
           {
-              addString(sb, "[", length);
+              sb.append( "[" );
               for(int j = 0; j < dim2 && i < 5; j++)
               {
                   if(j < dim2 - 1)
-                      addString(sb, ""+array[i+j*dim1]+",", length);
+                      sb.append( ""+array[i+j*dim1]+"," );
                   else
-                      addString(sb, ""+array[i+j*dim1], length);
+                      sb.append( ""+array[i+j*dim1] );
               }
-              addString(sb, "]", length);
+              sb.append( "]" );
          }
-         addString(sb, "]", length);
+         sb.append( "]" );
        } catch(StringLimitException ex) {
+         // This might happen, eventually
+         // but it's not an error       
        }
        return sb.toString();
     }

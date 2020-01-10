@@ -1,4 +1,6 @@
 build/
+junit_jar/
+junit_target/
 lib/
 src/imasjava/ids/
 src/imasjava/imas.java
