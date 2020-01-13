@@ -48,7 +48,7 @@ public class Vect2DFloat extends SummaryString
           return toString();
         } 
 
-        LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(length);
+        LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(length);
 
         try {
           sb.append( "[" );

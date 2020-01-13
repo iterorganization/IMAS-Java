@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class LimittedSizeStringBuilderTest {
+class LimitedSizeStringBuilderTest {
 
   @Test
   @DisplayName("Unlimitted String with a, b, c values appended")
   void addABCToUnlimittedSizeStringBuilder() {
-    LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(); 
+    LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(); 
     try {
       sb.append("a").append("b").append("c");
     } catch(StringLimitException ex) {
@@ -26,8 +26,8 @@ class LimittedSizeStringBuilderTest {
 
   @Test
   @DisplayName("Adding String to StringBuilder with size 2")
-  void addABCToLimittedSizeStringBuilder() {
-    LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(2);
+  void addABCToLimitedSizeStringBuilder() {
+    LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(2);
     assertThrows(StringLimitException.class, () -> {
       sb.append("a").append("b").append("c");
     });
@@ -36,7 +36,7 @@ class LimittedSizeStringBuilderTest {
   @Test
   @DisplayName("Adding String to StringBuilder that reached maximum - should throw exception twice")
   void addABCToMaximumLengthStringBuilder() {
-    LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(2);
+    LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(2);
     
     assertThrows(StringLimitException.class, () -> {
       sb.append("abc");
@@ -51,8 +51,8 @@ class LimittedSizeStringBuilderTest {
 
   @Test
   @DisplayName("Adding three one letter String to StringBuilder with size 2 - should throw Exception")
-  void addABCToLimittedSizeStringBuilderCatchException() {
-    LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(2);
+  void addABCToLimitedSizeStringBuilderCatchException() {
+    LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(2);
 
     assertThrows(StringLimitException.class, () -> {
       sb.append("a").append("b").append("c");
@@ -64,7 +64,7 @@ class LimittedSizeStringBuilderTest {
   @Test
   @DisplayName("Unlimitted String with unlimitted number of strings appended - should throw exception")
   void addUnlimittedNumberOfStringsToUnlimittedSizeStringBuilder() {
-    LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(); 
+    LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(); 
     assertThrows(java.lang.OutOfMemoryError.class, () -> {
       while(true) {
         try {

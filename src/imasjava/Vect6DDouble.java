@@ -82,7 +82,7 @@ public class Vect6DDouble extends SummaryString
         return toString();
       }
 
-      LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(length);
+      LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(length);
 
       try {
 

@@ -61,7 +61,7 @@ public class Vect5DComplex extends VectComplex
         return toString();
       }
 
-      LimittedSizeStringBuilder sb = new LimittedSizeStringBuilder(length);
+      LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(length);
 
       try {
 

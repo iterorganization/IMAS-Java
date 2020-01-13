@@ -15,32 +15,32 @@ package imasjava;
  *
  * I want to have (in resulting String): "1.123456" instead of "1." (in case of max size equal 2)
  * 
- * If I declare variable of LimittedSizeStringBuilder(0), it means that first String appendend to this
+ * If I declare variable of LimitedSizeStringBuilder(0), it means that first String appendend to this
  * StringBuilder will trigger exception. This way you can limit String to just one element regardles
  * of it's size.
  *
  */
 
-public class LimittedSizeStringBuilder {
+public class LimitedSizeStringBuilder {
 
   int           limit = -1;
   StringBuilder sb    = null;
 
 
   /**
-   * Creates LimittedSizeStringBuilder without size limit 
+   * Creates LimitedSizeStringBuilder without size limit 
    */
-  public LimittedSizeStringBuilder() {
+  public LimitedSizeStringBuilder() {
     this.sb    = new StringBuilder();
   }
 
   /**
-   * Creates LimittedSizeStringBuilder with size limit 
+   * Creates LimitedSizeStringBuilder with size limit 
    *
-   * @param size    maximum size of the LimittedSizeStringBuilder. If value is negative, there is no limit.
+   * @param size    maximum size of the LimitedSizeStringBuilder. If value is negative, there is no limit.
    * 
    */
-  public LimittedSizeStringBuilder(int size) {
+  public LimitedSizeStringBuilder(int size) {
     this.limit = size; 
     this.sb    = new StringBuilder();
   }
@@ -52,7 +52,7 @@ public class LimittedSizeStringBuilder {
    * @throws StringLimitException If StringBuilder length is bigger than maximum length
    *
    */
-  public LimittedSizeStringBuilder append(String s) throws StringLimitException {
+  public LimitedSizeStringBuilder append(String s) throws StringLimitException {
 
     if(limit >= 0) {
       // TODO: can we make it somehow smarter?
