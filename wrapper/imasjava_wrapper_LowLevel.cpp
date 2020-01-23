@@ -17,15 +17,15 @@ static bool isErrorCritical(int errorCode)
    return true;
  }
 
-static void raiseLowLevelException(JNIEnv *env, int errorCode)
+static void raiseLowLevelException(JNIEnv *env, al_status_t alStatus)
 {
-    char msgBuffer[200]; 
-    bool isCritical = isErrorCritical(errorCode);
+    char msgBuffer[MAX_ERR_MSG_LEN + 20] = {0}; 
+    bool isCritical = isErrorCritical(alStatus.code);
 
     if (!isCritical)
        return;
 
-     sprintf(msgBuffer, "ERROR: UAL LowLevel error code [%d]\n", errorCode);
+    sprintf(msgBuffer, "ERROR[%d]\n%s\n", alStatus.code, alStatus.message);
 
     jclass exc = env->FindClass("imasjava/UALException");
     env->ThrowNew(exc, msgBuffer);
@@ -34,10 +34,7 @@ static void raiseLowLevelException(JNIEnv *env, int errorCode)
 
 static void raiseException(JNIEnv *env, const char* callerName, const char* msg)
 {
-
-      printf("Throwing EXC");
     jclass exc = env->FindClass("imasjava/UALException");
-    printf("Throwing EXC");
     env->ThrowNew(exc, msg);
  }
 
@@ -151,16 +148,25 @@ static jobjectArray convertToJavaComplexArray(JNIEnv * env, int iArraySize, std_
  * Method:    ual_print_context
  * Signature: (I)I
  */
- void JNICALL Java_imasjava_wrapper_LowLevel_ual_1print_1context
+ jstring JNICALL Java_imasjava_wrapper_LowLevel_ual_1context_1info
   (JNIEnv *env, jclass jWrapperClass, jint jCtx)
 {
-    int status = -1;
+    al_status_t al_status;
+    char *info;
+    jstring jInfo;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_print_context((int)jCtx);
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    al_status = ual_context_info((int)jCtx, &info);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if(info != NULL)
+        jInfo = env->NewStringUTF(info);
+    else
+        jInfo = env->NewStringUTF("");
+
+    return jInfo;
 }
 extern "C" {
 /*
@@ -172,7 +178,8 @@ extern "C" {
  JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1pulse_1action
   (JNIEnv *env, jclass jWrapperClass, jint jBackendId, jint jShot, jint jRun, jstring jUser, jstring jTokamak, jstring jVersion)
 {
-    int status = -1;
+    al_status_t al_status;
+    int ctx = -1; 
 
     const char* user = env->GetStringUTFChars(jUser, 0);
     const char* tokamak = env->GetStringUTFChars(jTokamak, 0);
@@ -181,7 +188,7 @@ extern "C" {
  
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_begin_pulse_action(jBackendId, (int)jShot, (int)jRun, user, tokamak, version);
+    al_status = ual_begin_pulse_action(jBackendId, (int)jShot, (int)jRun, user, tokamak, version, &ctx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -189,10 +196,10 @@ extern "C" {
     env->ReleaseStringUTFChars(jTokamak, tokamak);
     env->ReleaseStringUTFChars(jVersion, version);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
-    return status;
+    return ctx;
 }
 
 /*
@@ -203,17 +210,17 @@ extern "C" {
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1open_1pulse
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jint jMode, jstring jOptions)
 {
-    int status = -1;
+    al_status_t al_status;
     const char *options = env->GetStringUTFChars(jOptions, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_open_pulse((int)jCtx, (int)jMode, options);
+    al_status = ual_open_pulse((int)jCtx, (int)jMode, options);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jOptions, options);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -223,17 +230,17 @@ extern "C" {
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1close_1pulse
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jint jMode, jstring jOptions)
 {
-    int status = -1;
+    al_status_t al_status;
     const char *options = env->GetStringUTFChars(jOptions, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_close_pulse((int)jCtx, (int)jMode, options);
+    al_status = ual_close_pulse((int)jCtx, (int)jMode, options);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jOptions, options);
    
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -243,21 +250,22 @@ extern "C" {
  jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1global_1action
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jDataObjectName, jint jRWMode)
 {
-    int status = -1;
+    al_status_t al_status;
+    int ctx = -1; 
     const char *dataObjectName = env->GetStringUTFChars(jDataObjectName, 0);
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_begin_global_action((int)jCtx, dataObjectName, (int)jRWMode);
+    al_status = ual_begin_global_action((int)jCtx, dataObjectName, (int)jRWMode, &ctx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
     env->ReleaseStringUTFChars(jDataObjectName, dataObjectName);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
-    return status;
+    return ctx;
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -267,21 +275,22 @@ extern "C" {
  jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1slice_1action
   (JNIEnv *env, jclass jWrapperClass, jint jCtx,  jstring jDataObjectName, jint jRWMode, jdouble jTime, jint jInterpMode)
 {
-    int status = -1;
+    al_status_t al_status;
+    int ctx = -1; 
     const char *dataObjectName = env->GetStringUTFChars(jDataObjectName, 0);
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_begin_slice_action((int)jCtx, dataObjectName, (int)jRWMode, (double)jTime, (int)jInterpMode);
+    al_status = ual_begin_slice_action((int)jCtx, dataObjectName, (int)jRWMode, (double)jTime, (int)jInterpMode, &ctx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
     env->ReleaseStringUTFChars(jDataObjectName, dataObjectName);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
-    return status;
+    return ctx;
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -291,14 +300,14 @@ extern "C" {
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1end_1action
   (JNIEnv *env, jclass jWrapperClass, jint jCtx)
 {
-    int status = -1;
+    al_status_t al_status;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_end_action((int)jCtx);
+    al_status = ual_end_action((int)jCtx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 }
 
 /*
@@ -309,7 +318,7 @@ extern "C" {
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1int
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jintArray jData, jint jDim, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
 
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
     const char *timeBasePath = env->GetStringUTFChars(jTimeBasePath, 0);
@@ -324,7 +333,7 @@ extern "C" {
         sizeArray = env->GetIntArrayElements(jSizeArray, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) dataArray, INTEGER_DATA, (int)jDim, (int*)sizeArray);
+    al_status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) dataArray, INTEGER_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -336,8 +345,8 @@ extern "C" {
     if(sizeArray != NULL)
         env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 }
 
 /*
@@ -348,7 +357,7 @@ extern "C" {
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1double
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jdoubleArray jData, jint jDim, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
 
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
     const char *timeBasePath = env->GetStringUTFChars(jTimeBasePath, 0);
@@ -365,7 +374,7 @@ extern "C" {
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) dataArray, DOUBLE_DATA, (int)jDim, (int*)sizeArray);
+    al_status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) dataArray, DOUBLE_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -377,8 +386,8 @@ extern "C" {
     if(sizeArray != NULL)
         env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 }
 
 /*
@@ -389,7 +398,7 @@ extern "C" {
 JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jobjectArray jComplexArray, jint jDim, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
 
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
     const char *timeBasePath = env->GetStringUTFChars(jTimeBasePath, 0);
@@ -403,7 +412,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
         sizeArray = env->GetIntArrayElements(jSizeArray, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
+    al_status = ual_write_data((int)jCtx, fieldPath, timeBasePath, (void*) cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -415,8 +424,8 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
     if(sizeArray != NULL)
         env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 }
 
 
@@ -428,7 +437,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1char
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jbyteArray jData, jint jDim, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
 
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
     const char *timeBasePath = env->GetStringUTFChars(jTimeBasePath, 0);
@@ -447,7 +456,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_write_data((int)jCtx, fieldPath, timeBasePath, dataArray, CHAR_DATA, (int)jDim, (int*)sizeArray);
+    al_status = ual_write_data((int)jCtx, fieldPath, timeBasePath, dataArray, CHAR_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
@@ -459,8 +468,8 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
     if(sizeArray != NULL)
         env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -470,7 +479,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
  jintArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1int
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jint jDim, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
     jsize retArraySize = 1;
     jintArray jData = NULL;
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
@@ -488,7 +497,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, INTEGER_DATA, (int)jDim, (int*)sizeArray);
+    al_status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, INTEGER_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     for (int i = 0; i < jDim; i++)
@@ -505,8 +514,8 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
     env->ReleaseStringUTFChars(jTimeBasePath, timeBasePath);
     env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
     return jData;
 }
@@ -518,7 +527,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
  jdoubleArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1double
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jint jDim, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
     jsize retArraySize = 1;
     jdoubleArray jData = NULL;
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
@@ -533,7 +542,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
     }
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, DOUBLE_DATA, (int)jDim, (int*)sizeArray);
+    al_status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, DOUBLE_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -552,8 +561,8 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
     env->ReleaseStringUTFChars(jTimeBasePath, timeBasePath);
     env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
     return jData;
 }
@@ -566,7 +575,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
 JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1complex
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jint jDim, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
     jsize retArraySize = 1;
     jobjectArray jData = NULL;
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
@@ -579,7 +588,7 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
         cppDataArray = &tmpScalar;
    
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
+    al_status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     for (int i = 0; i < jDim; i++)
@@ -596,8 +605,8 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
     env->ReleaseStringUTFChars(jTimeBasePath, timeBasePath);
     env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
     return jData;
 }
@@ -610,7 +619,7 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
  jbyteArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1char
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jint jDim, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
     jsize retArraySize = 1;
     jbyteArray jData = NULL;
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
@@ -625,7 +634,7 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
     }
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, CHAR_DATA, (int)jDim, (int*)sizeArray);
+    al_status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, CHAR_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -644,8 +653,8 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
     env->ReleaseStringUTFChars(jTimeBasePath, timeBasePath);
     env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
     return jData;
 }
@@ -657,18 +666,18 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1delete_1data
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath)
 {
-    int status = -1;
+    al_status_t al_status;
 
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_delete_data((int)jCtx, fieldPath);
+    al_status = ual_delete_data((int)jCtx, fieldPath);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -678,24 +687,25 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
  jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1arraystruct_1action
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jintArray jSizeArray)
 {
-    int status = -1;
+    al_status_t al_status;
+    int ctx = -1; 
 
     const char *fieldPath = env->GetStringUTFChars(jFieldPath, 0);
     const char *timeBasePath = env->GetStringUTFChars(jTimeBasePath, 0);
     jint *sizeArray = env->GetIntArrayElements(jSizeArray, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_begin_arraystruct_action((int)jCtx, fieldPath, timeBasePath, (int*)sizeArray);
+    al_status = ual_begin_arraystruct_action((int)jCtx, fieldPath, timeBasePath, (int*)sizeArray, &ctx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);
     env->ReleaseStringUTFChars(jTimeBasePath, timeBasePath);
     env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
-    return status;
+    return ctx;
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -705,29 +715,32 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1iterate_1over_1arraystruct
   (JNIEnv *env, jclass jWrapperClass, jint jAoSCtx, jint jStep)
 {
-    int status = -1;
+    al_status_t al_status;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_iterate_over_arraystruct((int)jAoSCtx, (int)jStep);
+    al_status = ual_iterate_over_arraystruct((int)jAoSCtx, (int)jStep);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
-    if (status < 0)
-        raiseLowLevelException( env, status);
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
 
 }
 
-void JNICALL Java_imasjava_wrapper_LowLevel_ual_1get_1backendID
+int JNICALL Java_imasjava_wrapper_LowLevel_ual_1get_1backendID
   (JNIEnv *env, jclass jWrapperClass, jint backendID)
-{
-    int status = -1;
+{   
+    al_status_t al_status;
+    int beid = -1;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    status = ual_get_backendID(backendID);
+    al_status = ual_get_backendID(backendID, &beid);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
-    if (status < 0)
-      raiseLowLevelException( env, status );
+    if (al_status.code < 0)
+      raiseLowLevelException( env, al_status );
+
+    return beid;
 }
 
 } //extern "C"

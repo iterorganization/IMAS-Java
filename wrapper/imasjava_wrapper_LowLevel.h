@@ -92,7 +92,7 @@ extern "C" {
  * Method:    ual_print_context
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1print_1context
+JNIEXPORT jstring JNICALL Java_imasjava_wrapper_LowLevel_ual_1context_1info
   (JNIEnv *, jclass, jint);
 
 /*
