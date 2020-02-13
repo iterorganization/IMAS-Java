@@ -342,6 +342,32 @@ static public void close(int refIdx) throws UALException
         return idsTimeMode;
     }
 
+    static public String timeModeToString( int idsTimeMode )
+    {
+        String strTimeMode;
+    
+        switch(idsTimeMode)
+        {
+            case LowLevel.IDS_TIME_MODE_UNKNOWN:     
+                                            strTimeMode = "UNKNOWN";
+                                            break;
+            case LowLevel.IDS_TIME_MODE_HETEROGENEOUS: 
+                                            strTimeMode = "HETEROGENEOUS";
+                                            break;
+            case LowLevel.IDS_TIME_MODE_HOMOGENEOUS:   
+                                            strTimeMode = "HOMOGENEOUS";
+                                            break;
+            case LowLevel.IDS_TIME_MODE_INDEPENDENT:
+                                            strTimeMode = "INDEPENDENT";
+                                            break;
+            default: 
+                                            strTimeMode = "UNKNOWN";
+                                            break;
+    
+        }
+        return strTimeMode;
+    }
+
  <xsl:apply-templates select = "IDS" mode="DEFINE_IDS_MEMBER"/>
  }
 </xsl:result-document>
@@ -570,12 +596,12 @@ public class <xsl:value-of select="@name"/>_IDSBase
     {
   
         int iOccurrence = 0;
-
+/*
         System.err.println("WARNING:\n"
                         + "\"putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) \"  is DEPRECATED.\n"
                         + "Please use \"putSlice()\" instead");
     
-    
+    */
         if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
         {
             String tokens[] = idsFullName.split("/");
@@ -593,6 +619,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
         int aosCtx = -1;
         int arraySize = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
+        int storedTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
         int idsTimeMode = this.ids_properties.homogeneous_time;
 
         if(iOccurrence > 0)
@@ -615,6 +642,38 @@ public class <xsl:value-of select="@name"/>_IDSBase
             throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
         }
 
+
+        /***   Checking homogeneous_time read from file   ***/
+    
+        // Open read ctx
+        ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
+        
+        try
+        {
+            storedTimeMode = imas.readIdsTimeMode(ctx);
+        }
+        finally
+        {
+            LowLevel.ual_end_action(ctx);
+        }
+
+    
+        // adding slice to an empty IDS
+        if( storedTimeMode ==  LowLevel.IDS_TIME_MODE_UNKNOWN)
+        {
+            System.out.println("Warning: Slice is being added to an empty IDS '<xsl:value-of select="@name"/>'. PUT is called to save time independent data.");
+            this.put(iOccurrence);
+            return ;
+        }
+    
+        // time mode conflict
+        if( storedTimeMode != idsTimeMode)
+        {
+            throw new UALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('" + imas.timeModeToString(idsTimeMode) + "') differs from value stored in IDS ('" + imas.timeModeToString(storedTimeMode) + "')!");
+        }
+
+
+    /***   Put slice   ***/
   
         try{
              // Open putSlice context
