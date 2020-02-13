@@ -319,6 +319,29 @@ static public void close(int refIdx) throws UALException
   return time;
  }
 
+    static public int readIdsTimeMode(int ctx) throws UALException
+    {
+        int idsTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
+        
+        idsTimeMode = Wrapper.readData(ctx, "ids_properties/homogeneous_time", "", idsTimeMode);
+
+
+        switch(idsTimeMode)
+        {
+            case LowLevel.IDS_TIME_MODE_UNKNOWN:     
+            case LowLevel.IDS_TIME_MODE_HETEROGENEOUS: 
+            case LowLevel.IDS_TIME_MODE_HOMOGENEOUS:   
+            case LowLevel.IDS_TIME_MODE_INDEPENDENT:   
+                                                break;
+               
+            default: 
+                  throw new UALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('ids_properties/homogeneous_time') set to unknown value!");
+
+        }
+    
+        return idsTimeMode;
+    }
+
  <xsl:apply-templates select = "IDS" mode="DEFINE_IDS_MEMBER"/>
  }
 </xsl:result-document>
@@ -358,7 +381,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
     private static final int maxOccurences = <xsl:value-of select="@maxoccur"/>;
     private static final String IDS_NAME    = "<xsl:value-of select="@name"/>";
 
-    private static boolean isHomogeneous = false;
+    private static int idsTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
     private static Vect1DDouble idsTime = null;
     private static int pulseCtx = -1;
     
@@ -370,7 +393,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
     {
            return <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
     }
-    
+/*    
      static private void setHomogeneous(boolean isHomogeneous)
     {
          <xsl:value-of select="@name"/>_IDSBase.isHomogeneous = isHomogeneous;
@@ -381,17 +404,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
         return <xsl:value-of select="@name"/>_IDSBase.isHomogeneous;
     }
     
-    boolean readHomogeneous(int ctx) throws UALException
-    {
-        int homogenousTime = -1;
-        
-        homogenousTime = Wrapper.readData(ctx, "ids_properties/homogeneous_time", "", homogenousTime);
-        
-        <xsl:value-of select="@name"/>_IDSBase.isHomogeneous =  (homogenousTime == 1);
 
-        return (homogenousTime == 1);
-    }
-    
+    */
     static private void setIdsTime(Vect1DDouble idsTime )
     {
           <xsl:value-of select="@name"/>_IDSBase.idsTime = idsTime;
@@ -496,22 +510,20 @@ public class <xsl:value-of select="@name"/>_IDSBase
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
  
 
-        boolean isIdsHomogeneous = false;
+        int idsTimeMode = this.ids_properties.homogeneous_time;
 
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
 
-      
-        if(this.ids_properties.homogeneous_time == LowLevel.EMPTY_INT)
+        if(idsTimeMode == LowLevel.IDS_TIME_MODE_UNKNOWN)
         {
             System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
             return;
         }
         
-        isIdsHomogeneous = (this.ids_properties.homogeneous_time == 1);
-        this.setHomogeneous( isIdsHomogeneous);
 
-        if(isIdsHomogeneous &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
+
+        if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
         {
             throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
         }
@@ -521,7 +533,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
             ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
 
             this.deleteRootFields(ctx);
-            this.putRootFields(ctx, isIdsHomogeneous);
+            this.putRootFields(ctx, idsTimeMode);
         }
         finally {
             if(ctx >= 0)
@@ -529,7 +541,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
         }
     }
 
-    public void putRootFields(int ctx, boolean isIdsHomogeneous)  throws UALException
+    public void putRootFields(int ctx, int idsTimeMode)  throws UALException
     {
         int aosCtx = -1;
         int arraySize = -1;
@@ -581,32 +593,34 @@ public class <xsl:value-of select="@name"/>_IDSBase
         int aosCtx = -1;
         int arraySize = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
-        boolean isIdsHomogeneous = false;
+        int idsTimeMode = this.ids_properties.homogeneous_time;
 
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
 
-
-       if(this.ids_properties.homogeneous_time == LowLevel.EMPTY_INT)
+       if(idsTimeMode == LowLevel.IDS_TIME_MODE_UNKNOWN)
         {
             System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUTSLICE quits with no action.");
             return;
         }
         
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT) 
+        {
+            System.err.println("Warning: IDS '<xsl:value-of select="@name"/>' time mode 'independent'. PUTSLICE quits with no action.");
+            return;
+        }
 
-        isIdsHomogeneous = (this.ids_properties.homogeneous_time == 1);
-        this.setHomogeneous( isIdsHomogeneous);
-
-        if(isIdsHomogeneous &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
+        if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
         {
             throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
         }
+
   
         try{
              // Open putSlice context
             ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, LowLevel.UNDEFINED_TIME, LowLevel.UNDEFINED_INTERP);
 
-            this.putSliceRootFields(ctx, isIdsHomogeneous);
+            this.putSliceRootFields(ctx, idsTimeMode);
         }
         finally {
             if(ctx >= 0)
@@ -615,7 +629,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
     }
 
 
-    public void putSliceRootFields(int ctx, boolean isIdsHomogeneous) throws UALException
+    public void putSliceRootFields(int ctx, int idsTimeMode) throws UALException
     {
         int aosCtx = -1;
         int arraySize = -1;
@@ -664,7 +678,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
  
 
-        boolean isIdsHomogeneous = false;
+        int idsTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
 
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
@@ -674,15 +688,15 @@ public class <xsl:value-of select="@name"/>_IDSBase
             // Open get context
             ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
 
-            isIdsHomogeneous = this.readHomogeneous(ctx);
-            this.getRootFields(ctx, isIdsHomogeneous);
+            idsTimeMode = imas.readIdsTimeMode(ctx);
+            this.getRootFields(ctx, idsTimeMode);
         }
         finally {
             if(ctx >= 0)
                 LowLevel.ual_end_action(ctx);
         }
     }
-    public void getRootFields(int ctx, boolean isIdsHomogeneous)  throws UALException
+    public void getRootFields(int ctx, int idsTimeMode)  throws UALException
     {
         int aosCtx = -1;
         int arraySize = -1;
@@ -738,7 +752,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
         int ctx = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
 
-        boolean isIdsHomogeneous = false;
+        int idsTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
 
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
@@ -748,8 +762,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
         try{
              // Open putSlice context
             ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.READ_OP, time, interpolMode);
-            isIdsHomogeneous = this.readHomogeneous(ctx);
-            this.getSliceRootFields(ctx, isIdsHomogeneous);
+            idsTimeMode = imas.readIdsTimeMode(ctx);
+            this.getSliceRootFields(ctx, idsTimeMode);
         }
         finally {
             if(ctx >= 0)
@@ -758,7 +772,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
     }
 
 
-    public void getSliceRootFields(int ctx, boolean isIdsHomogeneous) throws UALException
+    public void getSliceRootFields(int ctx, int idsTimeMode) throws UALException
     {
         int aosCtx = -1;
         int arraySize = -1;
@@ -956,7 +970,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* _____________________________________________________________________________________________________________ */
    /*_________________________________       PUT      _____________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
-  	public void put(int ctx, boolean isIdsHomogeneous)  throws UALException
+  	public void put(int ctx, int idsTimeMode)  throws UALException
     {
         String strTimeBasePath = null;
         String strNodePath = null;
@@ -972,7 +986,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________ */
    /*_________________________________       PUT SLICE     _______________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
-  	public void putSlice(int ctx, boolean isIdsHomogeneous)  throws UALException
+  	public void putSlice(int ctx, int idsTimeMode)  throws UALException
     {
         String strTimeBasePath = null;
         String strNodePath = null;
@@ -992,7 +1006,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________  */
    /* _________________________________       GET       ________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
-  	public void get(int ctx, boolean isIdsHomogeneous)   throws UALException
+  	public void get(int ctx, int idsTimeMode)   throws UALException
     {
         String strTimeBasePath = null;
         String strNodePath = null;
@@ -1009,7 +1023,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________  */
    /* _________________________________       GET  SLICE     ________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
-  	public void getSlice(int ctx, boolean isIdsHomogeneous)   throws UALException
+  	public void getSlice(int ctx, int idsTimeMode)   throws UALException
     {
         String strTimeBasePath = null;
         String strNodePath = null;
@@ -1479,7 +1493,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <!--========== Regular structures ==========-->
     <!-- YB 2014 -->
         <xsl:when test="@data_type='structure'">
-        this.<xsl:value-of select="@name"/>.<xsl:value-of select="$methodName"/>(ctx, isIdsHomogeneous);
+        this.<xsl:value-of select="@name"/>.<xsl:value-of select="$methodName"/>(ctx, idsTimeMode);
         </xsl:when>
 
 <!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX -->
@@ -1503,7 +1517,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     for( int i = 0; i &lt;arraySize; i++)
                     {
-                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode);
                         LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
                 }
@@ -1526,7 +1540,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                 </xsl:otherwise>
             </xsl:choose>
             strTimeBasePath = "";
-            if( !( this.<xsl:value-of select = "@name"/> == null ||  this.<xsl:value-of select = "@name"/>.length &lt; 1 ))
+            if( !( this.<xsl:value-of select = "@name"/> == null ||  this.<xsl:value-of select = "@name"/>.length &lt; 1 || idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT))
             {   
                 try{
                     arraySize = this.<xsl:value-of select = "@name"/>.length;
@@ -1534,7 +1548,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     for( int i = 0; i &lt;arraySize; i++)
                     {
-                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode);
                         LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
                 }
@@ -1551,21 +1565,21 @@ public class <xsl:value-of select="@name"/>_IDSBase
             <xsl:choose>
                 <xsl:when test="ancestor::field[@data_type='struct_array']">
                     strNodePath = &quot;<xsl:call-template  name="printAosRelativePath"/>&quot;;
-                    if (isIdsHomogeneous) 
+                    if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) 
                             strTimeBasePath = "/time";
                         else
                         strTimeBasePath = &quot;<xsl:call-template  name="printAosRelativePath"/>/time&quot;;
                 </xsl:when>
                 <xsl:otherwise>
                     strNodePath = &quot;<xsl:value-of select="@path"/>&quot;;
-                    if (isIdsHomogeneous) 
+                    if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) 
                             strTimeBasePath = "/time";
                         else
                         strTimeBasePath = &quot;<xsl:value-of select="@path"/>/time&quot;;
                 </xsl:otherwise>
             </xsl:choose>
        
-            if( !( this.<xsl:value-of select = "@name"/> == null ||  this.<xsl:value-of select = "@name"/>.length &lt; 1 ))
+            if( !( this.<xsl:value-of select = "@name"/> == null ||  this.<xsl:value-of select = "@name"/>.length &lt; 1 || idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT))
             {   
                 try{
                     arraySize = this.<xsl:value-of select = "@name"/>.length;
@@ -1573,7 +1587,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     for( int i = 0; i &lt;arraySize; i++)
                     {
-                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, isIdsHomogeneous);
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode);
                         LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
                 }
@@ -1609,10 +1623,12 @@ public class <xsl:value-of select="@name"/>_IDSBase
         </xsl:choose>
         <xsl:choose>
             <xsl:when test="@type='dynamic' and not(ancestor::field[@type='dynamic' and @data_type='struct_array'])">
-            if (isIdsHomogeneous) 
-            strTimeBasePath="/time";
-            else
-                strTimeBasePath=&quot;<xsl:value-of select="@timebasepath"/>&quot;;
+            if( idsTimeMode != LowLevel.IDS_TIME_MODE_INDEPENDENT)
+            {
+                if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) 
+                strTimeBasePath="/time";
+                else
+                    strTimeBasePath=&quot;<xsl:value-of select="@timebasepath"/>&quot;;
             </xsl:when>
             <xsl:otherwise>
                     strTimeBasePath = "";
@@ -1632,6 +1648,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
           Wrapper.writeData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
           </xsl:otherwise>
         </xsl:choose>
+
+        <xsl:if test="@type='dynamic' and not(ancestor::field[@type='dynamic' and @data_type='struct_array'])">
+            }
+        </xsl:if>
     </xsl:when>
         <xsl:otherwise>
             //Doc Put <xsl:value-of select="@path"/> : PROBLEM : UNIDENTIFIED TYPE !!! <!-- for comment only -->
@@ -1655,7 +1675,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <!--========== Regular structures ==========-->
     <!-- YB 2014 -->
         <xsl:when test="@data_type='structure'">
-            this.<xsl:value-of select="@name"/>.get(ctx, isIdsHomogeneous);
+            this.<xsl:value-of select="@name"/>.get(ctx, idsTimeMode);
         </xsl:when>
 
 <!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX -->
@@ -1686,7 +1706,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                         for( int i = 0; i &lt;arraySize; i++)
                         {
                             this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "@name"/>Class();
-                            this.<xsl:value-of select="@name"/>[i].get(aosCtx, isIdsHomogeneous);
+                            this.<xsl:value-of select="@name"/>[i].get(aosCtx, idsTimeMode);
                             LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                         }
                     }
@@ -1725,7 +1745,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                         for( int i = 0; i &lt;arraySize; i++)
                         {
                             this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "@name"/>Class();
-                            this.<xsl:value-of select="@name"/>[i].get(aosCtx, isIdsHomogeneous);
+                            this.<xsl:value-of select="@name"/>[i].get(aosCtx, idsTimeMode);
                             LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                         }
                     }
@@ -1737,17 +1757,19 @@ public class <xsl:value-of select="@name"/>_IDSBase
         </xsl:when>
         <xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
             <xsl:text>/*-----------------------------------------------------------------------------------------*/&#xA;</xsl:text>
+            if (idsTimeMode != LowLevel.IDS_TIME_MODE_INDEPENDENT) 
+            {
             <xsl:choose>
                 <xsl:when test="ancestor::field[@data_type='struct_array']">
                     strNodePath = &quot;<xsl:call-template  name="printAosRelativePath"/>&quot;;
-                    if (isIdsHomogeneous) 
+                    if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) 
                             strTimeBasePath = "/time";
                         else
                         strTimeBasePath = &quot;<xsl:call-template  name="printAosRelativePath"/>/time&quot;;
                 </xsl:when>
                 <xsl:otherwise>
                     strNodePath = &quot;<xsl:value-of select="@path"/>&quot;;
-                    if (isIdsHomogeneous) 
+                    if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) 
                             strTimeBasePath = "/time";
                         else
                         strTimeBasePath = &quot;<xsl:value-of select="@path"/>/time&quot;;
@@ -1769,7 +1791,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                         for( int i = 0; i &lt;arraySize; i++)
                         {
                             this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "@name"/>Class();
-                            this.<xsl:value-of select="@name"/>[i].get(aosCtx, isIdsHomogeneous);
+                            this.<xsl:value-of select="@name"/>[i].get(aosCtx, idsTimeMode);
                             LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                         }
                     }
@@ -1778,6 +1800,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     if(aosCtx >= 0)
                         LowLevel.ual_end_action(aosCtx);
                 }
+          }
         </xsl:when>
 
     <xsl:when test="
@@ -1804,17 +1827,21 @@ public class <xsl:value-of select="@name"/>_IDSBase
         </xsl:choose>
         <xsl:choose>
             <xsl:when test="@type='dynamic' and not(ancestor::field[@type='dynamic' and @data_type='struct_array'])">
-            if (isIdsHomogeneous) 
-            strTimeBasePath="/time";
-            else
-                strTimeBasePath=&quot;<xsl:value-of select="@timebasepath"/>&quot;;
-            </xsl:when>
+            if (idsTimeMode != LowLevel.IDS_TIME_MODE_INDEPENDENT) 
+            {
+                if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) 
+                    strTimeBasePath="/time";
+                else
+                    strTimeBasePath=&quot;<xsl:value-of select="@timebasepath"/>&quot;;
+                </xsl:when>
             <xsl:otherwise>
                     strTimeBasePath = "";
             </xsl:otherwise>
         </xsl:choose>
-        this.<xsl:value-of select="@name"/> = Wrapper.readData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
-
+            this.<xsl:value-of select="@name"/> = Wrapper.readData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
+        <xsl:if test="@type='dynamic' and not(ancestor::field[@type='dynamic' and @data_type='struct_array'])">
+        }
+        </xsl:if>
     </xsl:when>
         <xsl:otherwise>
             //Doc GET <xsl:value-of select="@path"/> : PROBLEM : UNIDENTIFIED TYPE !!! <!-- for comment only -->
