@@ -1,6 +1,6 @@
 package imasjava;
 
-public class Vect5DDouble
+public class Vect5DDouble extends SummaryString
 {
     int dim1;
     int dim2;
@@ -64,6 +64,107 @@ public class Vect5DDouble
         this.dim5 = dim5;
     }
 
+    public String toSummaryString(int length)
+    {
+      if(length < 0) {
+        return toString();
+      }
+
+      LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(length);
+
+      try {
+
+        sb.append( "[" );
+        for(int i = 0; i < dim1; i++)
+        {
+            sb.append( "[" );
+            for(int j = 0; j < dim2; j++)
+            {
+                sb.append( "[" );
+                for(int k = 0; k < dim3; k++)
+                {
+                    sb.append( "[" );
+                    for(int h = 0; h < dim4; h++)
+                    {
+                        sb.append( "[" );
+                        for(int l = 0; l < dim5; l++)
+                        {
+                            if(l < dim5 - 1)
+                                sb.append( ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4]+"," );
+                            else
+                                sb.append( ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4] );
+                        }
+                        sb.append( "]" );
+                    }
+                    sb.append( "]" );
+               }
+               sb.append( "]" );
+            }
+            sb.append( "]" );
+       }
+       sb.append( "]" );
+      } catch(StringLimitException ex) {
+        // This might happen, eventually
+        // but it's not an error       
+      }
+
+      return sb.toString();
+    }
+
+    public String toSummaryStringElements(int elements)
+    {
+      String retStr = "[";
+      int i = 0;
+      for(i = 0; i < dim1 && i < elements; i++)
+      {
+        retStr += "[";
+        int j = 0;
+        for(j = 0; j < dim2 && i < elements; j++)
+        {
+          retStr += "[";
+          int k = 0;
+          for(k = 0; k < dim3 && i < elements; k++)
+          {
+            retStr += "[";
+            int h = 0;
+            for(h = 0; h < dim4 && i < elements; h++)
+            {
+              retStr += "[";
+              int l = 0;
+              for(l = 0; l < dim5 && l < elements; l++)
+              {
+                if(l < dim5 - 1)
+                  retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4]+",";
+                else
+                  retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4];
+              }
+              if( l < dim5 ) {
+                retStr += "...";
+              }
+              retStr += "]";
+            }
+            if( h < dim4 ) {
+              retStr += "...";
+            }
+            retStr += "]";
+          }
+          if(k < dim3) {
+            retStr += "...";
+          }
+          retStr += "]";
+        }
+        if(j < dim2) {
+          retStr += "...";
+        }
+        retStr += "]";
+      }
+      if( i < dim1 ) {
+        retStr += "...";
+      }
+      retStr += "]";
+      return retStr;
+    }
+
     public String toString()
     {
         String retStr = "[";
@@ -86,6 +187,7 @@ public class Vect5DDouble
                             else
                                 retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4];
                         }
+                        retStr += "]";
                     }
                     retStr += "]";
                }

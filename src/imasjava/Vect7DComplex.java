@@ -63,50 +63,182 @@ public class Vect7DComplex extends VectComplex
         array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+l*dim1*dim2*dim3*dim4
 		+m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6] = element;
     }
+
+    public String toSummaryString(int length)
+    {
+      if(length < 0) {
+        return toString();
+      }
+
+      LimitedSizeStringBuilder sb = new LimitedSizeStringBuilder(length);
+
+      try {
+        sb.append( "[" );
+        for(int i = 0; i < dim1; i++)
+        {
+            sb.append( "[" );
+            for(int j = 0; j < dim2; j++)
+            {
+                sb.append( "[" );
+                for(int k = 0; k < dim3; k++)
+                {
+                    sb.append( "[" );
+                    for(int h = 0; h < dim4; h++)
+                    {
+                        sb.append( "[" );
+                        for(int l = 0; l < dim5; l++)
+                        {
+                            sb.append( "[" );
+                            for(int m = 0; m < dim6; m++)
+                            {
+                              	for(int n = 0; n < dim7; m++)
+                              	{
+                                     if(n < dim7 - 1)
+                                    	sb.append( ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6]+"," );
+                                     else
+                                    	sb.append( ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6] );
+				                        }
+                                sb.append( "]" );
+                            }
+                            sb.append( "]" );
+                        }
+                        sb.append( "]" );
+                    }
+                    sb.append( "]" );
+               }
+               sb.append( "]" );
+            }
+            sb.append( "]" );
+       }
+       sb.append( "]" );
+      } catch(StringLimitException ex) { 
+        // This might happen, eventually
+        // but it's not an error       
+      }
+
+      return sb.toString();
+    }
+
+    public String toSummaryStringElements(int elements)
+    {
+      String retStr = "[";
+      int i = 0;
+      for(i = 0; i < dim1 && i < elements; i++)
+      {
+        retStr += "[";
+        int j = 0;
+        for(j = 0; j < dim2 && j < elements; j++)
+        {
+          retStr += "[";
+          int k = 0;
+          for(k = 0; k < dim3 && k < elements; k++)
+          {
+            retStr += "[";
+            int h = 0;
+            for(h = 0; h < dim4 && h < elements; h++)
+            {
+              retStr += "[";
+              int l = 0;
+              for(l = 0; l < dim5 && l < elements; l++)
+              {
+                retStr += "[";
+                int m = 0;
+                for(m = 0; m < dim6 && m < elements; m++)
+                {
+                  int n = 0;
+                  for(n = 0; n < dim7 && n < elements; m++)
+                  {
+                    if(n < dim7 - 1)
+                      retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6]+",";
+                    else
+                      retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+				    	  +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6];
+				          }
+                  if(n < dim7) {
+                    retStr += "...";
+                  }
+                  retStr += "]";
+                }
+                if(m < dim6) {
+                  retStr += "...";
+                }
+                retStr += "]";
+              }
+              if(l < dim5) {
+                retStr += "...";
+              }
+              retStr += "]";
+            }
+            if(h < dim4) {
+              retStr += "...";
+            }
+            retStr += "]";
+          }
+          if(k < dim3) {
+            retStr += "...";
+          }
+          retStr += "]";
+        }
+        if(j < dim2) {
+          retStr += "...";
+        }
+        retStr += "]";
+      }
+      if(i < dim1) {
+        retStr += "...";
+      }
+      retStr += "]";
+      return retStr;
+    }    
+
+
     public String toString()
     {
-	if (getSize() > maxPrintSize) {
-	    return toSummary();
-	}
-	else {
-	    String retStr = "[";
-	    for(int i = 0; i < dim1; i++)
-		{
-		    retStr += "[";
-		    for(int j = 0; j < dim2; j++)
-			{
-			    retStr += "[";
-			    for(int k = 0; k < dim3; k++)
-				{
-				    retStr += "[";
-				    for(int h = 0; h < dim4; h++)
-					{
-					    retStr += "[";
-					    for(int l = 0; l < dim5; l++)
-						{
-						    retStr += "[";
-						    for(int m = 0; m < dim6; m++)
-							{
-							    for(int n = 0; n < dim7; m++)
-								{
-								    if(n < dim7 - 1)
-									retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
-											   +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6]+",";
-								    else
-									retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
-											   +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6];
-								}
-							}
-						}
-					}
-				    retStr += "]";
-				}
-			    retStr += "]";
-			}
-		    retStr += "]";
-		}
-	    retStr += "]";
-	    return retStr;
-	}
+      if (getSize() > maxPrintSize) {
+        return toSummary();
+      }
+      else {
+        String retStr = "[";
+        for(int i = 0; i < dim1; i++)
+        {
+          retStr += "[";
+          for(int j = 0; j < dim2; j++)
+          {
+            retStr += "[";
+            for(int k = 0; k < dim3; k++)
+            {
+              retStr += "[";
+              for(int h = 0; h < dim4; h++)
+              {
+                retStr += "[";
+                for(int l = 0; l < dim5; l++)
+                {
+                  retStr += "[";
+                  for(int m = 0; m < dim6; m++)
+                  {
+                    for(int n = 0; n < dim7; m++)
+                    {
+                      if(n < dim7 - 1)
+                        retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+                          +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6]+",";
+                      else
+                        retStr += ""+array[i+j*dim1+k*dim1*dim2+h*dim1*dim2*dim3+k*dim1*dim2*dim3*dim4
+                          +m*dim1*dim2*dim3*dim4*dim5+n*dim1*dim2*dim3*dim4*dim5*dim6];
+                    }
+                  }
+                }
+              }
+              retStr += "]";
+            }
+            retStr += "]";
+          }
+          retStr += "]";
+        }
+        retStr += "]";
+        return retStr;
+      }
     }
 }

@@ -10,6 +10,9 @@ else
 _JAVA_OPTIONS =
 JFLAGS = -g -Xmaxerrs 10 -J-Xmx1g -sourcepath ./src -d ./build
 
+JUnit = 1.5.2
+JUnit.JAR = junit-platform-console-standalone-$(JUnit).jar
+
 # Get a list of IDS from IDSDEF file
 IDSDEF = ../xml/IDSDef.xml
 IDSNAMES := $(shell sed '/<IDS name=/!d;s/.*name="\([^"]*\)".*/\1/' $(IDSDEF))
@@ -68,6 +71,21 @@ gensources: IDSDef2Java.xsl | saxonicajar
 	  touch $(addsuffix ~,$(GENSOURCES)) )
 beautify: $(GENSOURCES) | javaformatjar
 	$(JAVA) com.google.googlejavaformat.java.Main -i $^
+
+junit-dirs:
+	-mkdir -p junit_jar
+	-mkdir -p junit_target
+
+junit-test-compile: $(JARFILE) junit-download
+	$(JAVA_HOME)/bin/javac -cp lib/imas.jar:junit_jar/$(JUnit.JAR) -d junit_target tests/junit/imasjava/*.java
+
+junit-test-run: junit-test-compile
+	$(JAVA_HOME)/bin/java -jar junit_jar/$(JUnit.JAR) --class-path lib/imas.jar:junit_target --scan-class-path
+
+junit-download: junit-dirs
+	curl -s -z junit_jar/$(JUnit.JAR) \
+	-o junit_jar/$(JUnit.JAR) \
+	http://central.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/$(JUnit)/$(JUnit.JAR)
 
 #----------------------- identifiers ---------------------
 include ../Makefile.identifiers

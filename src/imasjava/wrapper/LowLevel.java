@@ -65,6 +65,12 @@ public final static int MEMORY_BACKEND     = BACKEND_ID_0 + 4;
 public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
 
 
+    public final static int IDS_TIME_MODE_UNKNOWN       = EMPTY_INT; 
+    public final static int IDS_TIME_MODE_HETEROGENEOUS = 0;
+    public final static int IDS_TIME_MODE_HOMOGENEOUS   = 1;
+    public final static int IDS_TIME_MODE_INDEPENDENT   = 2;
+
+
 	  /* returns a vector containing all the dimensions of an array) */
 
  /******************** DEFINITION OF THE C API ********************/
