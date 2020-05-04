@@ -319,12 +319,22 @@ static public void close(int refIdx) throws UALException
   return time;
  }
 
-    static public int readIdsTimeMode(int ctx) throws UALException
+    static public int readIdsTimeMode(int pulseCtx, String idsFullName) throws UALException
     {
         int idsTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
-        
-        idsTimeMode = Wrapper.readData(ctx, "ids_properties/homogeneous_time", "", idsTimeMode);
+        int ctx = -1;
 
+        // Open  ctx
+        ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
+
+        try
+        {
+            idsTimeMode = Wrapper.readData(ctx, "ids_properties/homogeneous_time", "", idsTimeMode);
+        }
+        finally
+        {
+            LowLevel.ual_end_action(ctx);
+        }
 
         switch(idsTimeMode)
         {
@@ -644,19 +654,8 @@ public class <xsl:value-of select="@name"/>_IDSBase
 
 
         /***   Checking homogeneous_time read from file   ***/
-    
-        // Open read ctx
-        ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
-        
-        try
-        {
-            storedTimeMode = imas.readIdsTimeMode(ctx);
-        }
-        finally
-        {
-            LowLevel.ual_end_action(ctx);
-        }
-
+        storedTimeMode = imas.readIdsTimeMode(pulseCtx, idsFullName);
+  
     
         // adding slice to an empty IDS
         if( storedTimeMode ==  LowLevel.IDS_TIME_MODE_UNKNOWN)
@@ -742,12 +741,12 @@ public class <xsl:value-of select="@name"/>_IDSBase
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
 
+        idsTimeMode = imas.readIdsTimeMode(pulseCtx, idsFullName);
+
         this.reset();
         try{
             // Open get context
             ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
-
-            idsTimeMode = imas.readIdsTimeMode(ctx);
             this.getRootFields(ctx, idsTimeMode);
         }
         finally {
@@ -816,12 +815,13 @@ public class <xsl:value-of select="@name"/>_IDSBase
         if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
   
-
+        idsTimeMode = imas.readIdsTimeMode(pulseCtx, idsFullName);
+        
         this.reset();
         try{
              // Open putSlice context
             ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.READ_OP, time, interpolMode);
-            idsTimeMode = imas.readIdsTimeMode(ctx);
+
             this.getSliceRootFields(ctx, idsTimeMode);
         }
         finally {
