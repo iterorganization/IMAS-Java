@@ -60,13 +60,13 @@ public class imas {
   }
   <xsl:choose><xsl:when test="$SYSTEM = 'Linux'">
   libpath = libpath + "/lib";
-  String imas_library = libpath + "/libimas-java-binding.so";
+  String imas_library = libpath + "/libal-java-binding.so";
   </xsl:when><xsl:otherwise>
-  String imas_library = libpath + "/javainterface/lib/libimas-java-binding.dll";
+  String imas_library = libpath + "/javainterface/lib/libal-java-binding.dll";
   </xsl:otherwise></xsl:choose>
   File f = new File(imas_library);
   if (!f.exists()) {
-   System.err.println("IMAS library not set up in the environment. (libimas-java-binding.so missing)");
+   System.err.println("IMAS library not set up in the environment. (libal-java-binding.so missing)");
   }
 
   try {

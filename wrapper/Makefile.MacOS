@@ -1,35 +1,35 @@
 INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I../../lowlevel
-LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L../../lowlevel -limas
-TARGETS= lib/libimas-java-binding.so lib/libimas-java-binding.a
+LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L../../lowlevel -lal
+TARGETS= lib/libal-java-binding.so lib/libal-java-binding.a
 
 # Ensure the all target is default
 all_:all
 
 # Dynamic library
-lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so.$(SO_NUM): $(COMMON_OBJECTS) | ./lib
+lib/libal-java-binding-$(DD_GIT_DESCRIBE).so.$(SO_NUM): $(COMMON_OBJECTS) | ./lib
 	$(CXX) -g -o $@ -shared -Wl,-install_name,$@ $^ $(LIBS)
-lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so: %:%.$(SO_NUM)
+lib/libal-java-binding-$(DD_GIT_DESCRIBE).so: %:%.$(SO_NUM)
 	$(LN_S) $(<F) $@
-lib/libimas-java-binding.so:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).so
+lib/libal-java-binding.so:lib/libal-java-binding-$(DD_GIT_DESCRIBE).so
 	$(LN_S) $(<F) $@
-lib/libimas-java-binding.so_install: %.so_install:%-$(DD_GIT_DESCRIBE).so.$(SO_NUM) | $(libdir)
+lib/libal-java-binding.so_install: %.so_install:%-$(DD_GIT_DESCRIBE).so.$(SO_NUM) | $(libdir)
 	$(INSTALL_DATA) $< $(libdir)
 	$(LN_S) $(<F) $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so
 	$(LN_S) $(<F) $(libdir)/$(*F).so
 
 # Static library
-lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a: $(COMMON_OBJECTS) | ./lib
+lib/libal-java-binding-$(DD_GIT_DESCRIBE).a: $(COMMON_OBJECTS) | ./lib
 	$(AR) rvs $@ $^
-lib/libimas-java-binding.a:lib/libimas-java-binding-$(DD_GIT_DESCRIBE).a
+lib/libal-java-binding.a:lib/libal-java-binding-$(DD_GIT_DESCRIBE).a
 	$(LN_S) $(<F) $@
-lib/libimas-java-binding.a_install: %.a_install:%-$(DD_GIT_DESCRIBE).a | $(libdir)
+lib/libal-java-binding.a_install: %.a_install:%-$(DD_GIT_DESCRIBE).a | $(libdir)
 	$(INSTALL_DATA) $< $(libdir)
 	$(LN_S) $(<F) $(libdir)/$(*F).a
 
-lib/libimas-java-binding.a_uninstall: %.a_uninstall
+lib/libal-java-binding.a_uninstall: %.a_uninstall
 	-rm -f $(libdir)/$(*F).a
 	-rm -f $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).a
-lib/libimas-java-binding.so_uninstall: %.so_uninstall
+lib/libal-java-binding.so_uninstall: %.so_uninstall
 	-rm -f $(libdir)/$(*F).so
 	-rm -f $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so
 	-rm -f $(libdir)/$(*F)-$(DD_GIT_DESCRIBE).so.$(SO_NUM)
