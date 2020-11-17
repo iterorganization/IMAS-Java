@@ -67,7 +67,7 @@ $(CLASSFILE): build/%.class:src/%.java | build
 $(GENSOURCES): gensources
 	$(if $(wildcard $@~),@echo Correcting indentation of $@ ; $(BEAUTIFY) $@ && $(RM) $@~)
 gensources: IDSDef2Java.xsl | saxonicajar
-	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(JAVA) net.sf.saxon.Transform -t -s:$(IDSDEF) -xsl:$< SYSTEM=$(SYSTEM) DD_VERSION=$(DD_GIT_DESCRIBE) AL_VERSION=$(UAL_GIT_DESCRIBE) && \
+	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(SAXON) -t -s:$(IDSDEF) -xsl:$< SYSTEM=$(SYSTEM) DD_VERSION=$(DD_GIT_DESCRIBE) AL_VERSION=$(UAL_GIT_DESCRIBE) && \
 	  touch $(addsuffix ~,$(GENSOURCES)) )
 beautify: $(GENSOURCES) | javaformatjar
 	$(JAVA) com.google.googlejavaformat.java.Main -i $^
