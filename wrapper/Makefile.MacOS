@@ -1,4 +1,4 @@
-INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I../../lowlevel
+INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/darwin -I../../lowlevel
 LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L../../lowlevel -limas
 TARGETS= lib/libimas-java-binding.so lib/libimas-java-binding.a
 
