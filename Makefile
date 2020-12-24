@@ -1,7 +1,7 @@
 # -*- makefile -*- #
 include ../Makefile.common
 
-ifeq ("no","$(strip $(IMAS_JAVA))")
+ifneq ("yes","$(strip $(IMAS_JAVA))")
 all sources sources_install install uninstall clean clean-src:
 	$(warning "Ignoring javainterface (IMAS_JAVA=no).")
 else
