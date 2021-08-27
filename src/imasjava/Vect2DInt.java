@@ -44,6 +44,43 @@ public class Vect2DInt extends SummaryString
         return array;
     }
 
+    /**
+     * Returns internal array as row-major ordered array - copy of an array is returned.
+     * 
+     * If you want to update values of oryginal column-major ordered array you have to use
+     * one of the methods: set2DArray, setElementAt, or setArray (requires 1D data with column-major order).
+     *
+     * @see set2DArray, setElementAt, setArray
+     */
+    public int [][] get2DArray() {
+
+      int [][] array = new int[dim1][dim2];
+      for(int i=0; i<dim1; i++) {
+        for(int p=0; p<dim2; p++) {
+          array[i][p] = this.array[i + p * dim1];
+        }
+      }
+
+      return array;
+
+    }
+
+    /**
+     * Sets internal array in column-major ordered way.
+     * 
+     * @param array row-major ordered array
+     *
+     */
+    public void set2DArray(int [][] array) {
+
+      for(int i=0; i<dim1; i++) {
+        for(int p=0; p<dim2; p++) {
+          this.array[i + p * dim1] = array[i][p];
+        }
+      }
+
+    }
+
     public void setArray(int[] array, int dim1, int dim2) 
     {
         //this.array = new int[dim1 * dim2 ];
