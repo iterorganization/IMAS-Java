@@ -171,36 +171,59 @@ static jobjectArray convertToJavaComplexArray(JNIEnv * env, int iArraySize, std_
 extern "C" {
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    ual_begin_pulse_action
+ * Method:    ual_begin_uri_action
  * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
- JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1pulse_1action
-  (JNIEnv *env, jclass jWrapperClass, jint jBackendId, jint jShot, jint jRun, jstring jUser, jstring jTokamak, jstring jVersion)
+ JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1uri_1action
+  (JNIEnv *env, jclass jWrapperClass, jstring jUri)
 {
     al_status_t al_status;
     int ctx = -1; 
 
+    const char* uri = env->GetStringUTFChars(jUri, 0);
+ 
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = ual_begin_uri_action(uri, &ctx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+
+     env->ReleaseStringUTFChars(jUri, uri);
+
+    return ctx;
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    ual_build_uri_from_legacy_parameters
+ * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
+ JNIEXPORT jstring JNICALL Java_imasjava_wrapper_LowLevel_ual_1build_1uri_1from_1legacy_1parameters
+  (JNIEnv *env, jclass jWrapperClass, jint jBackendId, jint jShot, jint jRun, jstring jUser, jstring jTokamak, jstring jVersion)
+{
+    al_status_t al_status;
+
     const char* user = env->GetStringUTFChars(jUser, 0);
     const char* tokamak = env->GetStringUTFChars(jTokamak, 0);
     const char* version = env->GetStringUTFChars(jVersion, 0);
-
- 
+    char *uri;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_begin_pulse_action(jBackendId, (int)jShot, (int)jRun, user, tokamak, version, &ctx);
+    al_status = ual_build_uri_from_legacy_parameters(jBackendId, (int)jShot, (int)jRun, user, tokamak, version, &uri);
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
-
-
     env->ReleaseStringUTFChars(jUser, user);
     env->ReleaseStringUTFChars(jTokamak, tokamak);
     env->ReleaseStringUTFChars(jVersion, version);
 
-    if (al_status.code < 0)
-        raiseLowLevelException( env, al_status);
-
-    return ctx;
+    jstring jUri = env->NewStringUTF(uri); 
+    return jUri;
 }
+
 
 /*
  * Class:     imasjava_wrapper_LowLevel

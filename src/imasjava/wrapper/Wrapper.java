@@ -5,15 +5,22 @@ import imasjava.*;
 
 public class Wrapper {
 
-        static public int ualBeginPulseAction(int backendID, int shot, int run, String user, String tokamak, String version) throws UALException
+        static public String ualBuildUriFromLegacyParameters(int backendID, int shot, int run, String user, String tokamak, String version) throws UALException
         {
-            int pulseCtx = -1;
 
             user = user.trim();
             tokamak = tokamak.trim();
             version = version.trim();
 
-            pulseCtx = LowLevel.ual_begin_pulse_action(backendID, shot, run, user, tokamak, version);
+            return LowLevel.ual_build_uri_from_legacy_parameters(backendID, shot, run, user, tokamak, version);
+        }
+
+        static public int ualBeginUriAction(String uri) throws UALException
+        {
+            int pulseCtx = -1;
+
+            uri = uri.trim();
+            pulseCtx = LowLevel.ual_begin_uri_action(uri);
 
             return pulseCtx;
         }

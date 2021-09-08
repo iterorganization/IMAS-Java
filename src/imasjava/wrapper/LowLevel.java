@@ -77,39 +77,50 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
 
   /**
      Print all the Context information corresponding to the passed Context identifier.
-     @param[in] ctx Context ID (either PulseContext, OperationContext or ArraystructContext)
+     @param[in] ctx Context ID (either DataEntryContext, OperationContext or ArraystructContext)
      @result error status
      int ual_print_context(int ctx) throws UALException;
    */
      public static native void ual_print_context(int ctx) throws UALException;
   /**
-     Starts an action on a pulse in the database.
-     This function associates a specified back-end with a specific entry in the database.
+     Builds an URI from legacy parameters.
      @param[in] backendID name/ID of the back-end
      @param[in] shot shot number
      @param[in] run run number
      @param[in] user username [_optional, "" for default_]
      @param[in] tokamak tokamak name [_optional, "" for default_]
      @param[in] version data version [_optional, "" for default_]
-     @return pulse context id [_or error status < 0_]
+     @return uri
 
-  int ual_begin_pulse_action(final int backendID, 
+  int ual_build_uri_from_legacy_parameters(final int backendID, 
 			     const int shot, 
 			     const int run, 
 			     const char *user, 
 			     const char *tokamak, 
-			     const char *version) throws UALException;
+			     const char *version,
+                 char* uri) throws UALException;
   */
-  public static native int ual_begin_pulse_action(final int backendID, 
+  public static native String ual_build_uri_from_legacy_parameters(final int backendID, 
 			     final int shot, 
 			     final int run, 
 			     final String user, 
 			     final String tokamak, 
 			     final String version) throws UALException;
+
+  /**
+     Starts an action on a URI in the database.
+     @param[in] uri
+     @return pulse context id
+
+  int ual_begin_uri_action(const char *uri, int *pctxID) throws UALException;
+  */
+  public static native int ual_begin_uri_action(
+                 final String uri) throws UALException;
+
   /**
      Opens a database entry.
      This function opens a database entry described by the passed pulse context.
-     @param[in] pulseCtx pulse context id (from ual_begin_pulse_action())
+     @param[in] pulseCtx pulse context id (from ual_begin_uri_action())
      @param[in] mode opening option:
      - OPEN_PULSE = open an existing pulse (only if exist)
      - FORCE_OPEN_PULSE = open a pulse (create it if not exist)
@@ -129,7 +140,7 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
   /**
      Closes a database entry.
      This function closes a database entry described by the passed pulse context.
-     @param[in] pulseCtx pulse context id (from ual_begin_pulse_action())
+     @param[in] pulseCtx pulse context id (from ual_begin_uri_action())
      @param[in] mode closing option:
      - CLOSE_PULSE = close the pulse
      - ERASE_PULSE = close and remove the pulse 
@@ -146,7 +157,7 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
   /**
      Starts an I/O action on a DATAOBJECT.
      This function gives a new operation context for the duration of an action on a DATAOBJECT.
-     @param[in] ctx pulse context id (from ual_begin_pulse_action())
+     @param[in] ctx pulse context id (from ual_begin_uri_action())
      @param[in] dataobjectname name of the DATAOBJECT
      @param[in] rwmode mode for this operation:
      - READ_OP = read operation
@@ -166,7 +177,7 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
   /**
      Starts an I/O action on a DATAOBJECT slice.
      This function gives a new operation context for the duration of an action on a slice.  
-     @param[in] ctx pulse context (from ual_begin_pulse_action())
+     @param[in] ctx pulse context (from ual_begin_uri_action())
      @param[in] dataobjectname name of the DATAOBJECT
      @param[in] rwmode mode for this operation:
      - READ_OP: read operation
@@ -199,7 +210,7 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
      Stops an I/O action.
      This function stop the current action designed by the context passed as argument. This context is then 
      not valide anymore.
-     @param[in] ctx a pulse (ual_begin_pulse_action()), an operation (ual_begin_global_action() or ual_begin_slice_action()) or an array of structure context id (ual_begin_array_struct_action())
+     @param[in] ctx a pulse (ual_begin_uri_action()), an operation (ual_begin_global_action() or ual_begin_slice_action()) or an array of structure context id (ual_begin_array_struct_action())
      @result error status
      
      @test Low-level API, implementation of endDataObjectGetSlice()

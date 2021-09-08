@@ -97,10 +97,18 @@ JNIEXPORT jstring JNICALL Java_imasjava_wrapper_LowLevel_ual_1context_1info
 
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    ual_begin_pulse_action
+ * Method:    ual_begin_uri_action
  * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1pulse_1action
+JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1uri_1action
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    ual_build_uri_from_legacy_parameters
+ * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1build_1uri_1from_1legacy_1parameters
   (JNIEnv *, jclass, jint, jint, jint, jstring, jstring, jstring);
 
 /*

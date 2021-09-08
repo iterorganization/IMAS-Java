@@ -199,9 +199,10 @@ static public int openEnv(int shot, int run, String user, String tokamak, String
     int pulseCtx;
 
     try{ 
-      pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version); 
+      String uri = Wrapper.ualBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version);
+      pulseCtx = Wrapper.ualBeginUriAction(uri);
     } catch(Exception exc) {
-      throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
+      throw new UALException(  "[ual_begin_uri_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
     }
 
     try{ 
@@ -253,9 +254,10 @@ static public int createEnv(int shot, int run, String user, String tokamak, Stri
     int pulseCtx = -1;
 
     try { 
-      pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version); 
+      String uri = Wrapper.ualBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version);
+      pulseCtx = Wrapper.ualBeginUriAction(uri);
     } catch(Exception exc){
-      throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
+      throw new UALException("[ual_begin_uri_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
     }
 
     try{ 
