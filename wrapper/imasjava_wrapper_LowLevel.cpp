@@ -171,12 +171,12 @@ static jobjectArray convertToJavaComplexArray(JNIEnv * env, int iArraySize, std_
 extern "C" {
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    ual_begin_uri_action
+ * Method:    ual_begin_dataentry_action
  * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
- JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1uri_1action
-  (JNIEnv *env, jclass jWrapperClass, jstring jUri)
+ JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1dataentry_1action
+  (JNIEnv *env, jclass jWrapperClass, jstring jUri, jint jMode)
 {
     al_status_t al_status;
     int ctx = -1; 
@@ -184,7 +184,7 @@ extern "C" {
     const char* uri = env->GetStringUTFChars(jUri, 0);
  
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_begin_uri_action(uri, &ctx);
+    al_status = ual_begin_dataentry_action(uri, (int)jMode, &ctx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
     if (al_status.code < 0)
         raiseLowLevelException( env, al_status);
@@ -224,27 +224,6 @@ extern "C" {
     return jUri;
 }
 
-
-/*
- * Class:     imasjava_wrapper_LowLevel
- * Method:    ual_open_pulse
- * Signature: (IILjava/lang/String;)I
- */
- void JNICALL Java_imasjava_wrapper_LowLevel_ual_1open_1pulse
-  (JNIEnv *env, jclass jWrapperClass, jint jCtx, jint jMode, jstring jOptions)
-{
-    al_status_t al_status;
-    const char *options = env->GetStringUTFChars(jOptions, 0);
-
-    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_open_pulse((int)jCtx, (int)jMode, options);
-    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
-
-    env->ReleaseStringUTFChars(jOptions, options);
-
-    if (al_status.code < 0)
-        raiseLowLevelException( env, al_status);
-}
 /*
  * Class:     imasjava_wrapper_LowLevel
  * Method:    ual_close_pulse

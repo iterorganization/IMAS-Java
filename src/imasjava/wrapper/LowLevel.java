@@ -108,35 +108,20 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
 			     final String version) throws UALException;
 
   /**
-     Starts an action on a URI in the database.
+     Starts an action on a Data Entry in the database.
      @param[in] uri
-     @return pulse context id
-
-  int ual_begin_uri_action(const char *uri, int *pctxID) throws UALException;
-  */
-  public static native int ual_begin_uri_action(
-                 final String uri) throws UALException;
-
-  /**
-     Opens a database entry.
-     This function opens a database entry described by the passed pulse context.
-     @param[in] pulseCtx pulse context id (from ual_begin_uri_action())
      @param[in] mode opening option:
      - OPEN_PULSE = open an existing pulse (only if exist)
      - FORCE_OPEN_PULSE = open a pulse (create it if not exist)
      - CREATE_PULSE = create a new pulse (do not overwrite if already exist)
      - FORCE_CREATE_PULSE = create a new pulse (erase old one if already exist)
-     @param[in] options additional options, ex: "name=treename refShot=1 refRun=2"
-     (possibly backend specific)
-     @result error status
+     @return data entry context id
 
-  int ual_open_pulse(int pulseCtx, 
-		     int mode, 
-		     const char *options) throws UALException;
-*/
-  public static native void ual_open_pulse(int pulseCtx, 
-		     int mode, 
-		     final String options) throws UALException;
+  int ual_begin_dataentry_action(const char *uri, int mode) throws UALException;
+  */
+  public static native int ual_begin_dataentry_action(
+                 final String uri, int mode) throws UALException;
+
   /**
      Closes a database entry.
      This function closes a database entry described by the passed pulse context.

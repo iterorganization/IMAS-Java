@@ -15,12 +15,12 @@ public class Wrapper {
             return LowLevel.ual_build_uri_from_legacy_parameters(backendID, shot, run, user, tokamak, version);
         }
 
-        static public int ualBeginUriAction(String uri) throws UALException
+        static public int ualBeginDataEntryAction(String uri, int mode) throws UALException
         {
             int pulseCtx = -1;
 
             uri = uri.trim();
-            pulseCtx = LowLevel.ual_begin_uri_action(uri);
+            pulseCtx = LowLevel.ual_begin_dataentry_action(uri, mode);
 
             return pulseCtx;
         }
