@@ -164,7 +164,32 @@ public class imas {
 
 
 
+/**
+* Opens database instance.
+* @param uri, URI of the IMAS Data Entry
+* @param mode, opening mode {OPEN_PULSE, FORCE_OPEN_PULSE, CREATE_PULSE, FORCE_CREATE_PULSE}
+* @exception UALException is thrown if the database cannot be open.
+**/
 
+static public int open(String uri, int mode) throws UALException
+{
+int pulseCtx;
+
+try{ 
+    pulseCtx = Wrapper.ualBeginDataEntryAction(uri, mode);
+} catch(Exception exc) {
+    throw new UALException(  "[ual_begin_dataentry_action]: Error opening data entry with URI: " + uri + ", using mode:" + mode + ":\n" + exc.getMessage()  );
+}
+
+imas.shot = shot;
+imas.run = run;
+imas.user = user;
+imas.tokamak = tokamak;
+imas.version = version;
+imas.pulseCtx = pulseCtx;
+imas.setPulseCtx(pulseCtx);
+return pulseCtx;
+}
 
  /**
   *Opens database instance.
