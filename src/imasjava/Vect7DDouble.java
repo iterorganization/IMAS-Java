@@ -151,7 +151,7 @@ public class Vect7DDouble extends SummaryString {
    *
    * @param array row-major ordered array
    */
-  public void set(double[][][][][][] array) {
+  public void set(double[][][][][][][] array) {
     for (int i = 0; i < dim1; i++) {
       for (int p = 0; p < dim2; p++) {
         for (int q = 0; q < dim3; q++) {
