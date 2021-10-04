@@ -5,14 +5,14 @@ import imasjava.*;
 
 public class Wrapper {
 
-        static public String ualBuildUriFromLegacyParameters(int backendID, int shot, int run, String user, String tokamak, String version) throws UALException
+        static public String ualBuildUriFromLegacyParameters(int backendID, int shot, int run, String user, String tokamak, String version, String options) throws UALException
         {
 
             user = user.trim();
             tokamak = tokamak.trim();
             version = version.trim();
-
-            return LowLevel.ual_build_uri_from_legacy_parameters(backendID, shot, run, user, tokamak, version);
+            options = options.trim();
+            return LowLevel.ual_build_uri_from_legacy_parameters(backendID, shot, run, user, tokamak, version, options);
         }
 
         static public int ualBeginDataEntryAction(String uri, int mode) throws UALException

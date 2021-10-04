@@ -88,8 +88,9 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
      @param[in] shot shot number
      @param[in] run run number
      @param[in] user username [_optional, "" for default_]
-     @param[in] tokamak tokamak name [_optional, "" for default_]
-     @param[in] version data version [_optional, "" for default_]
+     @param[in] tokamak tokamak name
+     @param[in] version data version
+     @param[in] options options
      @return uri
 
   int ual_build_uri_from_legacy_parameters(final int backendID, 
@@ -98,6 +99,7 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
 			     const char *user, 
 			     const char *tokamak, 
 			     const char *version,
+                 const char *options,
                  char* uri) throws UALException;
   */
   public static native String ual_build_uri_from_legacy_parameters(final int backendID, 
@@ -105,7 +107,8 @@ public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
 			     final int run, 
 			     final String user, 
 			     final String tokamak, 
-			     final String version) throws UALException;
+			     final String version,
+                 final String options) throws UALException;
 
   /**
      Starts an action on a Data Entry in the database.

@@ -109,7 +109,7 @@ JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1dataentry_1act
  * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1build_1uri_1from_1legacy_1parameters
-  (JNIEnv *, jclass, jint, jint, jint, jstring, jstring, jstring);
+  (JNIEnv *, jclass, jint, jint, jint, jstring, jstring, jstring, jstring);
 
 /*
  * Class:     imasjava_wrapper_LowLevel
