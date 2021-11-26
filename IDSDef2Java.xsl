@@ -162,52 +162,120 @@ public class imas {
     <xsl:apply-templates select="IDS" mode="SET_PULSE_CTX"/>
 }
 
+  /**
+   * Opens database instance.
+   *
+   * @param shot Shot number.
+   * @param run Run Number.
+   * @param user User name
+   * @param tokamak Machine name
+   * @param version Database version
+   * @return the database index to be used in subsequent get/put calls
+   * @exception UALException is thrown if the database cannot be open.
+   */
+  public static int openEnv(int shot, int run, String user, String tokamak, String version)
+      throws UALException {
+    return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
+  }
 
+  /**
+   * Opens database instance.
+   *
+   * @param shot Shot number.
+   * @param run Run Number.
+   * @param user User name
+   * @param tokamak Machine name
+   * @param version Database version
+   * @param options Options passed down to LowLevel
+   * @return the database index to be used in subsequent get/put calls
+   * @exception UALException is thrown if the database cannot be open.
+   */
+  public static int openEnv(
+      int shot, int run, String user, String tokamak, String version, String options)
+      throws UALException {
+    return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND, options);
+  }
 
+  /**
+   * Opens database instance.
+   *
+   * @param backendType Type of the backend to be used
+   * @param shot Shot number.
+   * @param run Run Number.
+   * @param user User name
+   * @param tokamak Name of the machine
+   * @param version Database version
+   * @param backendType Type of the backend to be used
+   * @return the database index to be used in subsequent get/put calls
+   * @exception UALException is thrown if the database cannot be open.
+   */
+  public static int openEnv(
+      int shot, int run, String user, String tokamak, String version, int backendType)
+      throws UALException {
+    return openEnv(shot, run, user, tokamak, version, backendType, "");
+  }
 
-
- /**
-  *Opens database instance.
-  * @param name Name of the database (by convention imas).
-  * @param shot Shot number.
-  * @param run Run Number.
-  * @param refShot Shot number of the reference database.
-  * @param runRun Run Number of the reference database.
-  * @return the database index to be used in subsequent get/put calls
-  * @exception UALException is thrown if the database cannot be open.
-  **/
-
- static public int openEnv(int shot, int run, String user, String tokamak, String version) throws UALException
-{
-  return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
-}
-
-/**
-  * Opens database instance.
-  * @param backendType Type of the backend to be used
-  * @param name Name of the database (by convention imas).
-  * @param shot Shot number.
-  * @param run Run Number.
-  * @param refShot Shot number of the reference database.
-  * @param runRun Run Number of the reference database.
-  * @return the database index to be used in subsequent get/put calls
-  * @exception UALException is thrown if the database cannot be open.
-  **/
-
-static public int openEnv(int shot, int run, String user, String tokamak, String version, int backendType) throws UALException
-{
+  /**
+   * Opens database instance.
+   *
+   * @param backendType Type of the backend to be used
+   * @param shot Shot number.
+   * @param run Run Number.
+   * @param user User name
+   * @param tokamak Name of the machine
+   * @param version Database version
+   * @param backendType Type of the backend to be used
+   * @param options Options passed down to LowLevel
+   * @return the database index to be used in subsequent get/put calls
+   * @exception UALException is thrown if the database cannot be open.
+   */
+  public static int openEnv(
+      int shot,
+      int run,
+      String user,
+      String tokamak,
+      String version,
+      int backendType,
+      String options)
+      throws UALException {
     int pulseCtx;
 
-    try{ 
-      pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version); 
-    } catch(Exception exc) {
-      throw new UALException(  "[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
+    try {
+      pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version);
+    } catch (Exception exc) {
+      throw new UALException(
+          "[ual_begin_pulse_action]: Error creating pulse file: "
+              + user
+              + "/"
+              + tokamak
+              + "/"
+              + version
+              + "/"
+              + shot
+              + "/"
+              + run
+              + "/"
+              + backendType
+              + ":\n"
+              + exc.getMessage());
     }
 
-    try{ 
-      LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, "");
-    } catch(Exception exc) {
-      throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
+    try {
+      LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, options);
+    } catch (Exception exc) {
+      throw new UALException(
+          "[ual_open_pulse]: Error creating pulse file: "
+              + user
+              + "/"
+              + tokamak
+              + "/"
+              + version
+              + "/"
+              + shot
+              + "/"
+              + run
+              + ":\n"
+              + exc.getMessage());
     }
 
     imas.shot = shot;
@@ -218,50 +286,120 @@ static public int openEnv(int shot, int run, String user, String tokamak, String
     imas.pulseCtx = pulseCtx;
     imas.setPulseCtx(pulseCtx);
     return pulseCtx;
-}
+  }
 
- /**
-  *Creates a new database instance.
-  * @param shot Shot number.
-  * @param run Run Number.
-  * @param user User name
-  * @param tokamak Name of the machine
-  * @param version Database version
-  * @return the database index to be used in subsequent get/put calls
-  * @exception UALException is thrown if the database cannot be open.
-  **/
+  /**
+   * Creates a new database instance.
+   *
+   * @param shot Shot number.
+   * @param run Run Number.
+   * @param user User name
+   * @param tokamak Name of the machine
+   * @param version Database version
+   * @return the database index to be used in subsequent get/put calls
+   * @exception UALException is thrown if the database cannot be open.
+   */
+  public static int createEnv(int shot, int run, String user, String tokamak, String version)
+      throws UALException {
+    return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
+  }
 
-static public int createEnv(int shot, int run, String user, String tokamak, String version ) throws UALException
-{
-  return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
-}
+  /**
+   * Creates a new database instance.
+   *
+   * @param shot Shot number.
+   * @param run Run Number.
+   * @param user User name
+   * @param tokamak Name of the machine
+   * @param version Database version
+   * @param options Options that are passed down to LowLevel
+   * @return the database index to be used in subsequent get/put calls
+   * @exception UALException is thrown if the database cannot be open.
+   */
+  public static int createEnv(
+      int shot, int run, String user, String tokamak, String version, String options)
+      throws UALException {
+    return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND, options);
+  }
 
- /**
-  *Creates a new database instance.
-  * @param shot Shot number.
-  * @param run Run Number.
-  * @param user User name
-  * @param tokamak Name of the machine
-  * @param version Database version
-  * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
-  * @return the database index to be used in subsequent get/put calls
-  * @exception UALException is thrown if the database cannot be open.
-  **/
+  /**
+   * Creates a new database instance.
+   *
+   * @param shot Shot number.
+   * @param run Run Number.
+   * @param user User name
+   * @param tokamak Name of the machine
+   * @param version Database version
+   * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
+   * @return the database index to be used in subsequent get/put calls
+   * @exception UALException is thrown if the database cannot be open.
+   */
+  public static int createEnv(
+      int shot, int run, String user, String tokamak, String version, int backendType)
+      throws UALException {
+    return createEnv(shot, run, user, tokamak, version, backendType, "");
+  }
 
-static public int createEnv(int shot, int run, String user, String tokamak, String version, int backendType ) throws UALException
-{
+  /**
+   * Creates a new database instance.
+   *
+   * @param shot Shot number.
+   * @param run Run Number.
+   * @param user User name
+   * @param tokamak Name of the machine
+   * @param version Database version
+   * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
+   * @param config String with the options that are passed to LowLevel.ual_open_pulse
+   * @return the database index to be used in subsequent get/put calls
+   * @exception UALException is thrown if the database cannot be open.
+   */
+  public static int createEnv(
+      int shot,
+      int run,
+      String user,
+      String tokamak,
+      String version,
+      int backendType,
+      String options)
+      throws UALException {
     int pulseCtx = -1;
 
-    try { 
-      pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version); 
-    } catch(Exception exc){
-      throw new UALException("[ual_begin_pulse_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
+    try {
+      pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version);
+    } catch (Exception exc) {
+      throw new UALException(
+          "[ual_begin_pulse_action]: Error creating pulse file: "
+              + user
+              + "/"
+              + tokamak
+              + "/"
+              + version
+              + "/"
+              + shot
+              + "/"
+              + run
+              + "/"
+              + backendType
+              + ":\n"
+              + exc.getMessage());
     }
 
-    try{ 
-      LowLevel.ual_open_pulse(pulseCtx, LowLevel.FORCE_CREATE_PULSE, "");
-    } catch(Exception exc) {
-      throw new UALException("[ual_open_pulse]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + ":\n" + exc.getMessage()  );
+    try {
+      LowLevel.ual_open_pulse(pulseCtx, LowLevel.FORCE_CREATE_PULSE, options);
+    } catch (Exception exc) {
+      throw new UALException(
+          "[ual_open_pulse]: Error creating pulse file: "
+              + user
+              + "/"
+              + tokamak
+              + "/"
+              + version
+              + "/"
+              + shot
+              + "/"
+              + run
+              + ":\n"
+              + exc.getMessage());
     }
 
     imas.shot = shot;
@@ -273,8 +411,7 @@ static public int createEnv(int shot, int run, String user, String tokamak, Stri
     imas.pulseCtx = pulseCtx;
     imas.setPulseCtx(pulseCtx);
     return pulseCtx;
-}
-
+  }
 
  
  /**
@@ -569,7 +706,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
             ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
 
             this.deleteRootFields(ctx);
-            this.putRootFields(ctx, idsTimeMode);
+            this.putRootFields(ctx, idsTimeMode, idsFullName);
         }
         finally {
             if(ctx >= 0)
@@ -577,7 +714,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
         }
     }
 
-    public void putRootFields(int ctx, int idsTimeMode)  throws UALException
+    public void putRootFields(int ctx, int idsTimeMode, String idsFullName)  throws UALException
     {
         int aosCtx = -1;
         int arraySize = -1;
@@ -678,7 +815,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
              // Open putSlice context
             ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, LowLevel.UNDEFINED_TIME, LowLevel.UNDEFINED_INTERP);
 
-            this.putSliceRootFields(ctx, idsTimeMode);
+            this.putSliceRootFields(ctx, idsTimeMode, idsFullName);
         }
         finally {
             if(ctx >= 0)
@@ -687,7 +824,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
     }
 
 
-    public void putSliceRootFields(int ctx, int idsTimeMode) throws UALException
+    public void putSliceRootFields(int ctx, int idsTimeMode, String idsFullName) throws UALException
     {
         int aosCtx = -1;
         int arraySize = -1;
@@ -1029,7 +1166,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* _____________________________________________________________________________________________________________ */
    /*_________________________________       PUT      _____________________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
-  	public void put(int ctx, int idsTimeMode)  throws UALException
+    public void put(int ctx, int idsTimeMode, String idsFullName)  throws UALException
     {
         String strTimeBasePath = null;
         String strNodePath = null;
@@ -1045,7 +1182,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
    /* ____________________________________________________________________________________________________________ */
    /*_________________________________       PUT SLICE     _______________________________________________________ */  
    /* ____________________________________________________________________________________________________________  */
-  	public void putSlice(int ctx, int idsTimeMode)  throws UALException
+    public void putSlice(int ctx, int idsTimeMode, String idsFullName)  throws UALException
     {
         String strTimeBasePath = null;
         String strNodePath = null;
@@ -1552,7 +1689,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
 <!--========== Regular structures ==========-->
     <!-- YB 2014 -->
         <xsl:when test="@data_type='structure'">
-        this.<xsl:value-of select="@name"/>.<xsl:value-of select="$methodName"/>(ctx, idsTimeMode);
+           this.<xsl:value-of select="@name"/>.<xsl:value-of select="$methodName"/>(ctx, idsTimeMode, idsFullName);
         </xsl:when>
 
 <!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX -->
@@ -1576,7 +1713,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     for( int i = 0; i &lt;arraySize; i++)
                     {
-                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode);
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
                         LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
                 }
@@ -1607,7 +1744,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     for( int i = 0; i &lt;arraySize; i++)
                     {
-                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode);
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
                         LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
                 }
@@ -1646,7 +1783,7 @@ public class <xsl:value-of select="@name"/>_IDSBase
                     aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
                     for( int i = 0; i &lt;arraySize; i++)
                     {
-                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode);
+                        this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
                         LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
                     }
                 }
@@ -1695,16 +1832,16 @@ public class <xsl:value-of select="@name"/>_IDSBase
         </xsl:choose>
         <xsl:choose>
           <xsl:when test="@path='ids_properties/version_put/data_dictionary'">
-          Wrapper.writeData(ctx, strNodePath, strTimeBasePath, "<xsl:value-of select="$DD_VERSION"/>" );
+            Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, "<xsl:value-of select="$DD_VERSION"/>", "<xsl:value-of select="@lifecycle_status"/>");
           </xsl:when>
           <xsl:when test="@path='ids_properties/version_put/access_layer'">
-          Wrapper.writeData(ctx, strNodePath, strTimeBasePath, "<xsl:value-of select="$AL_VERSION"/>" );
+            Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, "<xsl:value-of select="$AL_VERSION"/>", "<xsl:value-of select="@lifecycle_status"/>");
           </xsl:when>
           <xsl:when test="@path='ids_properties/version_put/access_layer_language'">
-          Wrapper.writeData(ctx, strNodePath, strTimeBasePath, "java");
+            Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, "java", "<xsl:value-of select="@lifecycle_status"/>");
           </xsl:when>
           <xsl:otherwise>
-          Wrapper.writeData(ctx, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>);
+            Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>, "<xsl:value-of select="@lifecycle_status"/>");
           </xsl:otherwise>
         </xsl:choose>
 

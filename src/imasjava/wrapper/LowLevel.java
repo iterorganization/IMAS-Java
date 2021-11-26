@@ -11,6 +11,8 @@ public static final int EMPTY_INT           = -999999999;
 public static final double EMPTY_DOUBLE     = -9.0E40;
 public static final Complex EMPTY_COMPLEX = new Complex(EMPTY_DOUBLE, EMPTY_DOUBLE);
 
+public static final String LIFECYCLE_STATUS_OBSOLETE = "obsolescent";
+
 
 public final static int  MAXDIM             =  7;
 
@@ -65,10 +67,10 @@ public final static int MEMORY_BACKEND     = BACKEND_ID_0 + 4;
 public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
 
 
-    public final static int IDS_TIME_MODE_UNKNOWN       = EMPTY_INT; 
-    public final static int IDS_TIME_MODE_HETEROGENEOUS = 0;
-    public final static int IDS_TIME_MODE_HOMOGENEOUS   = 1;
-    public final static int IDS_TIME_MODE_INDEPENDENT   = 2;
+public final static int IDS_TIME_MODE_UNKNOWN       = EMPTY_INT; 
+public final static int IDS_TIME_MODE_HETEROGENEOUS = 0;
+public final static int IDS_TIME_MODE_HOMOGENEOUS   = 1;
+public final static int IDS_TIME_MODE_INDEPENDENT   = 2;
 
 
 	  /* returns a vector containing all the dimensions of an array) */
