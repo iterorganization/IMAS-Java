@@ -5,6 +5,12 @@ import imasjava.*;
 
 public class Wrapper {
 
+		static private void warningWritingObsolescentNode(String idsName, String fieldPath, String lifeCycleStatus) 
+        {
+            if (lifeCycleStatus.equals(LowLevel.LIFECYCLE_STATUS_OBSOLETE))
+                System.out.println("Warning : while putting IDS " + idsName + ", the written IDS has non-empty obsolescent node " + fieldPath + ". Please consider updating the code to avoid using obsolescent nodes.");
+        }
+
         static public String ualBuildUriFromLegacyParameters(int backendID, int shot, int run, String user, String tokamak, String version, String options) throws UALException
         {
 
@@ -32,33 +38,41 @@ public class Wrapper {
     	/*********************************                                                                           ************************************/
     	/************************************************************************************************************************************************/
   
-	static public void writeData(int ctx, String fieldPath, String timeBasePath, int value)throws UALException
+	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, int value, String lifeCycleStatus)throws UALException
         {
             if(value == LowLevel.EMPTY_INT) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             int dataArray[] = {value};
             int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
             
 
-		 LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArray, 0, arrayOfSizes);
+		    LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArray, 0, arrayOfSizes);
         }
 
-	    static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DInt array)throws UALException
+	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect1DInt array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
-		int dataArr[] =  array.getArray();
-		int arrayOfSizes[] = {	array.getDim()};
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
-		LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
+		    int dataArr[] =  array.getArray();
+		    int arrayOfSizes[] = {	array.getDim()};
+
+		    LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
         }
 
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect2DInt array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect2DInt array, String lifeCycleStatus)throws UALException
         {            
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+
             int dataArr[] =  array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1) };
 
@@ -66,10 +80,12 @@ public class Wrapper {
     
         }
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect3DInt array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect3DInt array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             int dataArr[] =  array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2) };
@@ -80,33 +96,41 @@ public class Wrapper {
 
 
   	/************************************************************************************************************************************************/
-	static public void writeData(int ctx, String fieldPath, String timeBasePath, double value)throws UALException
-    {
-       if(value == LowLevel.EMPTY_DOUBLE) 
-                return;
-
-        int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
-		double dataArr[] = {value};
-
-		 LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
-
-    }
-
-	static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DDouble array)throws UALException
+	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, double value, String lifeCycleStatus)throws UALException
         {
-        if(array == null || array.getArray().length < 1) 
+            if(value == LowLevel.EMPTY_DOUBLE) 
                 return;
-		double dataArr[] = array.getArray();
-		int arrayOfSizes[] = {	array.getDim()};
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
-		LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
-
+            int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
+		    double dataArr[] = {value};
+    
+		    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
+    
         }
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect2DDouble array)throws UALException
+	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect1DDouble array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+    
+		    double dataArr[] = array.getArray();
+		    int arrayOfSizes[] = {	array.getDim()};
+    
+		    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
+    
+        }
+
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect2DDouble array, String lifeCycleStatus)throws UALException
+        {
+            if(array == null || array.getArray().length < 1) 
+                return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1) };
 
@@ -114,10 +138,13 @@ public class Wrapper {
     
         }
 	
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect3DDouble array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect3DDouble array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2)  };
 
@@ -125,10 +152,12 @@ public class Wrapper {
     
         }
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect4DDouble array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect4DDouble array, String lifeCycleStatus)throws UALException
         {
-           if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3)   };
@@ -137,10 +166,12 @@ public class Wrapper {
     
         }
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect5DDouble array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect5DDouble array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4) };
@@ -149,11 +180,13 @@ public class Wrapper {
     
         }
 
-       static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect6DDouble array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect6DDouble array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
-           
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4), array.getDim(5) };
 
@@ -161,10 +194,12 @@ public class Wrapper {
     
         }
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect7DDouble array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect7DDouble array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             double dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4), array.getDim(5), array.getDim(6) };
@@ -172,34 +207,42 @@ public class Wrapper {
             LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 7, arrayOfSizes);
     
         }
-    /************************************************************************************************************************************************/
-    static public void writeData(int ctx, String fieldPath, String timeBasePath, Complex value)throws UALException
-    {
-       if(value == LowLevel.EMPTY_COMPLEX) 
-                return;
-
-        int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
-        Complex dataArr[] = {value};
-
-         LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
-
-    }
-
-    static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DComplex array)throws UALException
+        /************************************************************************************************************************************************/
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Complex value, String lifeCycleStatus)throws UALException
         {
-        if(array == null || array.getArray().length < 1) 
+            if(value == LowLevel.EMPTY_COMPLEX) 
                 return;
-        Complex dataArr[] = array.getArray();
-        int arrayOfSizes[] = {  array.getDim()};
-
-        LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
-
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+    
+            int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
+            Complex dataArr[] = {value};
+    
+            LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
+    
         }
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect2DComplex array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect1DComplex array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+
+            Complex dataArr[] = array.getArray();
+            int arrayOfSizes[] = {  array.getDim()};
+    
+            LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
+
+        }
+
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect2DComplex array, String lifeCycleStatus)throws UALException
+        {
+            if(array == null || array.getArray().length < 1) 
+                return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+
             Complex dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1) };
 
@@ -207,10 +250,13 @@ public class Wrapper {
     
         }
     
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect3DComplex array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect3DComplex array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+
             Complex dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2)  };
 
@@ -218,10 +264,12 @@ public class Wrapper {
     
         }
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect4DComplex array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect4DComplex array, String lifeCycleStatus)throws UALException
         {
-           if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             Complex dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3)   };
@@ -230,10 +278,12 @@ public class Wrapper {
     
         }
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect5DComplex array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect5DComplex array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             Complex dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4) };
@@ -242,10 +292,12 @@ public class Wrapper {
     
         }
 
-       static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect6DComplex array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect6DComplex array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
            
             Complex dataArr[] = array.getArray();
             int arrayOfSizes[] = {  array.getDim(0), array.getDim(1), array.getDim(2), array.getDim(3), array.getDim(4), array.getDim(5) };
@@ -254,11 +306,13 @@ public class Wrapper {
     
         }
 
-    /************************************************************************************************************************************************/
-    	static public void writeData(int ctx, String fieldPath, String timeBasePath, String text)throws UALException
+        /************************************************************************************************************************************************/
+    	static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, String text, String lifeCycleStatus)throws UALException
         {
             if(text == null || text.length() < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
 		    int arrayOfSizes[] = {text.getBytes().length};
 
@@ -266,55 +320,57 @@ public class Wrapper {
         }
 
 
-        static public void writeData(int ctx, String fieldPath, String timeBasePath, Vect1DString array)throws UALException
+        static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect1DString array, String lifeCycleStatus)throws UALException
         {
             if(array == null || array.getArray().length < 1) 
                 return;
+            else
+                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             int arrayOfSizes[] = new int[2];
 
-        int maxStringSize = -1;
-        int  numberOfStrings = array.getDim();
-        String text = null;
-        byte[] textBytes = null;
-
-
-
-        byte strByteArray[] = null;
-        int size;
-        
-        //return on empty array
-        if(numberOfStrings < 1)
-            return;
-
-        for(int i = 0; i < numberOfStrings; i++)
-        {
-            text = array.getElementAt(i);
-            size = text.getBytes().length;
-            if( size > maxStringSize)
-                maxStringSize = size;
-                
-        }
-
-         if(maxStringSize < 1)
-            return;
-
-        arrayOfSizes[0] = numberOfStrings; 
-        arrayOfSizes[1] = maxStringSize;
-
-        strByteArray = new byte [numberOfStrings * maxStringSize];
-        
-        for(int i=0; i < numberOfStrings; i++)
-        {
-            text = array.getElementAt(i);
-            textBytes = text.getBytes();
-            size = textBytes.length;
-            System.arraycopy(textBytes, 0, strByteArray,  i * maxStringSize, size);
-           
-        }
-
-
-            LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, strByteArray, 2, arrayOfSizes);
+            int maxStringSize = -1;
+            int  numberOfStrings = array.getDim();
+            String text = null;
+            byte[] textBytes = null;
+    
+    
+    
+            byte strByteArray[] = null;
+            int size;
+            
+            //return on empty array
+            if(numberOfStrings < 1)
+                return;
+    
+            for(int i = 0; i < numberOfStrings; i++)
+            {
+                text = array.getElementAt(i);
+                size = text.getBytes().length;
+                if( size > maxStringSize)
+                    maxStringSize = size;
+                    
+            }
+    
+            if(maxStringSize < 1)
+                return;
+    
+            arrayOfSizes[0] = numberOfStrings; 
+            arrayOfSizes[1] = maxStringSize;
+    
+            strByteArray = new byte [numberOfStrings * maxStringSize];
+            
+            for(int i=0; i < numberOfStrings; i++)
+            {
+                text = array.getElementAt(i);
+                textBytes = text.getBytes();
+                size = textBytes.length;
+                System.arraycopy(textBytes, 0, strByteArray,  i * maxStringSize, size);
+            
+            }
+    
+    
+                LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, strByteArray, 2, arrayOfSizes);
         }
 
     	/************************************************************************************************************************************************/
