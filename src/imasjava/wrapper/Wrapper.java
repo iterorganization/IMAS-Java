@@ -7,7 +7,7 @@ public class Wrapper {
 
         static private void warningWritingObsolescentNode(String idsName, String fieldPath, String lifeCycleStatus) 
         {
-			String imas_obsolescent_nodes_warning_var = System.getenv("IMAS_DISABLE_OBSOLESCENT_WARNINGS");
+			String imas_disable_obsolescent_warnings_var = System.getenv("IMAS_DISABLE_OBSOLESCENT_WARNINGS");
 			boolean imas_disable_obsolescent_warnings = false;
 			if (imas_disable_obsolescent_warnings_var != null) {
 				imas_disable_obsolescent_warnings = Boolean.parseBoolean(imas_disable_obsolescent_warnings_var);
