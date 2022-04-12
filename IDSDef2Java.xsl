@@ -828,13 +828,10 @@ public class <xsl:value-of select="@name"/>_IDSBase
         // adding slice to an empty IDS
         if( storedTimeMode ==  LowLevel.IDS_TIME_MODE_UNKNOWN)
         {
-            System.out.println("Warning: Slice is being added to an empty IDS '<xsl:value-of select="@name"/>'. PUT is called to save time independent data.");
             this.put(iOccurrence);
             return ;
         }
-    
-        // time mode conflict
-        if( storedTimeMode != idsTimeMode)
+	else if( storedTimeMode != idsTimeMode)         // time mode conflict
         {
             throw new UALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('" + imas.timeModeToString(idsTimeMode) + "') differs from value stored in IDS ('" + imas.timeModeToString(storedTimeMode) + "')!");
         }
