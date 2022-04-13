@@ -657,11 +657,12 @@
             throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
             }
             
+            delete(iOccurrence);
+            
             try{
             // Open put context
             ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
             
-            this.deleteRootFields(ctx);
             this.putRootFields(ctx, idsTimeMode, idsFullName);
             }
             finally {
