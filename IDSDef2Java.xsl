@@ -744,24 +744,21 @@
             if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
             {
             throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
-            }
-            
-            
-            /***   Checking homogeneous_time read from file   ***/
-            storedTimeMode = imas.readIdsTimeMode(pulseCtx, idsFullName);
-            
-            
-            // adding slice to an empty IDS
-            if( storedTimeMode ==  LowLevel.IDS_TIME_MODE_UNKNOWN)
-            {
-            System.out.println("Warning: Slice is being added to an empty IDS '<xsl:value-of select="@name"/>'. PUT is called to save time independent data.");
+        }
+
+
+        /***   Checking homogeneous_time read from file   ***/
+        storedTimeMode = imas.readIdsTimeMode(pulseCtx, idsFullName);
+  
+    
+        // adding slice to an empty IDS
+        if( storedTimeMode ==  LowLevel.IDS_TIME_MODE_UNKNOWN)
+        {
             this.put(iOccurrence);
             return ;
-            }
-            
-            // time mode conflict
-            if( storedTimeMode != idsTimeMode)
-            {
+        }
+	else if( storedTimeMode != idsTimeMode)         // time mode conflict
+        {
             throw new UALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('" + imas.timeModeToString(idsTimeMode) + "') differs from value stored in IDS ('" + imas.timeModeToString(storedTimeMode) + "')!");
             }
             
