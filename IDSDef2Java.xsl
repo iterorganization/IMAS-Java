@@ -90,7 +90,6 @@ public class imas {
     public static String version;
     public static int shot; 
     public static int run;
-    public static boolean open_env_backend_specified  = true;
 
 
  public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException {
@@ -155,13 +154,20 @@ public class imas {
   public static int defaultBackend() 
   {
     int backend = LowLevel.MDSPLUS_BACKEND;
-    String backend_value = System.getenv("IMAS_AL_BACKEND");
-    if (backend_value == null || backend_value.isEmpty())
-		return backend;
-    backend = Integer.parseInt(backend_value);
-	return backend;
+    String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
+    if (backend_value != null)
+        backend = Integer.parseInt(backend_value);
+    return backend;
   }
 
+  public static int fallbackBackend() 
+  {
+    int backend = LowLevel.NO_BACKEND;
+    String backend_value = System.getenv("IMAS_AL_FALLBACK_BACKEND");
+    if (backend_value != null)
+        backend = Integer.parseInt(backend_value);
+    return backend;
+  }
 
  
 
@@ -184,7 +190,6 @@ public class imas {
    */
   public static int openEnv(int shot, int run, String user, String tokamak, String version)
       throws UALException {
-    imas.open_env_backend_specified = false;
     return openEnv(shot, run, user, tokamak, version, defaultBackend());
   }
 
@@ -203,7 +208,6 @@ public class imas {
   public static int openEnv(
       int shot, int run, String user, String tokamak, String version, String options)
       throws UALException {
-    imas.open_env_backend_specified = false;
     return openEnv(shot, run, user, tokamak, version, defaultBackend(), options);
   }
 
@@ -223,7 +227,6 @@ public class imas {
   public static int openEnv(
       int shot, int run, String user, String tokamak, String version, int backendType)
       throws UALException {
-    imas.open_env_backend_specified = true;
     return openEnv(shot, run, user, tokamak, version, backendType, "");
   }
 
@@ -250,7 +253,6 @@ public class imas {
       int backendType,
       String options)
       throws UALException {
-    imas.open_env_backend_specified = true;
     int pulseCtx = -1;
     boolean raisedException = false;
     String exc_message = "";
@@ -258,42 +260,6 @@ public class imas {
     try {
       pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version);
     } catch (Exception exc) {
-        raisedException = true;
-        exc_message = exc.getMessage();
-    }
-    
-    if (!raisedException) {
-		try {
-		  LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, options);
-		} catch (Exception exc) {
-
-					if (!imas.open_env_backend_specified &amp;&amp; (backendType == LowLevel.MDSPLUS_BACKEND || backendType == LowLevel.HDF5_BACKEND)) {
-					   String backend_search = System.getenv("IMAS_AL_BACKEND");
-					   if (backend_search != null &amp;&amp; !backend_search.isEmpty() &amp;&amp; backend_search=="1") {
-						  if (backendType == LowLevel.MDSPLUS_BACKEND ) {
-							  backendType = LowLevel.HDF5_BACKEND;
-						  }
-						  else {
-							  backendType = LowLevel.MDSPLUS_BACKEND;
-						  }
-						  try {
-							System.out.println("Warning:Backend search enabled, searching a pulse file with backend " + Integer.toString(backendType));
-							pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version);
-							LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, options);
-						  } catch(Exception exc2) {
-							  raisedException = true;
-							  exc_message = exc.getMessage();
-						  }
-						   
-					   }
-				  }
-				  else {
-					  raisedException = true;
-					  exc_message = exc.getMessage();
-				  }
-		}
-    }
-    if (raisedException) {
         throw new UALException("[ual_begin_pulse_action]: Error opening pulse file: "
 							  + user
 							  + "/"
@@ -307,7 +273,35 @@ public class imas {
 							  + "/"
 							  + backendType
 							  + ":\n"
-							  + exc_message);
+							  + exc.getMessage());
+    }
+    
+    try {
+        LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, options);
+    } catch (Exception exc) {
+        int fallback = fallbackBackend();
+	if (fallback != LowLevel.NO_BACKEND) {
+            System.out.println("WARNING: the pulse file is not available with the backend " + Integer.toString(backendType) + ", now attempting to access it with the fallback backend " + Integer.toString(fallback));
+	    try {
+	        pulseCtx = Wrapper.ualBeginPulseAction(fallback, shot, run, user, tokamak, version);
+	    	LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, options);
+	    } catch (Exception exc2) {
+                throw new UALException("[ual_begin_pulse_action]: Error opening pulse file: "
+							  + user
+							  + "/"
+							  + tokamak
+							  + "/"
+							  + version
+							  + "/"
+							  + shot
+							  + "/"
+							  + run
+							  + "/"
+							  + backendType
+							  + ":\n"
+							  + exc.getMessage());
+	    }
+	}		
     }
     imas.shot = shot;
     imas.run = run;
