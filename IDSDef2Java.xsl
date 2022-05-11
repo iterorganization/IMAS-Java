@@ -151,8 +151,23 @@ public class imas {
 
 
 
+  public static int defaultBackend() 
+  {
+    int backend = LowLevel.MDSPLUS_BACKEND;
+    String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
+    if (backend_value != null)
+        backend = Integer.parseInt(backend_value);
+    return backend;
+  }
 
-
+  public static int fallbackBackend() 
+  {
+    int backend = LowLevel.NO_BACKEND;
+    String backend_value = System.getenv("IMAS_AL_FALLBACK_BACKEND");
+    if (backend_value != null)
+        backend = Integer.parseInt(backend_value);
+    return backend;
+  }
 
  
 
@@ -175,7 +190,7 @@ public class imas {
    */
   public static int openEnv(int shot, int run, String user, String tokamak, String version)
       throws UALException {
-    return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
+    return openEnv(shot, run, user, tokamak, version, defaultBackend());
   }
 
   /**
@@ -193,7 +208,7 @@ public class imas {
   public static int openEnv(
       int shot, int run, String user, String tokamak, String version, String options)
       throws UALException {
-    return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND, options);
+    return openEnv(shot, run, user, tokamak, version, defaultBackend(), options);
   }
 
   /**
@@ -238,46 +253,56 @@ public class imas {
       int backendType,
       String options)
       throws UALException {
-    int pulseCtx;
+    int pulseCtx = -1;
+    boolean raisedException = false;
+    String exc_message = "";
 
     try {
       pulseCtx = Wrapper.ualBeginPulseAction(backendType, shot, run, user, tokamak, version);
     } catch (Exception exc) {
-      throw new UALException(
-          "[ual_begin_pulse_action]: Error creating pulse file: "
-              + user
-              + "/"
-              + tokamak
-              + "/"
-              + version
-              + "/"
-              + shot
-              + "/"
-              + run
-              + "/"
-              + backendType
-              + ":\n"
-              + exc.getMessage());
+        throw new UALException("[ual_begin_pulse_action]: Error opening pulse file: "
+							  + user
+							  + "/"
+							  + tokamak
+							  + "/"
+							  + version
+							  + "/"
+							  + shot
+							  + "/"
+							  + run
+							  + "/"
+							  + backendType
+							  + ":\n"
+							  + exc.getMessage());
     }
-
+    
     try {
-      LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, options);
+        LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, options);
     } catch (Exception exc) {
-      throw new UALException(
-          "[ual_open_pulse]: Error creating pulse file: "
-              + user
-              + "/"
-              + tokamak
-              + "/"
-              + version
-              + "/"
-              + shot
-              + "/"
-              + run
-              + ":\n"
-              + exc.getMessage());
+        int fallback = fallbackBackend();
+	if (fallback != LowLevel.NO_BACKEND) {
+            System.out.println("WARNING: the pulse file is not available with the backend " + Integer.toString(backendType) + ", now attempting to access it with the fallback backend " + Integer.toString(fallback));
+	    try {
+	        pulseCtx = Wrapper.ualBeginPulseAction(fallback, shot, run, user, tokamak, version);
+	    	LowLevel.ual_open_pulse(pulseCtx, LowLevel.OPEN_PULSE, options);
+	    } catch (Exception exc2) {
+                throw new UALException("[ual_begin_pulse_action]: Error opening pulse file: "
+							  + user
+							  + "/"
+							  + tokamak
+							  + "/"
+							  + version
+							  + "/"
+							  + shot
+							  + "/"
+							  + run
+							  + "/"
+							  + backendType
+							  + ":\n"
+							  + exc.getMessage());
+	    }
+	}		
     }
-
     imas.shot = shot;
     imas.run = run;
     imas.user = user;
@@ -301,7 +326,7 @@ public class imas {
    */
   public static int createEnv(int shot, int run, String user, String tokamak, String version)
       throws UALException {
-    return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
+    return createEnv(shot, run, user, tokamak, version, defaultBackend());
   }
 
   /**
@@ -319,7 +344,7 @@ public class imas {
   public static int createEnv(
       int shot, int run, String user, String tokamak, String version, String options)
       throws UALException {
-    return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND, options);
+    return createEnv(shot, run, user, tokamak, version, defaultBackend(), options);
   }
 
   /**
