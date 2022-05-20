@@ -10,7 +10,7 @@ public class Wrapper {
 			String disable_obsolescent_warning_var = System.getenv("IMAS_AL_DISABLE_OBSOLESCENT_WARNING");
 			int disable_obsolescent_warning = 0;
 			if (disable_obsolescent_warning_var != null) {
-				disable_obsolescent_warning = Boolean.parseInt(disable_obsolescent_warning_var);
+				disable_obsolescent_warning = Integer.parseInt(disable_obsolescent_warning_var);
 			}
 			if (disable_obsolescent_warning==1)
 				return;
