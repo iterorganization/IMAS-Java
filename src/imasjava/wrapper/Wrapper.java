@@ -7,6 +7,14 @@ public class Wrapper {
 
 		static private void warningWritingObsolescentNode(String idsName, String fieldPath, String lifeCycleStatus) 
         {
+			String imas_disable_obsolescent_warnings_var = System.getenv("IMAS_DISABLE_OBSOLESCENT_WARNINGS");
+			boolean imas_disable_obsolescent_warnings = false;
+			if (imas_disable_obsolescent_warnings_var != null) {
+				imas_disable_obsolescent_warnings = Boolean.parseBoolean(imas_disable_obsolescent_warnings_var);
+			}
+			if (imas_disable_obsolescent_warnings)
+				return;
+	   
             if (lifeCycleStatus.equals(LowLevel.LIFECYCLE_STATUS_OBSOLETE))
                 System.out.println("Warning : while putting IDS " + idsName + ", the written IDS has non-empty obsolescent node " + fieldPath + ". Please consider updating the code to avoid using obsolescent nodes.");
         }

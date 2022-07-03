@@ -15,8 +15,7 @@
                          xmlns:my="http://localhost.localdomain/localns"
                          exclude-result-prefixes="my"
                          extension-element-prefixes="yaslt exsl func">
-    
-    -->
+       -->
     <xsl:param name="SYSTEM" as="xs:string" required="yes"/>
     <xsl:param name="DD_VERSION" as="xs:string" required="yes"/>
     <xsl:param name="AL_VERSION" as="xs:string" required="yes"/>
@@ -60,13 +59,13 @@
         }
         <xsl:choose><xsl:when test="$SYSTEM = 'Linux'">
             libpath = libpath + "/lib";
-            String imas_library = libpath + "/libimas-java-binding.so";
+            String imas_library = libpath + "/libal-java-binding.so";
           </xsl:when><xsl:otherwise>
-            String imas_library = libpath + "/javainterface/lib/libimas-java-binding.dll";
+            String imas_library = libpath + "/javainterface/lib/libal-java-binding.dll";
           </xsl:otherwise></xsl:choose>
         File f = new File(imas_library);
         if (!f.exists()) {
-        System.err.println("IMAS library not set up in the environment. (libimas-java-binding.so missing)");
+        System.err.println("IMAS library not set up in the environment. (libal-java-binding.so missing)");
         }
         
         try {
@@ -149,13 +148,26 @@
         return -1;
         }
         
-        
-        
-        
-        
-        
-        
-        
+
+	public static int defaultBackend() 
+	{
+	int backend = LowLevel.MDSPLUS_BACKEND;
+	String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
+	if (backend_value != null)
+        backend = Integer.parseInt(backend_value);
+	return backend;
+	}
+
+	public static int fallbackBackend() 
+	{
+	int backend = LowLevel.NO_BACKEND;
+	String backend_value = System.getenv("IMAS_AL_FALLBACK_BACKEND");
+	if (backend_value != null)
+        backend = Integer.parseInt(backend_value);
+	return backend;
+	}
+
+                
         
         static public void setPulseCtx(int pulseCtx)
         {
@@ -169,8 +181,7 @@
         * @param uri, URI of the IMAS Data Entry
         * @param mode, opening mode {OPEN_PULSE, FORCE_OPEN_PULSE, CREATE_PULSE, FORCE_CREATE_PULSE}
         * @exception UALException is thrown if the database cannot be open.
-        **/
-        
+        */
         public static int open(String uri, int mode) throws UALException
         {
         int pulseCtx;
@@ -180,12 +191,13 @@
         } catch(Exception exc) {
         throw new UALException(  "[ual_begin_dataentry_action]: Error opening data entry with URI: " + uri + ", using mode:" + mode + ":\n" + exc.getMessage()  );
         }
-        
+
+        /* to be checked 
         imas.shot = shot;
         imas.run = run;
         imas.user = user;
         imas.tokamak = tokamak;
-        imas.version = version;
+        imas.version = version; */
         imas.pulseCtx = pulseCtx;
         imas.setPulseCtx(pulseCtx);
         return pulseCtx;
@@ -204,7 +216,7 @@
         */
         public static int openEnv(int shot, int run, String user, String tokamak, String version)
         throws UALException {
-        return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
+        return openEnv(shot, run, user, tokamak, version, defaultBackend(), "");
         }
         
         /**
@@ -222,7 +234,7 @@
         public static int openEnv(
         int shot, int run, String user, String tokamak, String version, String options)
         throws UALException {
-        return openEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND, options);
+        return openEnv(shot, run, user, tokamak, version, defaultBackend(), options);
         }
         
         /**
@@ -249,7 +261,6 @@
         /**
         * Opens database instance.
         * @param backendType Type of the backend to be used
-        * @param name Name of the database (by convention imas).
         * @param shot Shot number.
         * @param run Run Number.
         * @param user User name
@@ -259,19 +270,26 @@
         * @param options Options passed down to LowLevel
         * @return the database index to be used in subsequent get/put calls
         * @exception UALException is thrown if the database cannot be open.
-        **/
-        
+        */
         public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws UALException
         {
         int pulseCtx;
-        
+        String uri;
         try{ 
-        String uri = Wrapper.ualBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
-        pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
+        uri = Wrapper.ualBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
+	pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
         } catch(Exception exc) {
-        throw new UALException(  "[ual_begin_dataentry_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
-        }
-        
+	int fallback = fallbackBackend();
+	if (fallback != LowLevel.NO_BACKEND) {
+        System.out.println("WARNING: the pulse file is not available with the backend " + Integer.toString(backendType) + ", now attempting to access it with the fallback backend " + Integer.toString(fallback));
+	try {
+        uri = Wrapper.ualBuildUriFromLegacyParameters(fallback, shot, run, user, tokamak, version, options);
+	pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
+	} catch (Exception exc2) {
+        throw new UALException("[ual_begin_pulse_action]: Error opening pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + fallback + ":\n" + exc.getMessage());
+	}
+	}		
+
         imas.shot = shot;
         imas.run = run;
         imas.user = user;
@@ -295,7 +313,7 @@
         */
         public static int createEnv(int shot, int run, String user, String tokamak, String version)
         throws UALException {
-        return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND);
+        return createEnv(shot, run, user, tokamak, version, defaultBackend(), "");
         }
         
         /**
@@ -313,7 +331,7 @@
         public static int createEnv(
         int shot, int run, String user, String tokamak, String version, String options)
         throws UALException {
-        return createEnv(shot, run, user, tokamak, version, LowLevel.MDSPLUS_BACKEND, options);
+        return createEnv(shot, run, user, tokamak, version, defaultBackend(), options);
         }
         
         
@@ -327,7 +345,7 @@
         * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
         * @return the database index to be used in subsequent get/put calls
         * @exception UALException is thrown if the database cannot be open.
-        **/
+        */
         
         public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType) throws UALException
         {
@@ -342,10 +360,10 @@
         * @param tokamak Name of the machine
         * @param version Database version
         * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
+	* @param options Options passed down to LowLevel
         * @return the database index to be used in subsequent get/put calls
         * @exception UALException is thrown if the database cannot be open.
-        **/
-        
+        */
         public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws UALException
         {
         int pulseCtx = -1;

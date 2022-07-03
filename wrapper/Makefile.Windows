@@ -1,11 +1,11 @@
 INCLUDES= -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 -I../../lowlevel
 LIBS= -L$(JAVA_HOME)/jre/lib/amd64 -L../../lowlevel
-LIBS+= ../../lowlevel/libimas.lib
-TARGETS= lib/libimas-java-binding.dll lib/libimas-java-binding.lib
+LIBS+= ../../lowlevel/libal.lib
+TARGETS= lib/libal-java-binding.dll lib/libal-java-binding.lib
 CFLAGS+= -DWIN32
 CXXFLAGS+= -DWIN32
 
-ifneq ("no","$(strip $(IMAS_MDSPLUS))")
+ifeq ("yes","$(strip $(IMAS_MDSPLUS))")
 LIBS+= $(MDSPLUS_DIR)/lib/XTreeShr.a
 LIBS+= $(MDSPLUS_DIR)/lib/MdsObjectsCppShr.a
 LIBS+= $(MDSPLUS_DIR)/lib/TdiShr.a
@@ -15,8 +15,8 @@ LIBS+= $(MDSPLUS_DIR)/lib/MdsShr.a
 LIBS+= -lxml2 -lws2_32 -ldl -liphlpapi
 endif
 
-ifneq ("no","$(strip $(IMAS_UDA))")
-ifeq ("fat","$(strip $(IMAS_UDA))")
+ifeq ("yes","$(strip $(IMAS_UDA))")
+ifeq ("yes","$(strip $(IMAS_UDAFAT))")
 LIBS+= -L$(UDA_HOME)/lib
 LIBS+= $(UDA_HOME)/lib/libfatuda_cpp.a
 LIBS+= $(UDA_HOME)/lib/libportablexdr.a
@@ -30,7 +30,7 @@ LIBS+= -lws2_32 -lssl -lcrypto
 endif
 endif
 
-ifneq ("no","$(strip $(IMAS_HDF5))")
+ifeq ("yes","$(strip $(IMAS_HDF5))")
 LIBS+= -L$(HDF5_HOME)/lib
 LIBS+= $(HDF5_HOME)/lib/libhdf5.a -ldl -lz -lboost_filesystem-mt -lboost_system-mt
 endif
@@ -39,18 +39,18 @@ endif
 all_:all
 
 # Windows dynamic library
-lib/libimas-java-binding.dll: $(COMMON_OBJECTS) | ./lib
+lib/libal-java-binding.dll: $(COMMON_OBJECTS) | ./lib
 	$(CXX) -g -o $@ -shared -Wl,$(SONAME_OPT),$@.$(SO_NUM) -Wl,--out-implib,$@.lib $^ $(LIBS)
-lib/libimas-java-binding.dll_install: %_install:%
+lib/libal-java-binding.dll_install: %_install:%
 	$(mkdir_p) $(packagedir)/javainterface/lib
 	$(CP) $< $(packagedir)/javainterface/lib
-lib/libimas-java-binding.dll_uninstall:
+lib/libal-java-binding.dll_uninstall:
 
 # Windows static library
-lib/libimas-java-binding.lib: $(COMMON_OBJECTS) | ./lib
+lib/libal-java-binding.lib: $(COMMON_OBJECTS) | ./lib
 	$(AR) rcvsu $@ $^
 	ranlib $@
-lib/libimas-java-binding.lib_install: %_install:%
+lib/libal-java-binding.lib_install: %_install:%
 	$(mkdir_p) $(packagedir)/javainterface/lib
 	$(CP) $< $(packagedir)/javainterface/lib
-lib/libimas-java-binding.lib_uninstall:
+lib/libal-java-binding.lib_uninstall:
