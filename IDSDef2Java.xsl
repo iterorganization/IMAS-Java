@@ -289,7 +289,7 @@
         throw new UALException("[ual_begin_pulse_action]: Error opening pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + fallback + ":\n" + exc.getMessage());
 	}
 	}		
-
+	}
         imas.shot = shot;
         imas.run = run;
         imas.user = user;
