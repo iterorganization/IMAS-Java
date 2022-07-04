@@ -184,7 +184,7 @@
         */
         public static int open(String uri, int mode) throws UALException
         {
-        int pulseCtx;
+        int pulseCtx = -1;
         
         try{ 
         pulseCtx = Wrapper.ualBeginDataEntryAction(uri, mode);
@@ -273,7 +273,7 @@
         */
         public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws UALException
         {
-        int pulseCtx;
+        int pulseCtx = -1;
         String uri;
         try{ 
         uri = Wrapper.ualBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
