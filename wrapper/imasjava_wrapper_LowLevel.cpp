@@ -259,7 +259,7 @@ extern "C" {
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_begin_global_action((int)jCtx, dataObjectName, (int)jRWMode, &ctx);
+    al_status = ual_begin_global_action((int)jCtx, dataObjectName, "", (int)jRWMode, &ctx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
