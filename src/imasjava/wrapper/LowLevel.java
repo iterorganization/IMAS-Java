@@ -208,7 +208,51 @@ public final static int IDS_TIME_MODE_INDEPENDENT   = 2;
 
   int hli_end_action(int ctx) throws UALException; 
   */
-  public static native void hli_end_action(int ctx) throws UALException; 
+  public static native void hli_end_action(int ctx) throws UALException;
+  
+    /**
+     Bind readback plugins.
+     This function binds readback plugins before a get()/get_slice() operation.
+     @param[in] ctx an operation context (hli_begin_global_action() or hli_begin_slice_action())
+  */
+  public static native void hli_bind_readback_plugins(int ctx) throws UALException; 
+
+    /**
+     Unbind readback plugins.
+     This function unbinds readback plugins after a get()/get_slice() operation.
+     @param[in] ctx an operation context (hli_begin_global_action() or hli_begin_slice_action())
+  */
+  public static native void hli_unbind_readback_plugins(int ctx) throws UALException;
+
+  /**
+     Store plugins metadata.
+     This function stores plugins metadata after a put()/put_slice() operation.
+     @param[in] ctx an operation context (hli_begin_global_action() or hli_begin_slice_action())
+  */
+  public static native void hli_write_plugins_metadata(int ctx) throws UALException;
+
+  /**
+     Set the value of type double of a plugin parameter.
+     This function sets the value of a parameter plugin.
+     @param[parameterName] name of the parameter
+     @param[dim] dimension of the parameter (0 to 6)
+     @param[size] shape of the values
+     @param[data] parmameter double values
+     @param[pluginName] name of the plugin
+  */
+  public static native void hli_set_doublevalue_parameter_plugin(final String parameterName, int dim, int[] size, double[] data, final String pluginName) throws UALException;
+
+  /**
+     Set the value of type int of a plugin parameter.
+     This function sets the value of a parameter plugin.
+     @param[parameterName] name of the parameter
+     @param[dim] dimension of the parameter (0 to 6)
+     @param[size] shape of the values
+     @param[data] parmameter int values
+     @param[pluginName] name of the plugin
+  */
+  public static native void hli_set_intvalue_parameter_plugin(final String parameterName, int dim, int[] size, int[] data, final String pluginName) throws UALException;
+ 
   /**
      Writes data.
      This function writes a signal in the database given the passed context.

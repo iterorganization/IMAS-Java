@@ -315,6 +315,134 @@ extern "C" {
 
 /*
  * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_bind_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1bind_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+{
+    al_status_t al_status;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_bind_plugin((int)jCtx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_unbind_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1unbind_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+{
+    al_status_t al_status;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_unbind_plugin((int)jCtx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_write_plugins_metadata
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1write_1plugins_1metadata
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+{
+    al_status_t al_status;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_write_plugins_metadata((int)jCtx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_set_doublevalue_parameter_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1set_1doublevalue_1parameter_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jParameterName, jint jDim, jintArray jSizeArray, jdoubleArray jData, jstring jPluginName)
+{
+    al_status_t al_status;
+
+    const char *parameterName = env->GetStringUTFChars(jParameterName, 0);
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    jdoubleArray *dataArray = NULL;
+    jint *sizeArray = NULL;
+
+   //    jsize  len = env->GetArrayLength(jData);
+    if(jData != NULL)
+        dataArray = env->GetDoubleArrayElements(jData, 0);
+
+    if(jSizeArray != NULL)
+        sizeArray = env->GetIntArrayElements(jSizeArray, 0);
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_setvalue_parameter_plugin(parameterName, DOUBLE_DATA, (int)jDim, (int*)sizeArray, (void*) dataArray, pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    env->ReleaseStringUTFChars(jParameterName, parameterName);
+    env->ReleaseStringUTFChars(jPluginName, pluginName);
+
+    if(dataArray != NULL)
+        env->ReleaseDoubleArrayElements(jData, dataArray, 0);
+
+    if(sizeArray != NULL)
+        env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_set_intvalue_parameter_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1set_1intvalue_1parameter_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jParameterName, jint jDim, jintArray jSizeArray, jintArray jData, jstring jPluginName)
+{
+    al_status_t al_status;
+
+    const char *parameterName = env->GetStringUTFChars(jParameterName, 0);
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    jintArray *dataArray = NULL;
+    jint *sizeArray = NULL;
+
+   //    jsize  len = env->GetArrayLength(jData);
+    if(jData != NULL)
+        dataArray = env->GetIntArrayElements(jData, 0);
+
+    if(jSizeArray != NULL)
+        sizeArray = env->GetIntArrayElements(jSizeArray, 0);
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_setvalue_parameter_plugin(parameterName, INTEGER_DATA, (int)jDim, (int*)sizeArray, (void*) dataArray, pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    env->ReleaseStringUTFChars(jParameterName, parameterName);
+    env->ReleaseStringUTFChars(jPluginName, pluginName);
+
+    if(dataArray != NULL)
+        env->ReleaseIntArrayElements(jData, dataArray, 0);
+
+    if(sizeArray != NULL)
+        env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
  * Method:    ual_write_data_int
  * Signature: (ILjava/lang/String;Ljava/lang/String;[II[I)I
  */

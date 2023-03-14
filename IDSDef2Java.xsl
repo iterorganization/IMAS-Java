@@ -682,6 +682,7 @@
             ctx = LowLevel.hli_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
             
             this.putRootFields(ctx, idsTimeMode, idsFullName);
+            LowLevel.hli_write_plugins_metadata(ctx);
             }
             finally {
             if(ctx >= 0)
@@ -788,6 +789,7 @@
             ctx = LowLevel.hli_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, LowLevel.UNDEFINED_TIME, LowLevel.UNDEFINED_INTERP);
             
             this.putSliceRootFields(ctx, idsTimeMode, idsFullName);
+            LowLevel.hli_write_plugins_metadata(ctx);
             }
             finally {
             if(ctx >= 0)
@@ -856,7 +858,9 @@
             try{
             // Open get context
             ctx = LowLevel.hli_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
+            LowLevel.hli_bind_readback_plugins(ctx);
             this.getRootFields(ctx, idsTimeMode);
+            LowLevel.hli_unbind_readback_plugins(ctx);
             }
             finally {
             if(ctx >= 0)
@@ -930,8 +934,9 @@
             try{
             // Open putSlice context
             ctx = LowLevel.hli_begin_slice_action(pulseCtx, idsFullName, LowLevel.READ_OP, time, interpolMode);
-            
+            LowLevel.hli_bind_readback_plugins(ctx);
             this.getSliceRootFields(ctx, idsTimeMode);
+            LowLevel.hli_unbind_readback_plugins(ctx);
             }
             finally {
             if(ctx >= 0)
