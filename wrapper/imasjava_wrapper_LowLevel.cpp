@@ -315,15 +315,53 @@ extern "C" {
 
 /*
  * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_register_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1register_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jPluginName)
+{
+    al_status_t al_status;
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_register_plugin(pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_unregister_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1unregister_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jPluginName)
+{
+    al_status_t al_status;
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_unregister_plugin(pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
  * Method:    hli_bind_plugin
  */
  void JNICALL Java_imasjava_wrapper_LowLevel_hli_1bind_1plugin
-  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+  (JNIEnv *env, jclass jWrapperClass, jstring jPath, jstring jPluginName)
 {
     al_status_t al_status;
-
+    const char *path = env->GetStringUTFChars(jPath, 0);
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = hli_bind_plugin((int)jCtx);
+    al_status = hli_bind_plugin(path, pluginName);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     if (al_status.code < 0)
@@ -335,17 +373,54 @@ extern "C" {
  * Method:    hli_unbind_plugin
  */
  void JNICALL Java_imasjava_wrapper_LowLevel_hli_1unbind_1plugin
-  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+  (JNIEnv *env, jclass jWrapperClass, jstring jPath, jstring jPluginName)
 {
     al_status_t al_status;
-
+    const char *path = env->GetStringUTFChars(jPath, 0);
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = hli_unbind_plugin((int)jCtx);
+    al_status = hli_unbind_plugin(path, pluginName);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     if (al_status.code < 0)
         raiseLowLevelException( env, al_status);
 }
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_bind_readback_plugins
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1bind_1readback_1plugins
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+{
+    al_status_t al_status;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_bind_readback_plugins((int)jCtx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_unbind_readback_plugins
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1unbind_1readback_1plugins
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+{
+    al_status_t al_status;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_unbind_readback_plugins((int)jCtx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
 
 /*
  * Class:     imasjava_wrapper_LowLevel

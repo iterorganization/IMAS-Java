@@ -209,6 +209,18 @@ public final static int IDS_TIME_MODE_INDEPENDENT   = 2;
   int hli_end_action(int ctx) throws UALException; 
   */
   public static native void hli_end_action(int ctx) throws UALException;
+
+   /**
+     This function registers a plugin.
+     @param[in] plugin name
+  */
+  public static native void hli_register_plugin(final String pluginName) throws UALException;
+
+   /**
+     This function unregisters a plugin.
+     @param[in] plugin name
+  */
+  public static native void hli_unregister_plugin(final String pluginName) throws UALException; 
   
     /**
      Bind readback plugins.
