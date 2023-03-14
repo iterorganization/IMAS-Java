@@ -450,7 +450,7 @@ extern "C" {
 
     const char *parameterName = env->GetStringUTFChars(jParameterName, 0);
     const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
-    jdoubleArray *dataArray = NULL;
+    jdouble *dataArray = NULL;
     jint *sizeArray = NULL;
 
    //    jsize  len = env->GetArrayLength(jData);
