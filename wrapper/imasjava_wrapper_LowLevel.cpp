@@ -488,7 +488,7 @@ extern "C" {
 
     const char *parameterName = env->GetStringUTFChars(jParameterName, 0);
     const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
-    jintArray *dataArray = NULL;
+    jint *dataArray = NULL;
     jint *sizeArray = NULL;
 
    //    jsize  len = env->GetArrayLength(jData);
