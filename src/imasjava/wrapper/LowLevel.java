@@ -3,77 +3,74 @@ package imasjava.wrapper;
 import imasjava.UALException;
 import imasjava.Complex;
 
-
 public class LowLevel {
 
+      public static final int EMPTY_INT = -999999999;
+      public static final double EMPTY_DOUBLE = -9.0E40;
+      public static final Complex EMPTY_COMPLEX = new Complex(EMPTY_DOUBLE, EMPTY_DOUBLE);
 
-public static final int EMPTY_INT           = -999999999;
-public static final double EMPTY_DOUBLE     = -9.0E40;
-public static final Complex EMPTY_COMPLEX = new Complex(EMPTY_DOUBLE, EMPTY_DOUBLE);
+      public static final String LIFECYCLE_STATUS_OBSOLETE = "obsolescent";
 
-public static final String LIFECYCLE_STATUS_OBSOLETE = "obsolescent";
+      public final static int MAXDIM = 7;
 
+      public final static int OP_INTERP_0 = 0;
+      public final static int BACKEND_ID_0 = 10;
+      public final static int OP_RANGE_0 = 20;
+      public final static int OP_ACCESS_0 = 30;
+      public final static int ACCESS_PULSE_0 = 40;
+      public final static int DATA_TYPE_0 = 50;
+      public final static int SERIALIZER_PROTOCOL_0 = 60;
+      public final static int ERR_0 = -1;
 
-public final static int  MAXDIM             =  7;
+      public final static int TIMED = 1;
+      public final static int NON_TIMED = 0;
 
-public final static int  OP_INTERP_0        =  0;
-public final static int  BACKEND_ID_0       = 10;
-public final static int  OP_RANGE_0         = 20;
-public final static int  OP_ACCESS_0        = 30;
-public final static int  ACCESS_PULSE_0     = 40;
-public final static int  DATA_TYPE_0        = 50;
-public final static int  ERR_0              = -1;
+      public final static int ASCII_SERIALIZER_PROTOCOL = SERIALIZER_PROTOCOL_0;
+      public final static int DEFAULT_SERIALIZER_PROTOCOL = ASCII_SERIALIZER_PROTOCOL;
 
-public final static int  TIMED              =  1;
-public final static int  NON_TIMED          =  0;
+      public final static int GLOBAL_OP = OP_RANGE_0;
+      public final static int SLICE_OP = OP_RANGE_0 + 1;
 
-public final static int  GLOBAL_OP          =  OP_RANGE_0;
-public final static int  SLICE_OP           =  OP_RANGE_0 + 1;
+      public final static int READ_OP = OP_ACCESS_0;
+      public final static int WRITE_OP = OP_ACCESS_0 + 1;
+      public final static int REPLACE_OP = OP_ACCESS_0 + 2;
 
-public final static int  READ_OP            =  OP_ACCESS_0;
-public final static int  WRITE_OP           =  OP_ACCESS_0 + 1;
-public final static int  REPLACE_OP         =  OP_ACCESS_0 + 2;
+      public final static int UNDEFINED_INTERP = OP_INTERP_0;
+      public final static int CLOSEST_INTERP = OP_INTERP_0 + 1;
+      public final static int PREVIOUS_INTERP = OP_INTERP_0 + 2;
+      public final static int LINEAR_INTERP = OP_INTERP_0 + 3;
 
-public final static int  UNDEFINED_INTERP   =  OP_INTERP_0;
-public final static int  CLOSEST_INTERP     =  OP_INTERP_0 + 1;
-public final static int  PREVIOUS_INTERP    =  OP_INTERP_0 + 2;
-public final static int  LINEAR_INTERP      =  OP_INTERP_0 + 3;
+      public final static int UNDEFINED_TIME = -999;
 
-public final static int  UNDEFINED_TIME     =  -999;
-    
-public final static int  OPEN_PULSE         =  ACCESS_PULSE_0;
-public final static int  FORCE_OPEN_PULSE   =  ACCESS_PULSE_0 + 1;
-public final static int  CREATE_PULSE       =  ACCESS_PULSE_0 + 2;
-public final static int  FORCE_CREATE_PULSE =  ACCESS_PULSE_0 + 3;
-public final static int  CLOSE_PULSE        =  ACCESS_PULSE_0 + 4;
-public final static int  ERASE_PULSE        =  ACCESS_PULSE_0 + 5;
-    /*
-public final static int  CHAR_DATA         =   DATA_TYPE_0;
-public final static int  INTEGER_DATA      =   DATA_TYPE_0 + 1;
-public final static int  DOUBLE_DATA       =   DATA_TYPE_0 + 2;
-public final static int  COMPLEX_DATA      =   DATA_TYPE_0 + 3;
-*/
-public final static int  UNKNOWN_ERR       =   ERR_0;
-public final static int  CONTEXT_ERR       =   ERR_0 - 1;
-public final static int  BACKEND_ERR       =   ERR_0 - 2;
-public final static int  LOWLEVEL_ERR      =   ERR_0 - 3;
+      public final static int OPEN_PULSE = ACCESS_PULSE_0;
+      public final static int FORCE_OPEN_PULSE = ACCESS_PULSE_0 + 1;
+      public final static int CREATE_PULSE = ACCESS_PULSE_0 + 2;
+      public final static int FORCE_CREATE_PULSE = ACCESS_PULSE_0 + 3;
+      public final static int CLOSE_PULSE = ACCESS_PULSE_0 + 4;
+      public final static int ERASE_PULSE = ACCESS_PULSE_0 + 5;
+      /*
+       * public final static int CHAR_DATA = DATA_TYPE_0; public final static int
+       * INTEGER_DATA = DATA_TYPE_0 + 1; public final static int DOUBLE_DATA =
+       * DATA_TYPE_0 + 2; public final static int COMPLEX_DATA = DATA_TYPE_0 + 3;
+       */
+      public final static int UNKNOWN_ERR = ERR_0;
+      public final static int CONTEXT_ERR = ERR_0 - 1;
+      public final static int BACKEND_ERR = ERR_0 - 2;
+      public final static int LOWLEVEL_ERR = ERR_0 - 3;
 
+      public final static int NO_BACKEND = BACKEND_ID_0;
+      public final static int ASCII_BACKEND = BACKEND_ID_0 + 1;
+      public final static int MDSPLUS_BACKEND = BACKEND_ID_0 + 2;
+      public final static int HDF5_BACKEND = BACKEND_ID_0 + 3;
+      public final static int MEMORY_BACKEND = BACKEND_ID_0 + 4;
+      public final static int UDA_BACKEND = BACKEND_ID_0 + 5;
 
-public final static int NO_BACKEND         = BACKEND_ID_0;
-public final static int ASCII_BACKEND      = BACKEND_ID_0 + 1;
-public final static int MDSPLUS_BACKEND    = BACKEND_ID_0 + 2;
-public final static int HDF5_BACKEND       = BACKEND_ID_0 + 3;
-public final static int MEMORY_BACKEND     = BACKEND_ID_0 + 4;
-public final static int UDA_BACKEND        = BACKEND_ID_0 + 5;
+      public final static int IDS_TIME_MODE_UNKNOWN = EMPTY_INT;
+      public final static int IDS_TIME_MODE_HETEROGENEOUS = 0;
+      public final static int IDS_TIME_MODE_HOMOGENEOUS = 1;
+      public final static int IDS_TIME_MODE_INDEPENDENT = 2;
 
-
-public final static int IDS_TIME_MODE_UNKNOWN       = EMPTY_INT; 
-public final static int IDS_TIME_MODE_HETEROGENEOUS = 0;
-public final static int IDS_TIME_MODE_HOMOGENEOUS   = 1;
-public final static int IDS_TIME_MODE_INDEPENDENT   = 2;
-
-
-	  /* returns a vector containing all the dimensions of an array) */
+      /* returns a vector containing all the dimensions of an array) */
 
  /******************** DEFINITION OF THE C API ********************/
 
@@ -83,7 +80,7 @@ public final static int IDS_TIME_MODE_INDEPENDENT   = 2;
      @result error status
      int ual_print_context(int ctx) throws UALException;
    */
-     public static native void ual_print_context(int ctx) throws UALException;
+      public static native void ual_print_context(int ctx) throws UALException;
   /**
      Builds an URI from legacy parameters.
      @param[in] backendID name/ID of the back-end

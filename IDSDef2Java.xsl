@@ -638,28 +638,205 @@
             if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
             {
             String tokens[] = idsFullName.split("/");
-            iOccurrence = Integer.parseInt(tokens[1]);          
-            }
-            
-            ids.setPulseCtx(pulseCtx);
-            ids.put(iOccurrence);
-            }
-            
-            public void put()  throws UALException
-            {
-            this.put(0);
-            }
-            
-            public void put(int iOccurrence)  throws UALException
-            {
-            int pulseCtx = this.pulseCtx;
-            int ctx = -1;
-            String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
-            
-            
-            int idsTimeMode = this.ids_properties.homogeneous_time;
-            
-            if(iOccurrence > 0)
+            iOccurrence = Integer.parseInt(tokens[1]);
+        }
+
+        ids.setPulseCtx(pulseCtx);
+	    ids.put(iOccurrence);
+    }
+
+     
+    /* ------------------------------------------------------------------------------------------------------------ */
+    /* -----------------------------------        IDS SERIALIZE       --------------------------------------------- */  
+    /* ------------------------------------------------------------------------------------------------------------ */
+    /**
+    *Serialize data.
+    * @exception UALException is thrown if can not serialize.
+    */
+    public byte[] serialize() throws UALException
+    {
+            return this.serialize(LowLevel.DEFAULT_SERIALIZER_PROTOCOL);
+    }
+
+    /* ------------------------------------------------------------------------------------------------------------ */
+    /* -----------------------------------        IDS SERIALIZE       --------------------------------------------- */  
+    /* ------------------------------------------------------------------------------------------------------------ */
+    /**
+    *Serialize data.
+    * @param protocol Serializer protocol
+    * @exception UALException is thrown if can not serialize.
+    */
+    public byte[] serialize(int protocol) throws UALException
+    {
+        if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
+                File tmpdir=new File("/dev/shm") ;
+                if (!tmpdir.exists()) {
+                        tmpdir =  new File(System.getProperty("user.dir"));
+                }
+                File tmpfile=null;
+                try{
+                tmpfile = File.createTempFile("al_serialize_", null, tmpdir);
+                } catch (Exception exc) {
+                        throw new UALException("Can not create temporary file");
+                }
+                
+                int _pulseCtx = -1;
+                try{ 
+                        _pulseCtx = Wrapper.ualBeginPulseAction(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3");
+                } catch(Exception exc) 
+                {
+                        LowLevel.ual_end_action(_pulseCtx);
+                        throw new UALException("Error calling ualBeginPulseAction() in serialize");
+                }
+                String options = String.format("-fullpath %s",tmpfile);
+                try{ 
+                    LowLevel.ual_open_pulse(_pulseCtx, LowLevel.CREATE_PULSE, options);
+                } catch(Exception exc) {
+                        LowLevel.ual_end_action(_pulseCtx);
+                        throw new UALException("Error calling ual_open_pulse() in serialize");
+                }
+                // store state and overwrite so we use the ASCII backend in this->put
+                int _pulseCtx_stored = this.pulseCtx;
+                this.pulseCtx = _pulseCtx;
+                this.put();
+                // restore state
+                this.pulseCtx = _pulseCtx_stored;
+
+                // cleanup
+                try{
+                        LowLevel.ual_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE, "");
+                } catch (Exception exc) {
+                throw new UALException("[ual_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
+                } finally {
+                if(_pulseCtx >= 0)
+                        LowLevel.ual_end_action(_pulseCtx);
+                }
+
+                // read contents of tmpfile
+                byte[] output =null;
+                try{
+                        byte[] data=null;
+                        try{
+                                data = Files.readAllBytes(tmpfile.toPath());
+                        } catch (Exception exc) {
+                                throw new UALException("Can not read bytes");
+                        }
+                        String protocolInString = String.valueOf(LowLevel.ASCII_SERIALIZER_PROTOCOL);  
+                        byte[] prependBytes = protocolInString.getBytes();  
+                        output = new byte[prependBytes.length + data.length];
+                        for(int i=0; i &lt; prependBytes.length; i++)
+                        {
+                            output[i] = prependBytes[i];
+                        }
+                        int j= prependBytes.length ;
+                        for(int i=0;i &lt; data.length; i++){
+                        output[j] = data[i];
+                        j++;
+                        }
+                }
+                finally{
+                        tmpfile.delete();
+                }
+                return output;
+
+        }
+        else {
+                throw new UALException(String.format("Unrecognized serialization protocol: %s", protocol));
+        }
+    }
+   
+    /* ------------------------------------------------------------------------------------------------------------ */
+    /* -----------------------------------        IDS DESERIALIZE ------------------------------------------------- */  
+    /* ------------------------------------------------------------------------------------------------------------ */
+    /**
+    * Deserialize data.
+    * @param data Data to deserialize
+    * @exception UALException is thrown if can not serialize.
+    */
+    public void deserialize(byte[] data) throws UALException
+    {
+        if (data.length ==0)
+                throw new UALException("No data provided");
+        byte[] protocolBytes = new byte[2];
+        for (int i = 0; i &lt; 2; i++) {
+                protocolBytes[i] = data[i];
+        }
+        String protocolString = new String(protocolBytes);
+        int protocol = Integer.parseInt(protocolString);
+
+        if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
+                File tmpdir=new File("/dev/shm") ;
+                if (!tmpdir.exists()) {
+                        tmpdir =  new File(System.getProperty("user.dir"));
+                }
+                File tmpfile = null;
+                try{
+                        tmpfile = File.createTempFile("al_serialize_", null, tmpdir);
+                } catch (Exception exc) {
+                        throw new UALException("Can not create temporary file");
+                }
+                try{
+                        OutputStream outputStream = new FileOutputStream(tmpfile);
+                        outputStream.write(Arrays.copyOfRange(data, 2, data.length));
+                }catch(Exception exc) 
+                {
+                        if (!tmpdir.exists()) 
+                        {
+                                tmpfile.delete() ;
+                        }   
+                        throw new UALException("Can not write into the file");    
+                }
+                int _pulseCtx = -1;
+                try{ 
+                        _pulseCtx = Wrapper.ualBeginPulseAction(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3");
+                } catch(Exception exc) 
+                {
+                        LowLevel.ual_end_action(_pulseCtx);
+                        throw new UALException("Error calling ual_begin_dataentry_action() in deserialize");
+                }
+                String options = String.format("-fullpath %s",tmpfile);
+                try{ 
+                    LowLevel.ual_open_pulse(_pulseCtx, LowLevel.CREATE_PULSE, options);
+                } catch(Exception exc) {
+                    LowLevel.ual_end_action(_pulseCtx);
+                    throw new UALException("Error calling ual_open_pulse() in deserialize");
+                }
+                // store state and overwrite so we use the ASCII backend in this->put
+                int _pulseCtx_stored = this.pulseCtx;
+                this.pulseCtx = _pulseCtx;
+                this.get(0);
+                // restore state
+                this.pulseCtx = _pulseCtx_stored;
+
+                try{
+                    LowLevel.ual_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE, "");
+                } catch (Exception exc) {
+                throw new UALException("[ual_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
+                } finally {
+                    if(_pulseCtx >= 0)
+                        LowLevel.ual_end_action(_pulseCtx);
+                }
+                tmpfile.delete();
+        }
+        else {
+                throw new UALException(String.format("Unrecognized serialization protocol: %s", protocol));
+        }
+    }
+    public void put()  throws UALException
+    {
+        this.put(0);
+    }
+
+    public void put(int iOccurrence)  throws UALException
+    {
+        int pulseCtx = this.pulseCtx;
+        int ctx = -1;
+        String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
+ 
+
+        int idsTimeMode = this.ids_properties.homogeneous_time;
+
+        if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
             
             if(idsTimeMode == LowLevel.IDS_TIME_MODE_UNKNOWN)
