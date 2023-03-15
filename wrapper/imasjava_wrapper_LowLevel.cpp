@@ -247,10 +247,10 @@ extern "C" {
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    ual_begin_global_action
+ * Method:    hli_begin_global_action
  * Signature: (ILjava/lang/String;I)I
  */
- jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1global_1action
+ jint JNICALL Java_imasjava_wrapper_LowLevel_hli_1begin_1global_1action
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jDataObjectName, jint jRWMode)
 {
     al_status_t al_status;
@@ -259,7 +259,7 @@ extern "C" {
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_begin_global_action((int)jCtx, dataObjectName, (int)jRWMode, &ctx);
+    al_status = hli_begin_global_action((int)jCtx, dataObjectName, (int)jRWMode, &ctx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -297,21 +297,224 @@ extern "C" {
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    ual_end_action
+ * Method:    hli_end_action
  * Signature: (I)I
  */
- void JNICALL Java_imasjava_wrapper_LowLevel_ual_1end_1action
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1end_1action
   (JNIEnv *env, jclass jWrapperClass, jint jCtx)
 {
     al_status_t al_status;
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_end_action((int)jCtx);
+    al_status = hli_end_action((int)jCtx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     if (al_status.code < 0)
         raiseLowLevelException( env, al_status);
 }
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_register_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1register_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jPluginName)
+{
+    al_status_t al_status;
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_register_plugin(pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_unregister_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1unregister_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jPluginName)
+{
+    al_status_t al_status;
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_unregister_plugin(pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_bind_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1bind_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jPath, jstring jPluginName)
+{
+    al_status_t al_status;
+    const char *path = env->GetStringUTFChars(jPath, 0);
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_bind_plugin(path, pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_unbind_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1unbind_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jPath, jstring jPluginName)
+{
+    al_status_t al_status;
+    const char *path = env->GetStringUTFChars(jPath, 0);
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_unbind_plugin(path, pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_bind_readback_plugins
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1bind_1readback_1plugins
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+{
+    al_status_t al_status;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_bind_readback_plugins((int)jCtx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_unbind_readback_plugins
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1unbind_1readback_1plugins
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+{
+    al_status_t al_status;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_unbind_readback_plugins((int)jCtx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_write_plugins_metadata
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1write_1plugins_1metadata
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx)
+{
+    al_status_t al_status;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_write_plugins_metadata((int)jCtx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_set_doublevalue_parameter_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1set_1doublevalue_1parameter_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jParameterName, jint jDim, jintArray jSizeArray, jdoubleArray jData, jstring jPluginName)
+{
+    al_status_t al_status;
+
+    const char *parameterName = env->GetStringUTFChars(jParameterName, 0);
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    jdouble *dataArray = NULL;
+    jint *sizeArray = NULL;
+
+   //    jsize  len = env->GetArrayLength(jData);
+    if(jData != NULL)
+        dataArray = env->GetDoubleArrayElements(jData, 0);
+
+    if(jSizeArray != NULL)
+        sizeArray = env->GetIntArrayElements(jSizeArray, 0);
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_setvalue_parameter_plugin(parameterName, DOUBLE_DATA, (int)jDim, (int*)sizeArray, (void*) dataArray, pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    env->ReleaseStringUTFChars(jParameterName, parameterName);
+    env->ReleaseStringUTFChars(jPluginName, pluginName);
+
+    if(dataArray != NULL)
+        env->ReleaseDoubleArrayElements(jData, dataArray, 0);
+
+    if(sizeArray != NULL)
+        env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    hli_set_intvalue_parameter_plugin
+ */
+ void JNICALL Java_imasjava_wrapper_LowLevel_hli_1set_1intvalue_1parameter_1plugin
+  (JNIEnv *env, jclass jWrapperClass, jstring jParameterName, jint jDim, jintArray jSizeArray, jintArray jData, jstring jPluginName)
+{
+    al_status_t al_status;
+
+    const char *parameterName = env->GetStringUTFChars(jParameterName, 0);
+    const char *pluginName = env->GetStringUTFChars(jPluginName, 0);
+    jint *dataArray = NULL;
+    jint *sizeArray = NULL;
+
+   //    jsize  len = env->GetArrayLength(jData);
+    if(jData != NULL)
+        dataArray = env->GetIntArrayElements(jData, 0);
+
+    if(jSizeArray != NULL)
+        sizeArray = env->GetIntArrayElements(jSizeArray, 0);
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    al_status = hli_setvalue_parameter_plugin(parameterName, INTEGER_DATA, (int)jDim, (int*)sizeArray, (void*) dataArray, pluginName);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    env->ReleaseStringUTFChars(jParameterName, parameterName);
+    env->ReleaseStringUTFChars(jPluginName, pluginName);
+
+    if(dataArray != NULL)
+        env->ReleaseIntArrayElements(jData, dataArray, 0);
+
+    if(sizeArray != NULL)
+        env->ReleaseIntArrayElements(jSizeArray, sizeArray, 0);
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
 
 /*
  * Class:     imasjava_wrapper_LowLevel
@@ -500,7 +703,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
 
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, INTEGER_DATA, (int)jDim, (int*)sizeArray);
+    al_status = hli_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, INTEGER_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     for (int i = 0; i < jDim; i++)
@@ -545,7 +748,7 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1write_1data_1complex
     }
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, DOUBLE_DATA, (int)jDim, (int*)sizeArray);
+    al_status = hli_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, DOUBLE_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -591,7 +794,7 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
         cppDataArray = &tmpScalar;
    
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
+    al_status = hli_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&cppDataArray, COMPLEX_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     for (int i = 0; i < jDim; i++)
@@ -637,7 +840,7 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
     }
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, CHAR_DATA, (int)jDim, (int*)sizeArray);
+    al_status = hli_read_data((int)jCtx, fieldPath, timeBasePath, (void**)&dataArray, CHAR_DATA, (int)jDim, (int*)sizeArray);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
 
@@ -684,10 +887,10 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    ual_begin_arraystruct_action
+ * Method:    hli_begin_arraystruct_action
  * Signature: (ILjava/lang/String;Ljava/lang/String;[I)I
  */
- jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1arraystruct_1action
+ jint JNICALL Java_imasjava_wrapper_LowLevel_hli_1begin_1arraystruct_1action
   (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jFieldPath, jstring jTimeBasePath, jintArray jSizeArray)
 {
     al_status_t al_status;
@@ -698,7 +901,7 @@ JNIEXPORT jobjectArray JNICALL Java_imasjava_wrapper_LowLevel_ual_1read_1data_1c
     jint *sizeArray = env->GetIntArrayElements(jSizeArray, 0);
 
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_begin_arraystruct_action((int)jCtx, fieldPath, timeBasePath, (int*)sizeArray, &ctx);
+    al_status = hli_begin_arraystruct_action((int)jCtx, fieldPath, timeBasePath, (int*)sizeArray, &ctx);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jFieldPath, fieldPath);

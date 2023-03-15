@@ -412,7 +412,7 @@
         throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
         } finally {
         if(refIdx >= 0)
-        LowLevel.ual_end_action(refIdx);
+        LowLevel.hli_end_action(refIdx);
         }
         }
         
@@ -436,7 +436,7 @@
         int ctx = -1;
         
         // Open  ctx
-        ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
+        ctx = LowLevel.hli_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
         
         try
         {
@@ -444,7 +444,7 @@
         }
         finally
         {
-        LowLevel.ual_end_action(ctx);
+        LowLevel.hli_end_action(ctx);
         }
         
         switch(idsTimeMode)
@@ -679,13 +679,14 @@
             
             try{
             // Open put context
-            ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
+            ctx = LowLevel.hli_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
             
             this.putRootFields(ctx, idsTimeMode, idsFullName);
+            LowLevel.hli_write_plugins_metadata(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.hli_end_action(ctx);
             }
             }
             
@@ -785,13 +786,14 @@
             
             try{
             // Open putSlice context
-            ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, LowLevel.UNDEFINED_TIME, LowLevel.UNDEFINED_INTERP);
+            ctx = LowLevel.hli_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, LowLevel.UNDEFINED_TIME, LowLevel.UNDEFINED_INTERP);
             
             this.putSliceRootFields(ctx, idsTimeMode, idsFullName);
+            LowLevel.hli_write_plugins_metadata(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.hli_end_action(ctx);
             }
             }
             
@@ -855,12 +857,14 @@
             this.reset();
             try{
             // Open get context
-            ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
+            ctx = LowLevel.hli_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
+            LowLevel.hli_bind_readback_plugins(ctx);
             this.getRootFields(ctx, idsTimeMode);
+            LowLevel.hli_unbind_readback_plugins(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.hli_end_action(ctx);
             }
             }
             public void getRootFields(int ctx, int idsTimeMode)  throws UALException
@@ -929,13 +933,14 @@
             this.reset();
             try{
             // Open putSlice context
-            ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.READ_OP, time, interpolMode);
-            
+            ctx = LowLevel.hli_begin_slice_action(pulseCtx, idsFullName, LowLevel.READ_OP, time, interpolMode);
+            LowLevel.hli_bind_readback_plugins(ctx);
             this.getSliceRootFields(ctx, idsTimeMode);
+            LowLevel.hli_unbind_readback_plugins(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.hli_end_action(ctx);
             }
             }
             
@@ -988,13 +993,13 @@
             
             try{
             // Open put context
-            ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
+            ctx = LowLevel.hli_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
             
             this.deleteRootFields(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.hli_end_action(ctx);
             }
             }
             
@@ -1682,7 +1687,7 @@
             try{
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
-            aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+            aosCtx = LowLevel.hli_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
@@ -1692,7 +1697,7 @@
             
             finally { 
             if(aosCtx >= 0)
-            LowLevel.ual_end_action(aosCtx);
+            LowLevel.hli_end_action(aosCtx);
             }
             }
           </xsl:when>
@@ -1713,7 +1718,7 @@
             try{
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
-            aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+            aosCtx = LowLevel.hli_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
@@ -1723,7 +1728,7 @@
             
             finally { 
             if(aosCtx >= 0)
-            LowLevel.ual_end_action(aosCtx);
+            LowLevel.hli_end_action(aosCtx);
             }
             }
           </xsl:when>
@@ -1752,7 +1757,7 @@
             try{
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
-            aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+            aosCtx = LowLevel.hli_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
@@ -1762,7 +1767,7 @@
             
             finally { 
             if(aosCtx >= 0)
-            LowLevel.ual_end_action(aosCtx);
+            LowLevel.hli_end_action(aosCtx);
             }
             }
           </xsl:when>
@@ -1860,7 +1865,7 @@
           strTimeBasePath = "";
           try{       
           int tmpArray[] = new int[1];
-          aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+          aosCtx = LowLevel.hli_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
           arraySize = tmpArray[0];
           if(arraySize &lt;= 0)
           {
@@ -1881,7 +1886,7 @@
           }     
           finally { 
           if(aosCtx >= 0)
-          LowLevel.ual_end_action(aosCtx);
+          LowLevel.hli_end_action(aosCtx);
           }
           
           
@@ -1899,7 +1904,7 @@
           strTimeBasePath = "";
           try{       
           int tmpArray[] = new int[1];
-          aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+          aosCtx = LowLevel.hli_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
           arraySize = tmpArray[0];
           if(arraySize &lt;= 0)
           {
@@ -1920,7 +1925,7 @@
           }     
           finally { 
           if(aosCtx >= 0)
-          LowLevel.ual_end_action(aosCtx);
+          LowLevel.hli_end_action(aosCtx);
           }
         </xsl:when>
         <xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
@@ -1945,7 +1950,7 @@
           </xsl:choose>
           try{       
           int tmpArray[] = new int[1];
-          aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+          aosCtx = LowLevel.hli_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
           arraySize = tmpArray[0];
           if(arraySize &lt;= 0)
           {
@@ -1966,7 +1971,7 @@
           }     
           finally { 
           if(aosCtx >= 0)
-          LowLevel.ual_end_action(aosCtx);
+          LowLevel.hli_end_action(aosCtx);
           }
           }
         </xsl:when>
