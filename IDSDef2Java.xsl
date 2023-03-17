@@ -516,9 +516,17 @@
         package imasjava.ids;
         
         import java.util.List;
+        import java.util.Arrays;
         import java.util.ArrayList;
         import java.util.Collections;
-        
+
+        import java.io.File;
+        import java.io.FileOutputStream;
+        import java.io.OutputStream;
+
+        import java.nio.file.Files;
+        import java.nio.file.Paths; 
+
         import imasjava.wrapper.*;
         import imasjava.*;
         
@@ -681,19 +689,14 @@
                 }
                 
                 int _pulseCtx = -1;
-                try{ 
-                        _pulseCtx = Wrapper.ualBeginPulseAction(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3");
+                String options = String.format("-fullpath %s",tmpfile);
+                try{    
+                         String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options); 
+                        _pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
                 } catch(Exception exc) 
                 {
-                        LowLevel.ual_end_action(_pulseCtx);
-                        throw new UALException("Error calling ualBeginPulseAction() in serialize");
-                }
-                String options = String.format("-fullpath %s",tmpfile);
-                try{ 
-                    LowLevel.ual_open_pulse(_pulseCtx, LowLevel.CREATE_PULSE, options);
-                } catch(Exception exc) {
-                        LowLevel.ual_end_action(_pulseCtx);
-                        throw new UALException("Error calling ual_open_pulse() in serialize");
+                        LowLevel.hli_end_action(_pulseCtx);
+                        throw new UALException("Error calling ualBeginDataEntryAction() in serialize");
                 }
                 // store state and overwrite so we use the ASCII backend in this->put
                 int _pulseCtx_stored = this.pulseCtx;
@@ -709,7 +712,7 @@
                 throw new UALException("[ual_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
                 } finally {
                 if(_pulseCtx >= 0)
-                        LowLevel.ual_end_action(_pulseCtx);
+                        LowLevel.hli_end_action(_pulseCtx);
                 }
 
                 // read contents of tmpfile
@@ -787,20 +790,16 @@
                         throw new UALException("Can not write into the file");    
                 }
                 int _pulseCtx = -1;
-                try{ 
-                        _pulseCtx = Wrapper.ualBeginPulseAction(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3");
-                } catch(Exception exc) 
-                {
-                        LowLevel.ual_end_action(_pulseCtx);
-                        throw new UALException("Error calling ual_begin_dataentry_action() in deserialize");
-                }
                 String options = String.format("-fullpath %s",tmpfile);
-                try{ 
-                    LowLevel.ual_open_pulse(_pulseCtx, LowLevel.CREATE_PULSE, options);
-                } catch(Exception exc) {
-                    LowLevel.ual_end_action(_pulseCtx);
-                    throw new UALException("Error calling ual_open_pulse() in deserialize");
+                try{
+                         String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options);
+                        _pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
+                } catch(Exception exc)
+                {
+                        LowLevel.hli_end_action(_pulseCtx);
+                        throw new UALException("Error calling ualBeginDataEntryAction() in deserialize");
                 }
+
                 // store state and overwrite so we use the ASCII backend in this->put
                 int _pulseCtx_stored = this.pulseCtx;
                 this.pulseCtx = _pulseCtx;
@@ -814,7 +813,7 @@
                 throw new UALException("[ual_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
                 } finally {
                     if(_pulseCtx >= 0)
-                        LowLevel.ual_end_action(_pulseCtx);
+                        LowLevel.hli_end_action(_pulseCtx);
                 }
                 tmpfile.delete();
         }
