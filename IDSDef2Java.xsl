@@ -407,7 +407,7 @@
         static public void close(int refIdx) throws UALException
         {
         try{
-        LowLevel.ual_close_pulse(refIdx, LowLevel.CLOSE_PULSE, "");
+        LowLevel.ual_close_pulse(refIdx, LowLevel.CLOSE_PULSE);
         } catch (Exception exc) {
         throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
         } finally {
@@ -707,7 +707,7 @@
 
                 // cleanup
                 try{
-                        LowLevel.ual_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE, "");
+                        LowLevel.ual_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
                 } catch (Exception exc) {
                 throw new UALException("[ual_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
                 } finally {
@@ -808,7 +808,7 @@
                 this.pulseCtx = _pulseCtx_stored;
 
                 try{
-                    LowLevel.ual_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE, "");
+                    LowLevel.ual_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
                 } catch (Exception exc) {
                 throw new UALException("[ual_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
                 } finally {

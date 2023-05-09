@@ -134,13 +134,11 @@ public class LowLevel {
      @param[in] options additional options (possibly backend specific)
      @result error status
   int ual_close_pulse(int pulseCtx, 
-		      int mode,
-		      const char *options) throws UALException;
+		      int mode) throws UALException;
 
 */
   public static native void ual_close_pulse(int pulseCtx, 
-		      int mode,
-		      final String options) ;
+		      int mode) ;
   /**
      Starts an I/O action on a DATAOBJECT.
      This function gives a new operation context for the duration of an action on a DATAOBJECT.

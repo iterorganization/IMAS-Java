@@ -231,16 +231,13 @@ extern "C" {
  * Signature: (IILjava/lang/String;)I
  */
  void JNICALL Java_imasjava_wrapper_LowLevel_ual_1close_1pulse
-  (JNIEnv *env, jclass jWrapperClass, jint jCtx, jint jMode, jstring jOptions)
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx, jint jMode)
 {
     al_status_t al_status;
-    const char *options = env->GetStringUTFChars(jOptions, 0);
-
+  
     // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
-    al_status = ual_close_pulse((int)jCtx, (int)jMode, options);
+    al_status = ual_close_pulse((int)jCtx, (int)jMode);
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
-
-    env->ReleaseStringUTFChars(jOptions, options);
    
     if (al_status.code < 0)
         raiseLowLevelException( env, al_status);
