@@ -121,10 +121,10 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1close_1pulse
 
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    hli_begin_global_action
+ * Method:    ual_begin_global_action
  * Signature: (ILjava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_hli_1begin_1global_1action
+JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1global_1action
   (JNIEnv *, jclass, jint, jstring, jint);
 
 /*
@@ -137,10 +137,10 @@ JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1slice_1action
 
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    hli_end_action
+ * Method:    ual_end_action
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_hli_1end_1action
+JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1end_1action
   (JNIEnv *, jclass, jint);
 
 /*
@@ -217,10 +217,10 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_ual_1delete_1data
 
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    hli_begin_arraystruct_action
+ * Method:    ual_begin_arraystruct_action
  * Signature: (ILjava/lang/String;Ljava/lang/String;[I)I
  */
-JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_hli_1begin_1arraystruct_1action
+JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_ual_1begin_1arraystruct_1action
   (JNIEnv *, jclass, jint, jstring, jstring, jintArray);
 
 /*

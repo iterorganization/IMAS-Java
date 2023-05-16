@@ -152,13 +152,13 @@ public class LowLevel {
      @result operation context id [_or error status if < 0_]
      
      @test Low-level API, implementation of beginDataObjectPut()
-     @snippet ual_low_level.c ex_hli_begin_global_action
+     @snippet ual_low_level.c ex_ual_begin_global_action
 
-  int hli_begin_global_action(int ctx,
+  int ual_begin_global_action(int ctx,
 			      const char *dataobjectname,
 			      int rwmode) throws UALException;
 */
-  public static native int hli_begin_global_action(int ctx,
+  public static native int ual_begin_global_action(int ctx,
 			      final String dataobjectname,
 			      int rwmode) throws UALException;
   /**
@@ -180,15 +180,15 @@ public class LowLevel {
      @result operation context id [_or error status if < 0_]
      
      @test Low-level API, implementation of beginDataObjectGetSlice()
-     @snippet ual_low_level.c ex_hli_begin_slice_action
+     @snippet ual_low_level.c ex_ual_begin_slice_action
 
-  int hli_begin_slice_action(int ctx,
+  int ual_begin_slice_action(int ctx,
 			     const char *dataobjectname,
 			     int rwmode,
 			     double time,
 			     int interpmode) throws UALException;
 */
-  public static native int hli_begin_slice_action(int ctx,
+  public static native int ual_begin_slice_action(int ctx,
 			     final String dataobjectname,
 			     int rwmode,
 			     double time,
@@ -197,48 +197,48 @@ public class LowLevel {
      Stops an I/O action.
      This function stop the current action designed by the context passed as argument. This context is then 
      not valide anymore.
-     @param[in] ctx a pulse (ual_begin_uri_action()), an operation (hli_begin_global_action() or hli_begin_slice_action()) or an array of structure context id (ual_begin_array_struct_action())
+     @param[in] ctx a pulse (ual_begin_uri_action()), an operation (ual_begin_global_action() or ual_begin_slice_action()) or an array of structure context id (ual_begin_array_struct_action())
      @result error status
      
      @test Low-level API, implementation of endDataObjectGetSlice()
-     @snippet ual_low_level.c ex_hli_end_action
+     @snippet ual_low_level.c ex_ual_end_action
 
-  int hli_end_action(int ctx) throws UALException; 
+  int ual_end_action(int ctx) throws UALException; 
   */
-  public static native void hli_end_action(int ctx) throws UALException;
+  public static native void ual_end_action(int ctx) throws UALException;
 
    /**
      This function registers a plugin.
      @param[in] plugin name
   */
-  public static native void hli_register_plugin(final String pluginName) throws UALException;
+  public static native void ual_register_plugin(final String pluginName) throws UALException;
 
    /**
      This function unregisters a plugin.
      @param[in] plugin name
   */
-  public static native void hli_unregister_plugin(final String pluginName) throws UALException; 
+  public static native void ual_unregister_plugin(final String pluginName) throws UALException; 
   
     /**
      Bind readback plugins.
      This function binds readback plugins before a get()/get_slice() operation.
-     @param[in] ctx an operation context (hli_begin_global_action() or hli_begin_slice_action())
+     @param[in] ctx an operation context (ual_begin_global_action() or ual_begin_slice_action())
   */
-  public static native void hli_bind_readback_plugins(int ctx) throws UALException; 
+  public static native void ual_bind_readback_plugins(int ctx) throws UALException; 
 
     /**
      Unbind readback plugins.
      This function unbinds readback plugins after a get()/get_slice() operation.
-     @param[in] ctx an operation context (hli_begin_global_action() or hli_begin_slice_action())
+     @param[in] ctx an operation context (ual_begin_global_action() or ual_begin_slice_action())
   */
-  public static native void hli_unbind_readback_plugins(int ctx) throws UALException;
+  public static native void ual_unbind_readback_plugins(int ctx) throws UALException;
 
   /**
      Store plugins metadata.
      This function stores plugins metadata after a put()/put_slice() operation.
-     @param[in] ctx an operation context (hli_begin_global_action() or hli_begin_slice_action())
+     @param[in] ctx an operation context (ual_begin_global_action() or ual_begin_slice_action())
   */
-  public static native void hli_write_plugins_metadata(int ctx) throws UALException;
+  public static native void ual_write_plugins_metadata(int ctx) throws UALException;
 
   /**
      Set the value of type double of a plugin parameter.
@@ -249,7 +249,7 @@ public class LowLevel {
      @param[data] parmameter double values
      @param[pluginName] name of the plugin
   */
-  public static native void hli_set_doublevalue_parameter_plugin(final String parameterName, int dim, int[] size, double[] data, final String pluginName) throws UALException;
+  public static native void ual_set_doublevalue_parameter_plugin(final String parameterName, int dim, int[] size, double[] data, final String pluginName) throws UALException;
 
   /**
      Set the value of type int of a plugin parameter.
@@ -260,13 +260,13 @@ public class LowLevel {
      @param[data] parmameter int values
      @param[pluginName] name of the plugin
   */
-  public static native void hli_set_intvalue_parameter_plugin(final String parameterName, int dim, int[] size, int[] data, final String pluginName) throws UALException;
+  public static native void ual_set_intvalue_parameter_plugin(final String parameterName, int dim, int[] size, int[] data, final String pluginName) throws UALException;
  
   /**
      Writes data.
      This function writes a signal in the database given the passed context.
-     @param[in] ctx operation context id (from hli_begin_global_action() or hli_begin_slice_action()) or
-     array of structure context id (from hli_begin_arraystruct_action())
+     @param[in] ctx operation context id (from ual_begin_global_action() or ual_begin_slice_action()) or
+     array of structure context id (from ual_begin_arraystruct_action())
      @param[in] fieldpath field path for the data (paths are always relative to current Context, dataobject absolute path can be specified with a prepended '/')
      @param[in] timebasepath field path for the timebase (paths are always relative to current Context, dataobject absolute path can be specified with a prepended '/')
      @param[in] data pointer on the data to be written
@@ -323,8 +323,8 @@ public class LowLevel {
   /**
      Reads data.
      This function reads a signal in the database given the passed context.
-     @param[in] ctx operation context id (from hli_begin_global_action() or hli_begin_slice_action()) or
-     array of structure context id (from hli_begin_arraystruct_action())
+     @param[in] ctx operation context id (from ual_begin_global_action() or ual_begin_slice_action()) or
+     array of structure context id (from ual_begin_arraystruct_action())
      @param[in] fieldpath field path for the data (paths are always relative to current Context, dataobject absolute path can be specified with a prepended '/')
      @param[in] timebasepath field path for the timebase (paths are always relative to current Context, dataobject absolute path can be specified with a prepended '/')
      @param[out] data returned pointer on the read data 
@@ -338,9 +338,9 @@ public class LowLevel {
      @result error status
      
      @test Low-level API, implementation of getVect3DDouble() 
-     @snippet ual_low_level.c ex_hli_read_data
+     @snippet ual_low_level.c ex_ual_read_data
 
-  int hli_read_data(int ctx,
+  int ual_read_data(int ctx,
 		    const char *fieldpath,
 		    const char *timebasepath,
 		    void **data,
@@ -377,7 +377,7 @@ public class LowLevel {
     Deletes data.
     This function deletes some data (can be a signal, a structure, the whole DATAOBJECT) in the database 
     given the passed context.
-    @param[in] ctx operation context id (from hli_begin_global_action() or hli_begin_slice_action())
+    @param[in] ctx operation context id (from ual_begin_global_action() or ual_begin_slice_action())
     @param[in] path path of the data structure element to delete (suppress the whole subtree)
     @result error status
 
@@ -400,7 +400,7 @@ public class LowLevel {
      @param[in,out] size specify the size of the struct_array (number of elements)
      @result array of structure context [_or error status if < 0_]
 
-  int hli_begin_arraystruct_action(int ctx,
+  int ual_begin_arraystruct_action(int ctx,
 				   const char *path,
 				   const char *timebase,
 				   int *size) throws UALException;
@@ -408,7 +408,7 @@ public class LowLevel {
 
   */
 
-  public static native int hli_begin_arraystruct_action(int ctx,
+  public static native int ual_begin_arraystruct_action(int ctx,
 				   String path,
 				   String timebase,
 				   int[] size) throws UALException;
