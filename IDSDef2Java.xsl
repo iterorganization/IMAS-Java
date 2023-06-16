@@ -687,11 +687,13 @@
                 } catch (Exception exc) {
                         throw new UALException("Can not create temporary file");
                 }
-                
+                Path tmpfilepath = Paths.get(tmpfile);
+                String filename= tmpfilepath.getFileName();
                 int _pulseCtx = -1;
-                String options = String.format("-fullpath %s",tmpfile);
+                <!-- String options = String.format("-fullpath %s",tmpfile); -->
                 try{    
-                         String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options); 
+                         String uri = "imas:ascii?path="+tmpdir+";options=filename="+filename;
+                         <!-- String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options);  -->
                         _pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
                 } catch(Exception exc) 
                 {
@@ -789,10 +791,13 @@
                         }   
                         throw new UALException("Can not write into the file");    
                 }
+                Path tmpfilepath = Paths.get(tmpfile);
+                String filename= tmpfilepath.getFileName();
                 int _pulseCtx = -1;
-                String options = String.format("-fullpath %s",tmpfile);
+                <!-- String options = String.format("-fullpath %s",tmpfile); -->
                 try{
-                         String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options);
+                        String uri = "imas:ascii?path="+tmpdir+";options=filename="+filename;
+                         <!-- String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options); -->
                         _pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
                 } catch(Exception exc)
                 {
