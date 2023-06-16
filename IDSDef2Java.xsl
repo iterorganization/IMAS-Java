@@ -687,8 +687,7 @@
                 } catch (Exception exc) {
                         throw new UALException("Can not create temporary file");
                 }
-                Path tmpfilepath = Paths.get(tmpfile);
-                String filename= tmpfilepath.getFileName();
+                String filename= tmpfile.getName();
                 int _pulseCtx = -1;
                 <!-- String options = String.format("-fullpath %s",tmpfile); -->
                 try{    
@@ -791,8 +790,7 @@
                         }   
                         throw new UALException("Can not write into the file");    
                 }
-                Path tmpfilepath = Paths.get(tmpfile);
-                String filename= tmpfilepath.getFileName();
+                String filename= tmpfile.getName();
                 int _pulseCtx = -1;
                 <!-- String options = String.format("-fullpath %s",tmpfile); -->
                 try{
