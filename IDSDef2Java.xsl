@@ -691,7 +691,7 @@
                 int _pulseCtx = -1;
                 <!-- String options = String.format("-fullpath %s",tmpfile); -->
                 try{    
-                         String uri = "imas:ascii?path="+tmpdir+";options=filename="+filename;
+                         String uri = "imas:ascii?path="+tmpdir+";filename="+filename;
                          <!-- String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options);  -->
                         _pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
                 } catch(Exception exc) 
@@ -794,7 +794,7 @@
                 int _pulseCtx = -1;
                 <!-- String options = String.format("-fullpath %s",tmpfile); -->
                 try{
-                        String uri = "imas:ascii?path="+tmpdir+";options=filename="+filename;
+                        String uri = "imas:ascii?path="+tmpdir+";filename="+filename;
                          <!-- String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options); -->
                         _pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
                 } catch(Exception exc)
