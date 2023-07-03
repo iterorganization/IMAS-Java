@@ -15,6 +15,11 @@ public class Vect1DBoolean extends SummaryString {
     return array.length;
   }
 
+  public int getDim(int i) {
+    if (i==0) return array.length;
+    else return 0;
+  }
+
   public boolean getElementAt(int idx) {
     return array[idx];
   }
