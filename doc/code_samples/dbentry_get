@@ -1,0 +1,20 @@
+// Import the Access Layer
+import imasjava.imas;
+import imasjava.wrapper.LowLevel;
+
+public class load_ids {
+    public static void main(String[] args) throws Exception {
+        // Open the database entry by providing an IMAS URI
+        int data_entry = imas.open(
+            "imas:mdsplus?user=public;shot=131024;run=41;database=ITER?version=3",
+            LowLevel.OPEN_PULSE);
+
+        // Load the core_profiles IDS, occurrence 0
+        imas.core_profiles cp = imas.core_profiles.get(
+            data_entry, "core_profiles");
+
+        // Load the core_profiles IDS, occurrence 1
+        imas.core_profiles cp1 = imas.core_profiles.get(
+            data_entry, "core_profiles/1");
+    }
+}

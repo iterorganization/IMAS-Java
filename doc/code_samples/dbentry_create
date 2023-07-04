@@ -1,0 +1,11 @@
+// Import the Access Layer
+import imasjava.imas;
+import imasjava.wrapper.LowLevel;
+
+public class create_data_entry {
+    public static void main(String[] args) throws Exception {
+        // Create the database entry by providing an IMAS URI
+        int data_entry = imas.open(
+            "imas:hdf5?path=my-data", LowLevel.FORCE_CREATE_PULSE);
+    }
+}
