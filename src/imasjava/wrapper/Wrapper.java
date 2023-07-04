@@ -48,9 +48,7 @@ public class Wrapper {
   
 	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, int value, String lifeCycleStatus)throws UALException
         {
-            if(value == LowLevel.EMPTY_INT) 
-                return;
-            else
+            if(value != LowLevel.EMPTY_INT) 
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             int dataArray[] = {value};
@@ -106,9 +104,7 @@ public class Wrapper {
   	/************************************************************************************************************************************************/
 	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, double value, String lifeCycleStatus)throws UALException
         {
-            if(value == LowLevel.EMPTY_DOUBLE) 
-                return;
-            else
+            if(value != LowLevel.EMPTY_DOUBLE) 
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
             int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
@@ -218,9 +214,7 @@ public class Wrapper {
         /************************************************************************************************************************************************/
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Complex value, String lifeCycleStatus)throws UALException
         {
-            if(value == LowLevel.EMPTY_COMPLEX) 
-                return;
-            else
+            if(value != LowLevel.EMPTY_COMPLEX) 
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
     
             int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
