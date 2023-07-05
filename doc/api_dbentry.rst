@@ -40,8 +40,8 @@
 
         Create the Data Entry defined by the provided parameters.
 
-        :param integer shot: Shot number
-        :param integer run: Run number
+        :param int shot: Shot number
+        :param int run: Run number
         :param String user: User name
         :param String tokamak: Tokamak name, also known as Database name
         :param String version: Major version of the data dictionary, e.g. ``"3"``

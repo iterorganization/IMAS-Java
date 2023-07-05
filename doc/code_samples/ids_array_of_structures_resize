@@ -1,0 +1,36 @@
+// Import the Access Layer
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+
+public class ids_aos_resize {
+    public static void main(String[] args) {
+        // Create an empty interferometer IDS
+        imas.interferometer ids = new imas.interferometer();
+
+        // interferometer/channel is an array of structures, add some data
+        ids.channel = new imas.interferometer.channelClass[1];
+        System.out.println(ids.channel.length);  // -> 1
+        ids.channel[0] = new imas.interferometer.channelClass();
+        ids.channel[0].name = "test";
+
+        // resize, this will destroy the data that we just stored
+        ids.channel = new imas.interferometer.channelClass[2];
+        ids.channel[0] = new imas.interferometer.channelClass();
+        ids.channel[1] = new imas.interferometer.channelClass();
+        System.out.println(ids.channel[0].name);  // null
+
+        ids.channel[0].name = "test";
+        ids.channel[1].name = "test2";
+
+        // Resize, preserving existing data
+        imas.interferometer.channelClass[] tmp_channel =
+            new imas.interferometer.channelClass[3];
+        for (int i = 0; i < ids.channel.length; i++)
+            tmp_channel[i] = ids.channel[i];
+        ids.channel = tmp_channel;
+
+        System.out.println(ids.channel[0].name);  // test
+        System.out.println(ids.channel[1].name);  // test2
+        System.out.println(ids.channel[2]);  // null
+    }
+}

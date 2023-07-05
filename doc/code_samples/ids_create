@@ -1,0 +1,16 @@
+// Import the Access Layer
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+
+public class create_ids {
+    public static void main(String[] args) {
+        // Create an empty core_profiles IDS
+        imas.core_profiles core_profiles = new imas.core_profiles();
+        // -> -999999999 (default INT_0D value)
+        System.out.println(core_profiles.ids_properties.homogeneous_time);
+
+        // Create an empty equilibrium IDS
+        imas.equilibrium equilibrium = new imas.equilibrium();
+        System.out.println(equilibrium.time_slice); // -> null
+    }
+}

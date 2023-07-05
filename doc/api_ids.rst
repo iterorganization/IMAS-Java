@@ -13,7 +13,7 @@ IDS API
         Read the contents of the an IDS into memory.
 
         This method fetches the IDS in its entirety, with all time slices it may
-        contain. See :java:ref:`ids_get_slice` for reading a specific time slice.
+        contain. See :java:ref:`getSlice` for reading a specific time slice.
 
         Empty fields within the IDS in the Data Entry are returned with the
         default values indicated in :ref:`Default values`.

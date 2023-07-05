@@ -1,0 +1,15 @@
+// Import the Access Layer
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+
+public class deallocate_ids {
+    public static void main(String[] args) {
+        // Create an empty magnetics IDS
+        imas.magnetics magnetics = new imas.magnetics();
+        // Use the IDS ...
+
+        // Unset the magnetics IDS:
+        magnetics = null;
+        // Now the JVM garbage collector can free up the associated resources
+    }
+}

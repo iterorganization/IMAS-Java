@@ -12,7 +12,7 @@
 .. |structures_type| replace:: class
 .. |structures_child_attribute| replace:: instance fields
 .. |aos_type| replace:: an array of a class
-.. |aos_default| replace:: an empty array
+.. |aos_default| replace:: :code:`null`
 .. |aos_resize_meth| replace:: :code:`node = new nodeClass[n]`
 .. |aos_resize_keep_meth| replace:: a temporary variable (as in below example)
 
@@ -25,12 +25,12 @@
 .. |complex_type| replace:: :java:ref:`Complex`
 .. |complex_nd_type| replace:: :java:ref:`Vect1DComplex`, :java:ref:`Vect2DComplex`, :java:ref:`Vect3DComplex`, :java:ref:`Vect4DComplex`, :java:ref:`Vect5DComplex`, :java:ref:`Vect6DComplex`
 
-.. |str_default| replace:: an empty string (``""``)
-.. |str_1D_default| replace:: an empty vector
+.. |str_default| replace:: :code:`null`
+.. |str_1D_default| replace:: :code:`null`
 .. |int_default| replace:: :code:`-999_999_999`, :java:ref:`EMPTY_INT`
 .. |double_default| replace:: :code:`-9e40`, :java:ref:`EMPTY_DOUBLE`
 .. |complex_default| replace:: :code:`-9e40 -9e40i`, :java:ref:`EMPTY_COMPLEX`
-.. |ND_default| replace:: an empty vector
+.. |ND_default| replace:: :code:`null`
 
 .. |isFieldValid| replace:: \ .. ids_is_valid is not implemented in java
 

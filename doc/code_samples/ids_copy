@@ -1,0 +1,43 @@
+// Import the Access Layer
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+
+public class copy_ids {
+    public static void main(String[] args) throws UALException {
+        // Create an empty core_profiles IDS, and fill with some data
+        imas.core_profiles core_profiles = new imas.core_profiles();
+        core_profiles.ids_properties.homogeneous_time = 
+            LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
+        double[] time = {1.0, 2.0};
+        core_profiles.time = new Vect1DDouble(time);
+        core_profiles.profiles_1d = new imas.core_profiles.profiles_1dClass[2];
+        for (int i = 0; i < 2; i++ ) {
+            core_profiles.profiles_1d[i] =
+                new imas.core_profiles.profiles_1dClass();
+            double[] rtn = {0, 0.25, 0.5, 0.75, 1.0};
+            core_profiles.profiles_1d[i].grid.rho_tor_norm =
+                new Vect1DDouble(rtn);
+            double[] jt = {1+i, 1.25+i, 1.5+i, 1.75+i, 2.0+i};
+            core_profiles.profiles_1d[i].j_total = new Vect1DDouble(jt);
+        }
+
+        // Create memory backend Data Entry
+        int data_entry = imas.open(
+            "imas:memory?path=/", LowLevel.FORCE_CREATE_PULSE);
+        // Copy the IDS through the memory backend
+        core_profiles.put(data_entry, "core_profiles", core_profiles);
+        imas.core_profiles core_profiles_copy =
+            imas.core_profiles.get(data_entry, "core_profiles");
+        
+        // Adjust some data
+        for (int i=0; i<5; i++)
+            core_profiles_copy.profiles_1d[0].j_total.setElementAt(
+                i, core_profiles_copy.profiles_1d[0].j_total.getElementAt(i)*2);
+        
+        // Verify that we didn't change the original IDS
+        // -> [2.0,2.5,3.0,3.5,4.0]
+        System.out.println(core_profiles_copy.profiles_1d[0].j_total);
+        // -> [1.0,1.25,1.5,1.75,2.0]
+        System.out.println(core_profiles.profiles_1d[0].j_total);
+    }
+}

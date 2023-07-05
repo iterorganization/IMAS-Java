@@ -1,0 +1,15 @@
+// Import the Access Layer
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+
+public class ids_data {
+    public static void main(String[] args) {
+        // Create an empty core_profiles IDS
+        imas.core_profiles core_profiles = new imas.core_profiles();
+
+        // core_profiles/time is a FLT_1D data node
+        // We can assign values to it:
+        core_profiles.time = new Vect1DDouble(new double[]{0.5, 1.0, 1.5});
+        System.out.println(core_profiles.time);  // -> [0.5,1.0,1.5]
+    }
+}

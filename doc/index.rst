@@ -46,6 +46,7 @@ language.
    api_dbentry
    api_ids
    api_constants
+   api_util
 
 Indices and tables
 ==================
