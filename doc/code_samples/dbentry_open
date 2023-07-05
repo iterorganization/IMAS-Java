@@ -10,6 +10,6 @@ public class open_data_entry {
             LowLevel.OPEN_PULSE);
 
         // Alternatively, we can open an IDS providing legacy arguments
-        int data_entry2 = imas.openEnv(131024, 24, "public", "ITER", "3");
+        int data_entry2 = imas.openEnv(131024, 41, "public", "ITER", "3");
     }
 }
