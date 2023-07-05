@@ -6,7 +6,7 @@
 .. |lang| replace:: Java
 
 .. |create_ids_text| replace:: creating a new class object for that IDS, for example :code:`new imas.core_profiles()`
-.. |copy_ids| replace:: by putting it to the memory backend and getting it again.
+.. |copy_ids| replace:: by putting it to the memory backend and getting it again
 .. |deallocate_ids_text| replace:: In Java this is automatically handled by the garbage collector of the JVM.
 
 .. |structures_type| replace:: class
