@@ -48,36 +48,43 @@ public class Wrapper {
   
 	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, int value, String lifeCycleStatus)throws UALException
         {
-            if(value == LowLevel.EMPTY_INT) 
-                return;
-            else
-                Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
+                if(value != LowLevel.EMPTY_INT) 
+                    Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
-            int dataArray[] = {value};
-            int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
-            
-
-		    LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArray, 0, arrayOfSizes);
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                
+                if (value != LowLevel.EMPTY_INT || (value == LowLevel.EMPTY_INT && (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE")))) {
+                    int dataArray[] = {value};
+                    int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
+                    LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArray, 0, arrayOfSizes);
+                }
         }
 
 	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect1DInt array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, null, 1, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
 		    int dataArr[] =  array.getArray();
 		    int arrayOfSizes[] = {	array.getDim()};
-
 		    LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, dataArr, 1, arrayOfSizes);
         }
 
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect2DInt array, String lifeCycleStatus)throws UALException
         {            
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, null, 2, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -90,8 +97,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect3DInt array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_int(ctx, fieldPath, timeBasePath, null, 3, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -106,22 +117,25 @@ public class Wrapper {
   	/************************************************************************************************************************************************/
 	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, double value, String lifeCycleStatus)throws UALException
         {
-            if(value == LowLevel.EMPTY_DOUBLE) 
-                return;
-            else
+            if(value != LowLevel.EMPTY_DOUBLE) 
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
-
-            int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
-		    double dataArr[] = {value};
-    
-		    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
-    
+            
+            String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+            if (value != LowLevel.EMPTY_DOUBLE || (value == LowLevel.EMPTY_DOUBLE && (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))))  {
+                int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
+		        double dataArr[] = {value};
+		        LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
+            }
         }
 
 	    static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect1DDouble array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+		            LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, null, 1, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
     
@@ -134,8 +148,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect2DDouble array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, null, 2, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -148,8 +166,12 @@ public class Wrapper {
 	
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect3DDouble array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, null, 3, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -162,8 +184,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect4DDouble array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, null, 4, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -176,8 +202,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect5DDouble array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, null, 5, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -190,8 +220,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect6DDouble array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, null, 6, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -204,8 +238,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect7DDouble array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_double(ctx, fieldPath, timeBasePath, null, 7, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -218,22 +256,25 @@ public class Wrapper {
         /************************************************************************************************************************************************/
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Complex value, String lifeCycleStatus)throws UALException
         {
-            if(value == LowLevel.EMPTY_COMPLEX) 
-                return;
-            else
+            if(value != LowLevel.EMPTY_COMPLEX) 
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
-    
-            int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
-            Complex dataArr[] = {value};
-    
-            LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
-    
+            
+            String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+            if (value != LowLevel.EMPTY_COMPLEX || (value == LowLevel.EMPTY_COMPLEX && (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))))  {
+                int arrayOfSizes[] = { 0 }; // LowLevel doesn like null size....
+                Complex dataArr[] = {value};
+                LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, dataArr, 0, arrayOfSizes);
+            }
         }
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect1DComplex array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, null, 1, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -246,8 +287,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect2DComplex array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, null, 2, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -260,8 +305,12 @@ public class Wrapper {
     
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect3DComplex array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, null, 3, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -274,8 +323,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect4DComplex array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, null, 4, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -288,8 +341,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect5DComplex array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, null, 5, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -302,8 +359,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect6DComplex array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_complex(ctx, fieldPath, timeBasePath, null, 6, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
            
@@ -317,8 +378,12 @@ public class Wrapper {
         /************************************************************************************************************************************************/
     	static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, String text, String lifeCycleStatus)throws UALException
         {
-            if(text == null || text.length() < 1) 
+            if(text == null || text.length() < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED.equals("TRUE"))
+                    LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, null, 1, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
@@ -330,8 +395,12 @@ public class Wrapper {
 
         static public void writeData(int ctx, String idsName, String fieldPath, String timeBasePath, Vect1DString array, String lifeCycleStatus)throws UALException
         {
-            if(array == null || array.getArray().length < 1) 
+            if(array == null || array.getArray().length < 1) {
+                String AL_PLUGINS_ENABLED = System.getenv("AL_PLUGINS_ENABLED");
+                if (AL_PLUGINS_ENABLED != null && AL_PLUGINS_ENABLED == "TRUE")
+                    LowLevel.ual_write_data_char(ctx, fieldPath, timeBasePath, null, 2, null);
                 return;
+            }
             else
                 Wrapper.warningWritingObsolescentNode(idsName, fieldPath, lifeCycleStatus);
 
