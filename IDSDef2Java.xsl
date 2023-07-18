@@ -151,10 +151,10 @@
 
 	public static int defaultBackend() 
 	{
-	int backend = LowLevel.HDF5_BACKEND;
-	//String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
-	//if (backend_value != null)
-  //      backend = Integer.parseInt(backend_value);
+  int backend = LowLevel.MDSPLUS_BACKEND;
+  String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
+  if (backend_value != null)
+        backend = Integer.parseInt(backend_value);
 	return backend;
 	}
 
@@ -839,13 +839,14 @@
             
         isValidatedBeforePut = System.getenv("IMAS_AL_ENABLE_VALIDATION_AT_PUT");
 
-        if (isValidatedBeforePut != null &amp;&amp; isValidatedBeforePut.equals("0")){
+        if (isValidatedBeforePut != null &amp;&amp; !isValidatedBeforePut.equals("0")){
           try {
             validate();
           }
           catch (Exception e) {
             System.err.println("Warning: " + e.getMessage());
             System.err.println("The data has not been put."); 
+            return;
           }
         }
  
@@ -936,6 +937,21 @@
             String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
             int storedTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
             int idsTimeMode = this.ids_properties.homogeneous_time;
+
+            String isValidatedBeforePut;
+            
+            isValidatedBeforePut = System.getenv("IMAS_AL_ENABLE_VALIDATION_AT_PUT");
+
+            if (isValidatedBeforePut != null &amp;&amp; !isValidatedBeforePut.equals("0")){
+              try {
+                validate();
+              }
+              catch (Exception e) {
+                System.err.println("Warning: " + e.getMessage());
+                System.err.println("The data has not been put."); 
+                return;
+              }
+            }
             
             if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
@@ -1295,10 +1311,8 @@
         boolean error = true;
         int i = 0;
 
-        int idsTimeMode = -9999999;
+        int idsTimeMode = this.ids_properties.homogeneous_time;;
         int idsTimeSize = 0;
-
-        idsTimeMode = this.ids_properties.homogeneous_time;
 
         if (idsTimeMode != LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp;
             idsTimeMode != LowLevel.IDS_TIME_MODE_HETEROGENEOUS &amp;&amp;
@@ -1487,9 +1501,12 @@
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_1D"/>
         <!-- split of the code due to byte code size limit: a limitation case only for distributions/distribution/profiles_2d -->
         <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'">
-        validate_2d_collisions(idsTimeMode, idsTimeSize);
+        <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
+        validate_2d_<xsl:value-of select="@name"/>(idsTimeMode, idsTimeSize);
+        </xsl:for-each>
+        <!-- validate_2d_collisions(idsTimeMode, idsTimeSize);
         validate_2d_trapped(idsTimeMode, idsTimeSize);
-        validate_2d_others(idsTimeMode, idsTimeSize);
+        validate_2d_others(idsTimeMode, idsTimeSize); -->
         </xsl:if>
         <xsl:if test="not(ancestor::IDS/@name='distributions' and @name='profiles_2d')">
           <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_2D"/>
@@ -1502,63 +1519,29 @@
       }
 
       <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'">
-      private void validate_2d_collisions(int idsTimeMode, int idsTimeSize ) throws ValidationException
-      {
-        int arraySize = -1;
-        boolean check = true;
-        boolean error = true;
-        int i = 0;
-        <xsl:apply-templates select="field[@data_type='struct_array' or @data_type='structure' and @name='collisions']" mode="VALIDATE_DESCENDANT_2D_OF_FIELD">
-        <xsl:with-param name="currpath" select="@path_doc"/>
-        </xsl:apply-templates>
-        // endvalidate_2d
-      }
+      <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
+        private void validate_2d_<xsl:value-of select="@name"/>(int idsTimeMode, int idsTimeSize) throws ValidationException
+        {
+          int arraySize = -1;
+          boolean check = true;
+          boolean error = true;
+          int i = 0;
 
-      private void validate_2d_trapped(int idsTimeMode, int idsTimeSize ) throws ValidationException
-      {
-        int arraySize = -1;
-        boolean check = true;
-        boolean error = true;
-        int i = 0;
-        <xsl:apply-templates select="field[@data_type='struct_array' or @data_type='structure' and @name='trapped']" mode="VALIDATE_DESCENDANT_2D_OF_FIELD">
-        <xsl:with-param name="currpath" select="@path_doc"/>
-        </xsl:apply-templates>
-        // endvalidate_2d
-      }
-
-      private void validate_2d_others(int idsTimeMode, int idsTimeSize ) throws ValidationException
-      {
-        int arraySize = -1;
-        boolean check = true;
-        boolean error = true;
-        int i = 0;
-        <xsl:apply-templates select="field[@data_type='struct_array' or @data_type='structure' and not(@name='trapped') and not(@name='collisions')]" mode="VALIDATE_DESCENDANT_2D_OF_FIELD">
-        <xsl:with-param name="currpath" select="@path_doc"/>
-        </xsl:apply-templates>
-        <xsl:apply-templates select="field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
-        <xsl:with-param name="currpath" select="@path_doc"/>
-        </xsl:apply-templates>
-        // endvalidate_2d
-      }
+          <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
+          <xsl:with-param name="currpath" select="../@path_doc"/>
+          </xsl:apply-templates>
+        }
+        </xsl:for-each>
       </xsl:if>
-      
       }
       
       /* ____________________________________________________________________________________________________________  */
     </xsl:template>
 
-    <xsl:template match="field" mode="VALIDATE_DESCENDANT_2D_OF_FIELD">
-    <xsl:param name="currpath"/>
-    <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
-    <xsl:with-param name="currpath" select="$currpath"/>
-    </xsl:apply-templates>
-    </xsl:template> 
-
 <xsl:template match="field" mode="VALIDATE_CHILD">
     <xsl:choose>
       <xsl:when test="@data_type='structure'">
   // Validation of <xsl:value-of select = "@path"/>
-        <!-- System.out.println("Validation of <xsl:value-of select = "@path"/>..."); -->
         try{
         this.<xsl:value-of select="@name"/>.validate(idsTimeMode, idsTimeSize );
         }
@@ -1567,7 +1550,6 @@
         }
       </xsl:when>
       <xsl:when test="@data_type='struct_array'">
-        <!-- System.out.println("Validation of <xsl:value-of select = "@path"/>..."); -->
         if (!(this.<xsl:value-of select = "@name"/>==null)) {
           arraySize = this.<xsl:value-of select = "@name"/>.length;
           // Validation of <xsl:value-of select = "@path"/>
@@ -2707,16 +2689,7 @@
     </xsl:choose>
     </xsl:variable> 
     <!-- missing IDS coordinate exception--> 
-    // begin validation of <xsl:value-of select="@path"/> <xsl:value-of select="starts-with($coord,$currpath)"/><xsl:value-of select="contains($ispresent,'yes')"/><xsl:value-of select="$test"/>
-    // currpath: <xsl:value-of select="$currpath"/>
-    // child: <xsl:value-of select="$child"/>
-    // coord: <xsl:value-of select="$coord"/>
-    // ancestorfield: <xsl:value-of select="ancestor::field[@path_doc = $currpath]/@name"/>
-    // relativecoord: <xsl:value-of select="$relativecoord"/>
     <xsl:if test="starts-with($coord,$currpath) and contains($ispresent,'yes')">
-      // conti validation of <xsl:value-of select="@path"/> <xsl:value-of select="$test"/>
-      // child <xsl:value-of select="$child"/>
-      // child <xsl:value-of select="$relativecoord"/>
       <xsl:if test="$test='false'">
     // validation of <xsl:value-of select="@path"/> dimension <xsl:value-of select="number($dimension)"/>
         <xsl:variable name="newpath">
@@ -2956,10 +2929,6 @@
       </xsl:if>
       </xsl:if>
       </xsl:variable>
-      // <xsl:value-of select="concat('istimeslice: ', $istimeslice)"/>
-      // <xsl:value-of select="concat('object: ',concat($string,@name))"/>
-      // <xsl:value-of select="concat('coord: ',$coord)"/>
-      // <xsl:value-of select="concat('coord: ',$root)"/>
       <xsl:if test="not(contains($newpath,'/')) and not($istimeslice='yes')"> <!-- and ( (contains($string,'(itime)') and contains($coord,'(itime)')) or  (not(contains($string,'(itime)')) and not(contains($coord,'(itime)'))) )-->
         <xsl:choose>
         <xsl:when test="@data_type='struct_array'">
