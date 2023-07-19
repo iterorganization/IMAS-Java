@@ -1306,11 +1306,6 @@
 
         public void validate() throws ValidationException
       {
-        int arraySize = -1;
-        boolean check = true;
-        boolean error = true;
-        int i = 0;
-
         int idsTimeMode = this.ids_properties.homogeneous_time;;
         int idsTimeSize = 0;
 
@@ -1493,10 +1488,6 @@
       public void validate(int idsTimeMode, int idsTimeSize ) throws ValidationException
       {
         // validate definition <xsl:value-of select="@path"/>
-        int arraySize = -1;
-        boolean check = true;
-        boolean error = true;
-        int i = 0;
         <!-- validation logic  -->
         <xsl:apply-templates select = "field" mode = "VALIDATE_CHILD"/>
 
@@ -1532,10 +1523,6 @@
       <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
         private void validate_2d_<xsl:value-of select="@name"/>(int idsTimeMode, int idsTimeSize) throws ValidationException
         {
-          int arraySize = -1;
-          boolean check = true;
-          boolean error = true;
-          int i = 0;
 
           <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
           <xsl:with-param name="currpath" select="../@path_doc"/>
@@ -1561,9 +1548,9 @@
       </xsl:when>
       <xsl:when test="@data_type='struct_array'">
         if (!(this.<xsl:value-of select = "@name"/>==null)) {
-          arraySize = this.<xsl:value-of select = "@name"/>.length;
+          int arraySize = this.<xsl:value-of select = "@name"/>.length;
           // Validation of <xsl:value-of select = "@path"/>
-          for( i = 0; i &lt;arraySize; i++)
+          for(int i = 0; i &lt;arraySize; i++)
           {
             try {
               if (this.<xsl:value-of select = "@name"/>[i] != null)
@@ -2943,19 +2930,19 @@
         <xsl:choose>
         <xsl:when test="@data_type='struct_array'">
        if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-        arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
+        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
         </xsl:when>
         <xsl:otherwise>
        if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-        arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
         </xsl:otherwise>
         </xsl:choose>
         <xsl:if test="@type='dynamic' and contains($coord,'/time')">
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         </xsl:if>
-          check = true;
-          error = true;
-          i = 0;
+          boolean check = true;
+          boolean error = true;
+          int i = 0;
           <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
           if (i&gt;1) { 
             throw new ValidationException("Coordinate consistency error for <xsl:value-of select="@path"/> (dimension <xsl:value-of select="number($dimension)"/>). Exactly one of the coordinate must be verified. (<xsl:value-of select="$coord"/>)");
@@ -3015,7 +3002,7 @@
           </xsl:if>
       </xsl:variable>
       <xsl:if test="not(contains(substring-before($coord,' OR'),'1...'))">
-              if (this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/> != null) i = i + 1;
+          if (this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/> != null) i = i + 1;
       </xsl:if>
       <xsl:apply-templates select="." mode="possible-coordinates">
         <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
@@ -3309,10 +3296,10 @@
         if (this.<xsl:value-of select = "@name"/> != null) {
         <xsl:choose>
           <xsl:when test="@data_type='struct_array'">
-          arraySize = this.<xsl:value-of select = "@name"/>.length;
+          int arraySize = this.<xsl:value-of select = "@name"/>.length;
           </xsl:when>
           <xsl:otherwise>
-          arraySize = this.<xsl:value-of select = "@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+          int arraySize = this.<xsl:value-of select = "@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
           </xsl:otherwise> 
         </xsl:choose>
           if (arraySize != 0) {
@@ -3331,10 +3318,10 @@
     if (this.<xsl:value-of select="@name"/> != null) {
       <xsl:choose>
         <xsl:when test="@data_type='struct_array'">
-        arraySize = this.<xsl:value-of select = "@name"/>.length;
+        int arraySize = this.<xsl:value-of select = "@name"/>.length;
         </xsl:when>
         <xsl:otherwise>
-        arraySize = this.<xsl:value-of select = "@name"/>.getDim(0);
+        int arraySize = this.<xsl:value-of select = "@name"/>.getDim(0);
         </xsl:otherwise> 
       </xsl:choose>
     }
