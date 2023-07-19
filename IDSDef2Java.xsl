@@ -3324,10 +3324,6 @@
         int arraySize = this.<xsl:value-of select = "@name"/>.getDim(0);
         </xsl:otherwise> 
       </xsl:choose>
-    }
-    else {
-      throw new ValidationException("<xsl:value-of select="@path"/> must be allocated.");
-    }
     <xsl:if test="contains(@coordinate1,'/time')">
     if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
         if(arraySize != idsTimeSize) {
@@ -3345,6 +3341,7 @@
       throw new ValidationException("array size of <xsl:value-of select="@path"/> wrong dimension. Must be the size of <xsl:value-of select="@coordinate1"/>.");
     }
     </xsl:if>
+    }
     </xsl:when>
     <xsl:otherwise>
       // warning <xsl:value-of select="@path_doc"/> coordinates consistency not verified (<xsl:value-of select="@coordinate1"/>)
