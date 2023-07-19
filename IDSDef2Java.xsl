@@ -2611,7 +2611,7 @@
     this variable is a safeguard that prevents wrong code generation-->
     <xsl:variable name="ispresent">
       <xsl:choose>
-      <xsl:when test="$currpath='' and not($coord='')">
+      <xsl:when test="$currpath='' and not($coord='') and not(contains($coord, '1...'))">
           <xsl:value-of select="'yes'"/>
       </xsl:when>
       <xsl:when test="contains($coord,'OR')">
@@ -3293,6 +3293,7 @@
       <xsl:param name="coord"/>
       <xsl:param name="dimension"/>
         <xsl:if test="not(contains($coord,' OR ')) and contains($coord, '1...') and not(contains($coord, '1...N')) and not(string(number(substring-after($coord,'1...')))='NaN')">
+        // validation of <xsl:value-of select="@path"/> dimension <xsl:value-of select="number($dimension)"/>
         if (this.<xsl:value-of select = "@name"/> != null) {
         <xsl:choose>
           <xsl:when test="@data_type='struct_array'">
