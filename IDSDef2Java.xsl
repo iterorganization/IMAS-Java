@@ -3120,7 +3120,6 @@
       </xsl:apply-templates>
       </xsl:if>
       <xsl:if test="not(contains($coord,' OR'))">
-      // // <xsl:value-of select=".//field[contains(@path_doc, $coord)]/@name"/>
             <xsl:variable name="mesure_string">
               <xsl:if test="//field[contains(@path_doc, $coord) and @data_type='struct_array']">length
               </xsl:if>
