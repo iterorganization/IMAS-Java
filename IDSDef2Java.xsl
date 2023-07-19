@@ -1497,24 +1497,34 @@
         boolean check = true;
         boolean error = true;
         int i = 0;
+        <!-- validation logic  -->
         <xsl:apply-templates select = "field" mode = "VALIDATE_CHILD"/>
+
+        <!-- 1D field coordinate validation -->
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_1D"/>
+
+        <!-- 2D field coordinate validation -->
         <!-- split of the code due to byte code size limit: a limitation case only for distributions/distribution/profiles_2d -->
         <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'">
+        <!-- the 2D field of the current node (profiles_2d) -->
+        <xsl:apply-templates select="field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
+          <xsl:with-param name="currpath" select="@path_doc"/>
+        </xsl:apply-templates>
+        <!-- the 2D field of each children node  -->
         <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
         validate_2d_<xsl:value-of select="@name"/>(idsTimeMode, idsTimeSize);
         </xsl:for-each>
-        <!-- validate_2d_collisions(idsTimeMode, idsTimeSize);
-        validate_2d_trapped(idsTimeMode, idsTimeSize);
-        validate_2d_others(idsTimeMode, idsTimeSize); -->
         </xsl:if>
         <xsl:if test="not(ancestor::IDS/@name='distributions' and @name='profiles_2d')">
           <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_2D"/>
         </xsl:if>
+
+        <!-- 3D+ field coordinate validation -->
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_3D"/>
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_4D"/> 
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_5D"/>
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_6D"/>
+        <!-- FIXED_SIZE field coordinate validation -->
         <xsl:apply-templates select="field" mode="VALIDATE_CHILD_FIXED_SIZE"/>
       }
 
@@ -1537,7 +1547,7 @@
       
       /* ____________________________________________________________________________________________________________  */
     </xsl:template>
-
+    
 <xsl:template match="field" mode="VALIDATE_CHILD">
     <xsl:choose>
       <xsl:when test="@data_type='structure'">
@@ -3036,6 +3046,50 @@
       </xsl:if>
       </xsl:template>
 
+      <xsl:template match='field' mode="resolve_indices">
+      <xsl:param name="target"/>
+      <xsl:param name="string-resolved"/>
+      <xsl:if test="contains($target,'(')">
+        <xsl:variable name="indexstr">
+          <xsl:apply-templates select="." mode="get_indices">
+            <xsl:with-param name="target" select="$target"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+        <xsl:variable name="resolved_indexstr">
+        <xsl:if test="matches($indexstr, '^[0-9]+$') or matches($indexstr, '^itime|i[1-9]$')">
+          <xsl:value-of select="$indexstr"/>
+        </xsl:if>
+        <xsl:if test="not(matches($indexstr, '^[0-9]+$') or matches($indexstr, '^itime|i[1-9]$'))">
+          <xsl:value-of select="concat('this.',$indexstr)"/>
+        </xsl:if>
+        </xsl:variable>
+        <xsl:apply-templates select="." mode="resolve_indices">
+            <xsl:with-param name="target" select="substring-after($target,concat($indexstr,')'))"/>
+            <xsl:with-param name="string-resolved" select="concat($string-resolved,substring-before($target,concat($indexstr,')')), concat($resolved_indexstr,')'))"/>
+        </xsl:apply-templates>
+      </xsl:if>
+      <xsl:if test="not(contains($target,'('))">
+        <xsl:value-of select="concat($string-resolved, $target)"/>
+      </xsl:if>
+      </xsl:template>
+
+      <!-- the get_indices function return the sub-string between parenthesis
+            process(i1)/coordinate_index ===> i1
+            struct(process(i1)/coordinate_index)/substruc ===> process(i1)/coordinate_index
+      -->
+      <xsl:template match='field' mode="get_indices">
+      <xsl:param name="target"/>
+      <xsl:variable name="partialindex" select="substring-before(substring-after($target,'('),')')"/>
+      <xsl:if test="contains($partialindex,'(')">
+        <xsl:value-of select="concat($partialindex,')',substring-before(substring-after($target,concat($partialindex,')')),')'))"/>
+        <!-- <xsl:value-of select="concat($partialindex,substring-before(substring-after($target,concat($partialindex,')')),')'))"/> -->
+      </xsl:if>
+      <xsl:if test="not(contains($partialindex,'('))">
+        <xsl:value-of select="$partialindex"/>
+      </xsl:if>
+      </xsl:template>
+
+
       <xsl:template match='field' mode="check-possible-coordinates">
       <xsl:param name="coord"/>
       <xsl:param name="relativepathdoc"/>
@@ -3054,17 +3108,18 @@
                 <xsl:value-of select="replace(substring-before(substring-after($coord,$relativepathdoc),' OR'),'/','.')"/>
               </xsl:if>
               <xsl:if test="$relativepathdoc='/'">
-                <xsl:if test="ancestor::IDS/@name='amns_data'">
-              <xsl:value-of select="replace(concat(substring-before(substring-before($coord,' OR'),'process(i1)/coordinate_index'),'this.process(i1)/coordinate_index', substring-after(substring-before($coord,' OR'),'process(i1)/coordinate_index')),'/','.')"/>
-                </xsl:if>
-                <xsl:if test="not(ancestor::IDS/@name='amns_data')">
                   <xsl:value-of select="replace(substring-before($coord,' OR'),'/','.')"/>
-                </xsl:if>
               </xsl:if>
             </xsl:variable>
+            <xsl:variable name="resolved_target">
+            <xsl:apply-templates select="." mode="resolve_indices">
+              <xsl:with-param name="target" select="$target"/>
+              <xsl:with-param name="string-resolved" select="''"/>
+            </xsl:apply-templates>
+            </xsl:variable>
             <xsl:if test="not(contains(substring-before($coord,' OR'),'1...'))">
-            if (this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/> != null) {
-              if (arraySize == this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/>.<xsl:value-of select="$mesure_string"/>) {
+            if (this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/> != null) {
+              if (arraySize == this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>.<xsl:value-of select="$mesure_string"/>) {
                 error = false;
               } 
             } 
@@ -3090,17 +3145,18 @@
                 <xsl:value-of select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
               </xsl:if>
               <xsl:if test="$relativepathdoc='/'">
-                <xsl:if test="ancestor::IDS/@name='amns_data'">
-              <xsl:value-of select="replace(concat(substring-before($coord,'process(i1)/coordinate_index'),'this.process(i1)/coordinate_index', substring-after($coord,'process(i1)/coordinate_index')),'/','.')"/>
-                </xsl:if>
-                <xsl:if test="not(ancestor::IDS/@name='amns_data')">
                   <xsl:value-of select="replace($coord,'/','.')"/>
-                </xsl:if>
               </xsl:if>
             </xsl:variable>
+            <xsl:variable name="resolved_target">
+            <xsl:apply-templates select="." mode="resolve_indices">
+              <xsl:with-param name="target" select="$target"/>
+              <xsl:with-param name="string-resolved" select="''"/>
+            </xsl:apply-templates>
+            </xsl:variable>
             <xsl:if test="not(contains($coord,'1...'))">
-            if (this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/> != null) {
-              if (arraySize == this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/>.<xsl:value-of select="$mesure_string"/>) {
+            if (this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/> != null) {
+              if (arraySize == this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>.<xsl:value-of select="$mesure_string"/>) {
                 error = false;
               } 
             } 
