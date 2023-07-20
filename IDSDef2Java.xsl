@@ -89,7 +89,65 @@
         public static String version;
         public static int shot; 
         public static int run;
+
+        public static boolean check_possible_coordinate(int arraySize, int dim, Object... objs) {
+            boolean error = true; 
+            java.lang.reflect.Method method;
+            for (Object s : objs) {
+                if (s != null) {
+                  try {
+                  method = s.getClass().getMethod("getDim",int.class);
+                  } catch (SecurityException e) { return true; }
+                    catch (NoSuchMethodException e) {method=null;}
+                  if (method != null) {
+                  try {
+                        int size = (int) method.invoke(s,dim);
+                        if (arraySize == size) error = false;
+                  } catch (IllegalArgumentException e) { return true; }
+                    catch (IllegalAccessException e) { return true; }
+                    catch (InvocationTargetException e) { return true; } 
+                  } else {
+                  if (arraySize == ((Object[])s).length) error = false;
+                  }
+                }
+            }
+            return error;
+        }
         
+        public static void validate_coordinate(int arraySize, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
+        {
+
+          boolean check = true;
+          boolean error = true;
+          int i = 0;
+
+          for (Object s : objs) {
+            if (s != null) i = i + 1;
+          }
+
+          if (i!=1) { 
+            check = false;
+          } 
+          if (i&gt;1) { 
+            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+dim+"). Exactly one of the coordinate must be verified. ("+coordinates+")");
+          }
+          if(check) {
+            error = imas.check_possible_coordinate(arraySize, objdim ,objs);
+          }
+
+          // Alternative fixed size?
+
+          if (!check &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
+            error = false; 
+          }
+
+          // Dimension sizz not validated?
+            
+          if (error) { 
+            throw new ValidationException("Wrong dimension "+dim+" for "+name+". ("+coordinates+")");
+          }
+
+        }
         
         public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException {
         Class ids = ImasReflection.getIdsClass(idsName);
@@ -1496,19 +1554,19 @@
 
         <!-- 2D field coordinate validation -->
         <!-- split of the code due to byte code size limit: a limitation case only for distributions/distribution/profiles_2d -->
-        <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'">
+          <!-- <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'"> -->
         <!-- the 2D field of the current node (profiles_2d) -->
-        <xsl:apply-templates select="field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
-          <xsl:with-param name="currpath" select="@path_doc"/>
-        </xsl:apply-templates>
+          <!-- <xsl:apply-templates select="field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
+            <xsl:with-param name="currpath" select="@path_doc"/>
+          </xsl:apply-templates> -->
         <!-- the 2D field of each children node  -->
-        <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
-        validate_2d_<xsl:value-of select="@name"/>(idsTimeMode, idsTimeSize);
-        </xsl:for-each>
-        </xsl:if>
-        <xsl:if test="not(ancestor::IDS/@name='distributions' and @name='profiles_2d')">
+          <!-- <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
+          validate_2d_<xsl:value-of select="@name"/>(idsTimeMode, idsTimeSize);
+          </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="not(ancestor::IDS/@name='distributions' and @name='profiles_2d')"> -->
           <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_2D"/>
-        </xsl:if>
+          <!-- </xsl:if> -->
 
         <!-- 3D+ field coordinate validation -->
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_3D"/>
@@ -1519,7 +1577,7 @@
         <xsl:apply-templates select="field" mode="VALIDATE_CHILD_FIXED_SIZE"/>
       }
 
-      <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'">
+      <!-- <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'">
       <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
         private void validate_2d_<xsl:value-of select="@name"/>(int idsTimeMode, int idsTimeSize) throws ValidationException
         {
@@ -1529,7 +1587,7 @@
           </xsl:apply-templates>
         }
         </xsl:for-each>
-      </xsl:if>
+      </xsl:if> -->
       }
       
       /* ____________________________________________________________________________________________________________  */
@@ -2940,32 +2998,14 @@
         <xsl:if test="@type='dynamic' and contains($coord,'/time')">
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         </xsl:if>
-          boolean check = true;
-          boolean error = true;
-          int i = 0;
-          <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
-          if (i&gt;1) { 
-            throw new ValidationException("Coordinate consistency error for <xsl:value-of select="@path"/> (dimension <xsl:value-of select="number($dimension)"/>). Exactly one of the coordinate must be verified. (<xsl:value-of select="$coord"/>)");
-          }
-          if(check) {
-            <xsl:apply-templates select="." mode="check-possible-coordinates">
-              <xsl:with-param name="coord" select="$coord"/>
-              <xsl:with-param name="relativepathdoc" select="$root"/>
-              <xsl:with-param name="dimension" select="$dimension"/>
-              <xsl:with-param name="self" select="concat($string,@name)"/>
-              <xsl:with-param  name="targetdim" select="$targetdim"/>
-            </xsl:apply-templates> 
-          }
 
-            <xsl:apply-templates select="." mode="check-specific-coordinates">
-              <xsl:with-param name="coord" select="$coord"/>
-              <xsl:with-param name="relativepathdoc" select="$root"/>
-              <xsl:with-param name="dimension" select="$dimension"/>
-              <xsl:with-param name="self" select="concat($string,@name)"/>
-            </xsl:apply-templates>
-          if (error) { 
-            throw new ValidationException("Wrong dimension <xsl:value-of select="number($dimension)"/> for <xsl:value-of select="@path"/>. (<xsl:value-of select="$coord"/>)");
-          }
+          imas.validate_coordinate(arraySize,
+                                  <xsl:value-of select="number($dimension)"/>, 
+                                  "<xsl:value-of select="@path"/>",
+                                  <xsl:value-of select="number($targetdim)"/>,
+                                  "<xsl:value-of select="$coord"/>"
+                                  <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
+                                  <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>);
       <xsl:if test="@type='dynamic' and contains($coord,'/time')">
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
@@ -3002,7 +3042,7 @@
           </xsl:if>
       </xsl:variable>
       <xsl:if test="not(contains(substring-before($coord,' OR'),'1...'))">
-          if (this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/> != null) i = i + 1;
+        ,(Object) this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/>
       </xsl:if>
       <xsl:apply-templates select="." mode="possible-coordinates">
         <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
@@ -3025,11 +3065,8 @@
           </xsl:if>
       </xsl:variable>
       <xsl:if test="not(contains($coord,'1...'))">
-          if (this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/> != null) i = i + 1;
+          ,(Object) this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/>
       </xsl:if>
-          if (i!=1) { 
-            check = false;
-          } 
       </xsl:if>
       </xsl:template>
 
@@ -3105,11 +3142,7 @@
             </xsl:apply-templates>
             </xsl:variable>
             <xsl:if test="not(contains(substring-before($coord,' OR'),'1...'))">
-            if (this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/> != null) {
-              if (arraySize == this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>.<xsl:value-of select="$mesure_string"/>) {
-                error = false;
-              } 
-            } 
+              ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
             </xsl:if>
       <xsl:apply-templates select="." mode="check-possible-coordinates">
         <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
@@ -3141,11 +3174,7 @@
             </xsl:apply-templates>
             </xsl:variable>
             <xsl:if test="not(contains($coord,'1...'))">
-            if (this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/> != null) {
-              if (arraySize == this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>.<xsl:value-of select="$mesure_string"/>) {
-                error = false;
-              } 
-            } 
+              ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
             </xsl:if>
       </xsl:if>
       </xsl:template>
@@ -3158,9 +3187,7 @@
       <xsl:if test="contains($coord,' OR')">
             <xsl:variable name="target" select="replace(substring-before(substring-after($coord,$relativepathdoc),' OR'),'/','.')"/>
             <xsl:if test="contains(substring-before($coord,' OR'),'1...')">
-            if (!check &amp;&amp; arraySize == <xsl:value-of select="substring-after($coord,'1...')"/>) {  
-            error = false; 
-            }
+              ,true, <xsl:value-of select="substring-after($coord,'1...')"/>
             </xsl:if>
       <xsl:apply-templates select="." mode="check-specific-coordinates">
         <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
@@ -3172,9 +3199,10 @@
       <xsl:if test="not(contains($coord,' OR'))">
             <xsl:variable name="target" select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
             <xsl:if test="contains($coord,'1...')">
-            if (!check &amp;&amp; arraySize == <xsl:value-of select="substring-after($coord,'1...')"/>) {   
-            error = false; 
-            }
+              ,true, <xsl:value-of select="substring-after($coord,'1...')"/>
+            </xsl:if>
+            <xsl:if test="not(contains($coord,'1...'))">
+              ,false, 0
             </xsl:if>
       </xsl:if>
       </xsl:template>
