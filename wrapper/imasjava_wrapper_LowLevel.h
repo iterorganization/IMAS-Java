@@ -239,6 +239,14 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_al_1iterate_1over_1arrayst
 JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_al_1get_1backendID
   (JNIEnv *, jclass, jint);
 
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    ual_get_version
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_imasjava_wrapper_LowLevel_ual_1get_1version
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif

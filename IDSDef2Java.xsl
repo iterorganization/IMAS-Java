@@ -19,6 +19,15 @@
     <xsl:param name="SYSTEM" as="xs:string" required="yes"/>
     <xsl:param name="DD_VERSION" as="xs:string" required="yes"/>
     <xsl:param name="AL_VERSION" as="xs:string" required="yes"/>
+
+    <xsl:variable name="version_regex" select="'^([0-9]+)\.([0-9]+)\.([0-9]+)(-.*)?$'"/>
+    <xsl:variable name="DD_MAJOR" as="xs:int" select="xs:int(replace($DD_VERSION, $version_regex, '$1'))"/>
+    <xsl:variable name="DD_MINOR" as="xs:int" select="xs:int(replace($DD_VERSION, $version_regex, '$2'))"/>
+    <xsl:variable name="DD_PATCH" as="xs:int" select="xs:int(replace($DD_VERSION, $version_regex, '$3'))"/>
+
+    <xsl:variable name="HLI_MAJOR" as="xs:int" select="xs:int(replace($AL_VERSION, $version_regex, '$1'))"/>
+    <xsl:variable name="HLI_MINOR" as="xs:int" select="xs:int(replace($AL_VERSION, $version_regex, '$2'))"/>
+    <xsl:variable name="HLI_PATCH" as="xs:int" select="xs:int(replace($AL_VERSION, $version_regex, '$3'))"/>
     
     <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
     <!-- MODE can be set to get or put in the 2 transformations for generating the subroutines, this reduced editing requirements
@@ -80,6 +89,20 @@
         
         
         public static final int INTERPOLATION = 3, CLOSEST_SAMPLE = 1, PREVIOUS_SAMPLE = 2;
+        
+        public static final String al_java_version = "<xsl:value-of select="$AL_VERSION"/>";
+        public static final int al_java_major_version = <xsl:value-of select="$HLI_MAJOR"/>;
+        public static final int al_java_minor_version = <xsl:value-of select="$HLI_MINOR"/>;
+        public static final int al_java_patch_version = <xsl:value-of select="$HLI_PATCH"/>;
+
+        public static final String al_dd_version = "<xsl:value-of select="$DD_VERSION"/>";
+        public static final int al_dd_major_version = <xsl:value-of select="$DD_MAJOR"/>;
+        public static final int al_dd_minor_version = <xsl:value-of select="$DD_MINOR"/>;
+        public static final int al_dd_patch_version = <xsl:value-of select="$DD_PATCH"/>;
+
+        public static String get_al_version() {
+            return LowLevel.ual_get_version();
+        }
         
         
         public static int pulseCtx = -1;

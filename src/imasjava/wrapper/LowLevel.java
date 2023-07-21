@@ -426,4 +426,6 @@ public class LowLevel {
 
   public static native int al_get_backendID(int backendId) throws ALException;
 
+  public static native String ual_get_version();
+
 }

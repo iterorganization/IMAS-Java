@@ -946,4 +946,22 @@ int JNICALL Java_imasjava_wrapper_LowLevel_al_1get_1backendID
     return beid;
 }
 
+jstring JNICALL Java_imasjava_wrapper_LowLevel_ual_1get_1version
+  (JNIEnv *env, jclass)
+{
+    const char * version;
+    jstring jVersion;
+
+    // - - - - - - - - - - UAL LowLevel method call - - - - - - - - - - - -
+    version = getUALVersion();
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    if(version != NULL)
+        jVersion = env->NewStringUTF(version);
+    else
+        jVersion = env->NewStringUTF("");
+
+    return jVersion;
+}
+
 } //extern "C"
