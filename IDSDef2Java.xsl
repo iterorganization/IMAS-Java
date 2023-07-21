@@ -897,16 +897,7 @@
             
         isValidatedBeforePut = System.getenv("IMAS_AL_ENABLE_VALIDATION_AT_PUT");
 
-        if (isValidatedBeforePut != null &amp;&amp; !isValidatedBeforePut.equals("0")){
-          try {
-            validate();
-          }
-          catch (Exception e) {
-            System.err.println("Warning: " + e.getMessage());
-            System.err.println("The data has not been put."); 
-            return;
-          }
-        }
+        if (isValidatedBeforePut != null &amp;&amp; !isValidatedBeforePut.equals("0")) validate();
  
         int idsTimeMode = this.ids_properties.homogeneous_time;
 
@@ -1000,16 +991,7 @@
             
             isValidatedBeforePut = System.getenv("IMAS_AL_ENABLE_VALIDATION_AT_PUT");
 
-            if (isValidatedBeforePut != null &amp;&amp; !isValidatedBeforePut.equals("0")){
-              try {
-                validate();
-              }
-              catch (Exception e) {
-                System.err.println("Warning: " + e.getMessage());
-                System.err.println("The data has not been put."); 
-                return;
-              }
-            }
+            if (isValidatedBeforePut != null &amp;&amp; !isValidatedBeforePut.equals("0")) validate();
             
             if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
