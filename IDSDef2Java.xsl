@@ -47,15 +47,15 @@
         String ualversion = System.getenv("UAL_VERSION");
         if (libpath == null) {
         System.err.println("IMAS library not set up in the environment. (IMAS_PREFIX missing)");
-        System.exit(0);
+        System.exit(1);
         }
         if (imasversion == null) {
         System.err.println("IMAS library not set up in the environment. (IMAS_VERSION missing)");
-        System.exit(0);
+        System.exit(1);
         }
         if (ualversion == null) {
         System.err.println("IMAS library not set up in the environment. (UAL_VERSION missing)");
-        System.exit(0);
+        System.exit(1);
         }
         <xsl:choose><xsl:when test="$SYSTEM = 'Linux'">
             libpath = libpath + "/lib";
