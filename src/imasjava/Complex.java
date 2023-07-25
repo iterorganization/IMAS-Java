@@ -258,8 +258,8 @@ public class Complex implements Serializable
 	   return 7;
 	}
 	
-	return 37 * (17 * new Double(imaginary).hashCode() +
-		 	new Double(real).hashCode());
+	return 37 * (17 * Double.valueOf(imaginary).hashCode() +
+		 	Double.valueOf(real).hashCode());
   	}
 }
 
