@@ -52,7 +52,7 @@ public class Helper {
     }
 
 
-    public static int initPut() throws UALException, Exception
+    public static int initPut() throws ALException, Exception
     {
         String user = Helper.getUserName();
         String tokamak = Helper.getTokamak(); 
@@ -63,7 +63,7 @@ public class Helper {
         return idx;
     }
 
-    public static int initGet() throws UALException , Exception
+    public static int initGet() throws ALException , Exception
     {
         String user = Helper.getUserName();
         String tokamak = Helper.getTokamak(); 
@@ -73,7 +73,7 @@ public class Helper {
         return idx;
     }
 
-    public static void finish(int idx) throws UALException {
+    public static void finish(int idx) throws ALException {
         imas.close(idx);
     }
 

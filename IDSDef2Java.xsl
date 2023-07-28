@@ -44,7 +44,7 @@
         static {
         String libpath = System.getenv("IMAS_PREFIX");
         String imasversion = System.getenv("IMAS_VERSION");
-        String ualversion = System.getenv("UAL_VERSION");
+        String alversion = System.getenv("AL_VERSION");
         if (libpath == null) {
         System.err.println("IMAS library not set up in the environment. (IMAS_PREFIX missing)");
         System.exit(0);
@@ -53,8 +53,8 @@
         System.err.println("IMAS library not set up in the environment. (IMAS_VERSION missing)");
         System.exit(0);
         }
-        if (ualversion == null) {
-        System.err.println("IMAS library not set up in the environment. (UAL_VERSION missing)");
+        if (alversion == null) {
+        System.err.println("IMAS library not set up in the environment. (AL_VERSION missing)");
         System.exit(0);
         }
         <xsl:choose><xsl:when test="$SYSTEM = 'Linux'">
@@ -180,16 +180,16 @@
         * Opens database instance.
         * @param uri, URI of the IMAS Data Entry
         * @param mode, opening mode {OPEN_PULSE, FORCE_OPEN_PULSE, CREATE_PULSE, FORCE_CREATE_PULSE}
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
-        public static int open(String uri, int mode) throws UALException
+        public static int open(String uri, int mode) throws ALException
         {
         int pulseCtx = -1;
         
         try{ 
-        pulseCtx = Wrapper.ualBeginDataEntryAction(uri, mode);
+        pulseCtx = Wrapper.alBeginDataEntryAction(uri, mode);
         } catch(Exception exc) {
-        throw new UALException(  "[ual_begin_dataentry_action]: Error opening data entry with URI: " + uri + ", using mode:" + mode + ":\n" + exc.getMessage()  );
+        throw new ALException(  "[al_begin_dataentry_action]: Error opening data entry with URI: " + uri + ", using mode:" + mode + ":\n" + exc.getMessage()  );
         }
 
         /* to be checked 
@@ -212,10 +212,10 @@
         * @param tokamak Machine name
         * @param version Database version
         * @return the database index to be used in subsequent get/put calls
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
         public static int openEnv(int shot, int run, String user, String tokamak, String version)
-        throws UALException {
+        throws ALException {
         return openEnv(shot, run, user, tokamak, version, defaultBackend(), "");
         }
         
@@ -229,11 +229,11 @@
         * @param version Database version
         * @param options Options passed down to LowLevel
         * @return the database index to be used in subsequent get/put calls
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
         public static int openEnv(
         int shot, int run, String user, String tokamak, String version, String options)
-        throws UALException {
+        throws ALException {
         return openEnv(shot, run, user, tokamak, version, defaultBackend(), options);
         }
         
@@ -248,11 +248,11 @@
         * @param version Database version
         * @param backendType Type of the backend to be used
         * @return the database index to be used in subsequent get/put calls
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
         public static int openEnv(
         int shot, int run, String user, String tokamak, String version, int backendType)
-        throws UALException {
+        throws ALException {
         return openEnv(shot, run, user, tokamak, version, backendType, "");
         }
         
@@ -269,24 +269,24 @@
         * @param backendType Type of the backend to be used
         * @param options Options passed down to LowLevel
         * @return the database index to be used in subsequent get/put calls
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
-        public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws UALException
+        public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
         {
         int pulseCtx = -1;
         String uri;
         try{ 
-        uri = Wrapper.ualBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
-	pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
+        uri = Wrapper.alBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
+	pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
         } catch(Exception exc) {
 	int fallback = fallbackBackend();
 	if (fallback != LowLevel.NO_BACKEND) {
         System.out.println("WARNING: the pulse file is not available with the backend " + Integer.toString(backendType) + ", now attempting to access it with the fallback backend " + Integer.toString(fallback));
 	try {
-        uri = Wrapper.ualBuildUriFromLegacyParameters(fallback, shot, run, user, tokamak, version, options);
-	pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
+        uri = Wrapper.alBuildUriFromLegacyParameters(fallback, shot, run, user, tokamak, version, options);
+	pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
 	} catch (Exception exc2) {
-        throw new UALException("[ual_begin_pulse_action]: Error opening pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + fallback + ":\n" + exc.getMessage());
+        throw new ALException("[al_begin_pulse_action]: Error opening pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + fallback + ":\n" + exc.getMessage());
 	}
 	}		
 	}
@@ -309,10 +309,10 @@
         * @param tokamak Name of the machine
         * @param version Database version
         * @return the database index to be used in subsequent get/put calls
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
         public static int createEnv(int shot, int run, String user, String tokamak, String version)
-        throws UALException {
+        throws ALException {
         return createEnv(shot, run, user, tokamak, version, defaultBackend(), "");
         }
         
@@ -326,11 +326,11 @@
         * @param version Database version
         * @param options Options that are passed down to LowLevel
         * @return the database index to be used in subsequent get/put calls
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
         public static int createEnv(
         int shot, int run, String user, String tokamak, String version, String options)
-        throws UALException {
+        throws ALException {
         return createEnv(shot, run, user, tokamak, version, defaultBackend(), options);
         }
         
@@ -344,10 +344,10 @@
         * @param version Database version
         * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
         * @return the database index to be used in subsequent get/put calls
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
         
-        public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType) throws UALException
+        public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType) throws ALException
         {
         return createEnv(shot, run, user, tokamak, version, backendType, "");
         }
@@ -362,17 +362,17 @@
         * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
 	* @param options Options passed down to LowLevel
         * @return the database index to be used in subsequent get/put calls
-        * @exception UALException is thrown if the database cannot be open.
+        * @exception ALException is thrown if the database cannot be open.
         */
-        public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws UALException
+        public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
         {
         int pulseCtx = -1;
         
         try { 
-        String uri = Wrapper.ualBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
-        pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.FORCE_CREATE_PULSE);
+        String uri = Wrapper.alBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
+        pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.FORCE_CREATE_PULSE);
         } catch(Exception exc){
-        throw new UALException("[ual_begin_uri_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
+        throw new ALException("[al_begin_uri_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
         }
         
         imas.shot = shot;
@@ -392,27 +392,27 @@
         *Closes the currently open database.
         * @param refIdx database index, returned by create or open.
         **/
-        static public void close() throws UALException
+        static public void close() throws ALException
         {
         close(imas.pulseCtx);
         }
         
-        static public void close(int refIdx, String name, int shot, int run) throws UALException{
+        static public void close(int refIdx, String name, int shot, int run) throws ALException{
         System.err.println(  "WARNING:\n"
         + "\"int close(int refIdx, String name, int shot, int run)\"  is DEPRECATED.\n"
         + "Please use \"close()\" instead");
         close(refIdx);
         }
         
-        static public void close(int refIdx) throws UALException
+        static public void close(int refIdx) throws ALException
         {
         try{
-        LowLevel.ual_close_pulse(refIdx, LowLevel.CLOSE_PULSE);
+        LowLevel.al_close_pulse(refIdx, LowLevel.CLOSE_PULSE);
         } catch (Exception exc) {
-        throw new UALException("[ual_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
+        throw new ALException("[al_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
         } finally {
         if(refIdx >= 0)
-        LowLevel.ual_end_action(refIdx);
+        LowLevel.al_end_action(refIdx);
         }
         }
         
@@ -421,22 +421,22 @@
         * @param idx database index, returned by create or open.
         * @param path name of the IDS
         * @return a vector containing the times of all slices
-        * @exception UALException is thrown if the time base cannot be read.
+        * @exception ALException is thrown if the time base cannot be read.
         **/
-        static public Vect1DDouble getTime(int expIdx, String path) throws UALException {
-        UALLowLevel.beginIDSGet(expIdx, path, true);
-        Vect1DDouble time = UALLowLevel.getVect1DDouble(expIdx, path, "time");
-        UALLowLevel.endIDSGet(expIdx, path);
+        static public Vect1DDouble getTime(int expIdx, String path) throws ALException {
+        ALLowLevel.beginIDSGet(expIdx, path, true);
+        Vect1DDouble time = ALLowLevel.getVect1DDouble(expIdx, path, "time");
+        ALLowLevel.endIDSGet(expIdx, path);
         return time;
         }
         
-        static public int readIdsTimeMode(int pulseCtx, String idsFullName) throws UALException
+        static public int readIdsTimeMode(int pulseCtx, String idsFullName) throws ALException
         {
         int idsTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
         int ctx = -1;
         
         // Open  ctx
-        ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
+        ctx = LowLevel.al_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
         
         try
         {
@@ -444,7 +444,7 @@
         }
         finally
         {
-        LowLevel.ual_end_action(ctx);
+        LowLevel.al_end_action(ctx);
         }
         
         switch(idsTimeMode)
@@ -456,7 +456,7 @@
         break;
         
         default: 
-        throw new UALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('ids_properties/homogeneous_time') set to unknown value!");
+        throw new ALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('ids_properties/homogeneous_time') set to unknown value!");
         
         }
         
@@ -594,11 +594,11 @@
             * @param srcOccur The occurence of the IDS in the source database.
             * @param destIdx The index of the destination database, returned by imas.open()
             * @param destOccur The occurence of the IDS in the destination database.
-            * @exception UALException Issued when the operation fails for any reason.
+            * @exception ALException Issued when the operation fails for any reason.
             **/
-            public static void copy(int srcIdx, int srcOccur, int destIdx, int destOccur) throws UALException
+            public static void copy(int srcIdx, int srcOccur, int destIdx, int destOccur) throws ALException
             {
-            UALLowLevel.ualCopyIds(srcIdx, destIdx, "<xsl:value-of select="@name"/>", srcOccur, destOccur);
+            ALLowLevel.alCopyIds(srcIdx, destIdx, "<xsl:value-of select="@name"/>", srcOccur, destOccur);
             }
             
             /**
@@ -615,11 +615,11 @@
             * @param destShot Shot number of the destination database
             * @param destRun Run number of the destination database
             * @param destOccur The occurence of the IDS in the destination database.
-            * @exception UALException Issued when the operation fails for any reason.
+            * @exception ALException Issued when the operation fails for any reason.
             **/
-            public static void copyEnv(String srcUser, String srcTokamak, String srcVersion, int srcShot, int srcRun, int srcOccur, String destUser, String destTokamak, String destVersion, int destShot, int destRun, int destOccur) throws UALException
+            public static void copyEnv(String srcUser, String srcTokamak, String srcVersion, int srcShot, int srcRun, int srcOccur, String destUser, String destTokamak, String destVersion, int destShot, int destRun, int destOccur) throws ALException
             {
-            UALLowLevel.ualCopyIdsEnv(srcTokamak, srcVersion, srcUser, srcShot, srcRun, srcOccur, destTokamak, destVersion, destUser, destShot, destRun, destOccur, "<xsl:value-of select="@name"/>");
+            ALLowLevel.alCopyIdsEnv(srcTokamak, srcVersion, srcUser, srcShot, srcRun, srcOccur, destTokamak, destVersion, destUser, destShot, destRun, destOccur, "<xsl:value-of select="@name"/>");
             }
             
             
@@ -631,9 +631,9 @@
             * @param expIdx The index to the database, returned by imas.open()
             * @param path The path name to the selected data item. By convention, only a single tree level is defined for IDS objects in the database.
             * @param idss The passed <xsl:value-of select="@name"/> ids.
-            * @exception UALException Issued when data cannot be stored for any reason.
+            * @exception ALException Issued when data cannot be stored for any reason.
             **/
-            public static void put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids)  throws UALException
+            public static void put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids)  throws ALException
             {
             int iOccurrence = 0;
             
@@ -659,9 +659,9 @@
     /* ------------------------------------------------------------------------------------------------------------ */
     /**
     *Serialize data.
-    * @exception UALException is thrown if can not serialize.
+    * @exception ALException is thrown if can not serialize.
     */
-    public byte[] serialize() throws UALException
+    public byte[] serialize() throws ALException
     {
             return this.serialize(LowLevel.DEFAULT_SERIALIZER_PROTOCOL);
     }
@@ -672,9 +672,9 @@
     /**
     *Serialize data.
     * @param protocol Serializer protocol
-    * @exception UALException is thrown if can not serialize.
+    * @exception ALException is thrown if can not serialize.
     */
-    public byte[] serialize(int protocol) throws UALException
+    public byte[] serialize(int protocol) throws ALException
     {
         if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
                 File tmpdir=new File("/dev/shm") ;
@@ -685,19 +685,19 @@
                 try{
                 tmpfile = File.createTempFile("al_serialize_", null, tmpdir);
                 } catch (Exception exc) {
-                        throw new UALException("Can not create temporary file");
+                        throw new ALException("Can not create temporary file");
                 }
                 String filename= tmpfile.getName();
                 int _pulseCtx = -1;
                 <!-- String options = String.format("-fullpath %s",tmpfile); -->
                 try{    
                          String uri = "imas:ascii?path="+tmpdir+";filename="+filename;
-                         <!-- String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options);  -->
-                        _pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
+                         <!-- String uri = Wrapper.alBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options);  -->
+                        _pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
                 } catch(Exception exc) 
                 {
-                        LowLevel.ual_end_action(_pulseCtx);
-                        throw new UALException("Error calling ualBeginDataEntryAction() in serialize");
+                        LowLevel.al_end_action(_pulseCtx);
+                        throw new ALException("Error calling alBeginDataEntryAction() in serialize");
                 }
                 // store state and overwrite so we use the ASCII backend in this->put
                 int _pulseCtx_stored = this.pulseCtx;
@@ -708,12 +708,12 @@
 
                 // cleanup
                 try{
-                        LowLevel.ual_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
+                        LowLevel.al_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
                 } catch (Exception exc) {
-                throw new UALException("[ual_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
+                throw new ALException("[al_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
                 } finally {
                 if(_pulseCtx >= 0)
-                        LowLevel.ual_end_action(_pulseCtx);
+                        LowLevel.al_end_action(_pulseCtx);
                 }
 
                 // read contents of tmpfile
@@ -723,7 +723,7 @@
                         try{
                                 data = Files.readAllBytes(tmpfile.toPath());
                         } catch (Exception exc) {
-                                throw new UALException("Can not read bytes");
+                                throw new ALException("Can not read bytes");
                         }
                         String protocolInString = String.valueOf(LowLevel.ASCII_SERIALIZER_PROTOCOL);  
                         byte[] prependBytes = protocolInString.getBytes();  
@@ -745,7 +745,7 @@
 
         }
         else {
-                throw new UALException(String.format("Unrecognized serialization protocol: %s", protocol));
+                throw new ALException(String.format("Unrecognized serialization protocol: %s", protocol));
         }
     }
    
@@ -755,12 +755,12 @@
     /**
     * Deserialize data.
     * @param data Data to deserialize
-    * @exception UALException is thrown if can not serialize.
+    * @exception ALException is thrown if can not serialize.
     */
-    public void deserialize(byte[] data) throws UALException
+    public void deserialize(byte[] data) throws ALException
     {
         if (data.length ==0)
-                throw new UALException("No data provided");
+                throw new ALException("No data provided");
         byte[] protocolBytes = new byte[2];
         for (int i = 0; i &lt; 2; i++) {
                 protocolBytes[i] = data[i];
@@ -777,7 +777,7 @@
                 try{
                         tmpfile = File.createTempFile("al_serialize_", null, tmpdir);
                 } catch (Exception exc) {
-                        throw new UALException("Can not create temporary file");
+                        throw new ALException("Can not create temporary file");
                 }
                 try{
                         OutputStream outputStream = new FileOutputStream(tmpfile);
@@ -788,19 +788,19 @@
                         {
                                 tmpfile.delete() ;
                         }   
-                        throw new UALException("Can not write into the file");    
+                        throw new ALException("Can not write into the file");    
                 }
                 String filename= tmpfile.getName();
                 int _pulseCtx = -1;
                 <!-- String options = String.format("-fullpath %s",tmpfile); -->
                 try{
                         String uri = "imas:ascii?path="+tmpdir+";filename="+filename;
-                         <!-- String uri = Wrapper.ualBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options); -->
-                        _pulseCtx = Wrapper.ualBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
+                         <!-- String uri = Wrapper.alBuildUriFromLegacyParameters(LowLevel.ASCII_BACKEND, 0, 0, "serialize", "serialize", "3", options); -->
+                        _pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.CREATE_PULSE);
                 } catch(Exception exc)
                 {
-                        LowLevel.ual_end_action(_pulseCtx);
-                        throw new UALException("Error calling ualBeginDataEntryAction() in deserialize");
+                        LowLevel.al_end_action(_pulseCtx);
+                        throw new ALException("Error calling alBeginDataEntryAction() in deserialize");
                 }
 
                 // store state and overwrite so we use the ASCII backend in this->put
@@ -811,25 +811,25 @@
                 this.pulseCtx = _pulseCtx_stored;
 
                 try{
-                    LowLevel.ual_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
+                    LowLevel.al_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
                 } catch (Exception exc) {
-                throw new UALException("[ual_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
+                throw new ALException("[al_close_pulse]: Error closing pulse file: " + exc.getMessage()  );
                 } finally {
                     if(_pulseCtx >= 0)
-                        LowLevel.ual_end_action(_pulseCtx);
+                        LowLevel.al_end_action(_pulseCtx);
                 }
                 tmpfile.delete();
         }
         else {
-                throw new UALException(String.format("Unrecognized serialization protocol: %s", protocol));
+                throw new ALException(String.format("Unrecognized serialization protocol: %s", protocol));
         }
     }
-    public void put()  throws UALException
+    public void put()  throws ALException
     {
         this.put(0);
     }
 
-    public void put(int iOccurrence)  throws UALException
+    public void put(int iOccurrence)  throws ALException
     {
         int pulseCtx = this.pulseCtx;
         int ctx = -1;
@@ -851,25 +851,25 @@
             
             if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
             {
-            throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
+            throw new ALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
             }
             
             delete(iOccurrence);
             
             try{
             // Open put context
-            ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
+            ctx = LowLevel.al_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
             
             this.putRootFields(ctx, idsTimeMode, idsFullName);
-            LowLevel.ual_write_plugins_metadata(ctx);
+            LowLevel.al_write_plugins_metadata(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.al_end_action(ctx);
             }
             }
             
-            public void putRootFields(int ctx, int idsTimeMode, String idsFullName)  throws UALException
+            public void putRootFields(int ctx, int idsTimeMode, String idsFullName)  throws ALException
             {
             int aosCtx = -1;
             int arraySize = -1;
@@ -892,9 +892,9 @@
             * @param path The path name to the selected d
             ata item. By convention, only a single tree level is defined for IDS objects in the database.
             * @param ids The timed <xsl:value-of select="@name"/> IDS
-            * @exception UALException Issued when data cannot be stored for any reason.
+            * @exception ALException Issued when data cannot be stored for any reason.
             **/
-            public static void putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) throws UALException
+            public static void putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) throws ALException
             {
             
             int iOccurrence = 0;
@@ -914,7 +914,7 @@
             ids.putSlice(iOccurrence);
             
             }
-            public void putSlice(int iOccurrence) throws UALException
+            public void putSlice(int iOccurrence) throws ALException
             {
             int pulseCtx = this.pulseCtx;
             int ctx = -1;
@@ -941,7 +941,7 @@
             
             if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
             {
-            throw new UALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
+            throw new ALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
         }
 
 
@@ -957,7 +957,7 @@
         }
 	else if( storedTimeMode != idsTimeMode)         // time mode conflict
         {
-            throw new UALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('" + imas.timeModeToString(idsTimeMode) + "') differs from value stored in IDS ('" + imas.timeModeToString(storedTimeMode) + "')!");
+            throw new ALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('" + imas.timeModeToString(idsTimeMode) + "') differs from value stored in IDS ('" + imas.timeModeToString(storedTimeMode) + "')!");
             }
             
             
@@ -965,19 +965,19 @@
             
             try{
             // Open putSlice context
-            ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, LowLevel.UNDEFINED_TIME, LowLevel.UNDEFINED_INTERP);
+            ctx = LowLevel.al_begin_slice_action(pulseCtx, idsFullName, LowLevel.WRITE_OP, LowLevel.UNDEFINED_TIME, LowLevel.UNDEFINED_INTERP);
             
             this.putSliceRootFields(ctx, idsTimeMode, idsFullName);
-            LowLevel.ual_write_plugins_metadata(ctx);
+            LowLevel.al_write_plugins_metadata(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.al_end_action(ctx);
             }
             }
             
             
-            public void putSliceRootFields(int ctx, int idsTimeMode, String idsFullName) throws UALException
+            public void putSliceRootFields(int ctx, int idsTimeMode, String idsFullName) throws ALException
             {
             int aosCtx = -1;
             int arraySize = -1;
@@ -998,7 +998,7 @@
             /* ------------------------------------------------------------------------------------------------------------ */
             /* -----------------------------------       GET       ------------------------------------------------------- */  
             /* ------------------------------------------------------------------------------------------------------------ */
-            public static imas.<xsl:value-of select="@name"/>  get(int expIdx, String idsFullName)  throws UALException
+            public static imas.<xsl:value-of select="@name"/>  get(int expIdx, String idsFullName)  throws ALException
             {
             imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
             int iOccurrence = 0;
@@ -1018,7 +1018,7 @@
             }
             
             
-            public void get(int iOccurrence)  throws UALException
+            public void get(int iOccurrence)  throws ALException
             {
             String strNodePath = "";
             int pulseCtx = this.pulseCtx;
@@ -1036,17 +1036,17 @@
             this.reset();
             try{
             // Open get context
-            ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
-            LowLevel.ual_bind_readback_plugins(ctx);
+            ctx = LowLevel.al_begin_global_action(pulseCtx, idsFullName, LowLevel.READ_OP);
+            LowLevel.al_bind_readback_plugins(ctx);
             this.getRootFields(ctx, idsTimeMode);
-            LowLevel.ual_unbind_readback_plugins(ctx);
+            LowLevel.al_unbind_readback_plugins(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.al_end_action(ctx);
             }
             }
-            public void getRootFields(int ctx, int idsTimeMode)  throws UALException
+            public void getRootFields(int ctx, int idsTimeMode)  throws ALException
             {
             int aosCtx = -1;
             int arraySize = -1;
@@ -1069,12 +1069,12 @@
             * @param time The retrieval time.
             * @param interpolMode Defines the selected interpolation. Allowed values are imas.INTERPOLATION, imas.CLOSEST_SAMPLE,
             * imas.PREVIOUS_SAMPLE
-            * @exception UALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
+            * @exception ALException Issued when data cannot be accessed for any reason. Note that the exception is not raised if there are
             * missing IDS fields.
             * @return the selected <xsl:value-of select="@name"/> ids. Missing fields are represented by zero sized vectors if not scalars,
             * by LowLevel.EMPTY_INT if integer, imas.EMPTY_DOUBLE if double and empty String is string.
             **/
-            public static imas.<xsl:value-of select="@name"/>  getSlice(int pulseCtx, String idsFullName, double time, int interpolMode) throws UALException
+            public static imas.<xsl:value-of select="@name"/>  getSlice(int pulseCtx, String idsFullName, double time, int interpolMode) throws ALException
             {
             imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
             int iOccurrence = 0;
@@ -1096,7 +1096,7 @@
             return ids;
             
             }
-            public void getSlice(int iOccurrence, double time, int interpolMode) throws UALException
+            public void getSlice(int iOccurrence, double time, int interpolMode) throws ALException
             {
             int pulseCtx = this.pulseCtx;
             int ctx = -1;
@@ -1112,19 +1112,19 @@
             this.reset();
             try{
             // Open putSlice context
-            ctx = LowLevel.ual_begin_slice_action(pulseCtx, idsFullName, LowLevel.READ_OP, time, interpolMode);
-            LowLevel.ual_bind_readback_plugins(ctx);
+            ctx = LowLevel.al_begin_slice_action(pulseCtx, idsFullName, LowLevel.READ_OP, time, interpolMode);
+            LowLevel.al_bind_readback_plugins(ctx);
             this.getSliceRootFields(ctx, idsTimeMode);
-            LowLevel.ual_unbind_readback_plugins(ctx);
+            LowLevel.al_unbind_readback_plugins(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.al_end_action(ctx);
             }
             }
             
             
-            public void getSliceRootFields(int ctx, int idsTimeMode) throws UALException
+            public void getSliceRootFields(int ctx, int idsTimeMode) throws ALException
             {
             int aosCtx = -1;
             int arraySize = -1;
@@ -1143,9 +1143,9 @@
             * Method delete removes all the data associated with a <xsl:value-of select="@name"/> IDS in the open database.
             * @param expIdx The index to the database, returned by imas.open()
             * @param path The path name to the selected data item. By convention, only a single tree level is defined for IDS objects in the database.
-            * @exception UALException Issued when data cannot be stored for any reason.
+            * @exception ALException Issued when data cannot be stored for any reason.
             **/
-            public static void delete(int pulseCtx, String idsFullName) throws UALException
+            public static void delete(int pulseCtx, String idsFullName) throws ALException
             {
             
             imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
@@ -1162,7 +1162,7 @@
             
             }
             
-            public void delete(int iOccurrence) throws UALException
+            public void delete(int iOccurrence) throws ALException
             {  
             String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
             int ctx = -1;
@@ -1172,18 +1172,18 @@
             
             try{
             // Open put context
-            ctx = LowLevel.ual_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
+            ctx = LowLevel.al_begin_global_action(pulseCtx, idsFullName, LowLevel.WRITE_OP);
             
             this.deleteRootFields(ctx);
             }
             finally {
             if(ctx >= 0)
-            LowLevel.ual_end_action(ctx);
+            LowLevel.al_end_action(ctx);
             }
             }
             
             
-            private void deleteRootFields(int ctx) throws UALException
+            private void deleteRootFields(int ctx) throws ALException
             {  
             String strNodePath = "";
             
@@ -1208,12 +1208,12 @@
         /* ------------------------------------------------------------------------------------------------------------ */
         //  Field(s) to be appended: <xsl:value-of select="descendant-or-self::field[@appendable_by_appender_actor='yes']/@path"/>
         /* ------------------------------------------------------------------------------------------------------------ */
-        public static imas.<xsl:value-of select="@name"/> appendIDSes(imas.<xsl:value-of select="@name"/>[] idsArray)  throws UALException
+        public static imas.<xsl:value-of select="@name"/> appendIDSes(imas.<xsl:value-of select="@name"/>[] idsArray)  throws ALException
         {
         <xsl:choose>
           
           <xsl:when test="count(descendant-or-self::field[@appendable_by_appender_actor='yes' ]) lt 1">
-            throw new UALException("IDS '<xsl:value-of select="@name"/>' has no fields that could be appended!");
+            throw new ALException("IDS '<xsl:value-of select="@name"/>' has no fields that could be appended!");
           </xsl:when>
           
           <xsl:otherwise>
@@ -1222,13 +1222,13 @@
             
             //Sanity check - array size 
             if(idsArray.length &lt; 1)
-            throw new UALException("IDS '<xsl:value-of select="@name"/>': appendIDSes called with an empty array of IDSes!");
+            throw new ALException("IDS '<xsl:value-of select="@name"/>': appendIDSes called with an empty array of IDSes!");
             
             //homogeneous time check
             for(imas.<xsl:value-of select="@name"/> inIDS : idsArray)
             {
             if (inIDS.ids_properties.homogeneous_time != 1)
-            throw new UALException("Heterogeneous IDSes cannot be appended!");
+            throw new ALException("Heterogeneous IDSes cannot be appended!");
             }
             outIDS.ids_properties.homogeneous_time = 1;
             outIDS.time = idsArray[0].time;
@@ -1322,7 +1322,7 @@
       /* _____________________________________________________________________________________________________________ */
       /*_________________________________       PUT      _____________________________________________________________ */  
       /* ____________________________________________________________________________________________________________  */
-      public void put(int ctx, int idsTimeMode, String idsFullName)  throws UALException
+      public void put(int ctx, int idsTimeMode, String idsFullName)  throws ALException
       {
       String strTimeBasePath = null;
       String strNodePath = null;
@@ -1338,7 +1338,7 @@
         /* ____________________________________________________________________________________________________________ */
         /*_________________________________       PUT SLICE     _______________________________________________________ */  
         /* ____________________________________________________________________________________________________________  */
-        public void putSlice(int ctx, int idsTimeMode, String idsFullName)  throws UALException
+        public void putSlice(int ctx, int idsTimeMode, String idsFullName)  throws ALException
         {
         String strTimeBasePath = null;
         String strNodePath = null;
@@ -1358,7 +1358,7 @@
       /* ____________________________________________________________________________________________________________  */
       /* _________________________________       GET       ________________________________________________________ */  
       /* ____________________________________________________________________________________________________________  */
-      public void get(int ctx, int idsTimeMode)   throws UALException
+      public void get(int ctx, int idsTimeMode)   throws ALException
       {
       String strTimeBasePath = null;
       String strNodePath = null;
@@ -1375,7 +1375,7 @@
       /* ____________________________________________________________________________________________________________  */
       /* _________________________________       GET  SLICE     ________________________________________________________ */  
       /* ____________________________________________________________________________________________________________  */
-      public void getSlice(int ctx, int idsTimeMode)   throws UALException
+      public void getSlice(int ctx, int idsTimeMode)   throws ALException
       {
       String strTimeBasePath = null;
       String strNodePath = null;
@@ -1391,7 +1391,7 @@
         /* ________________________________________       DELETE     ___________________________________________________ */  
         /* ____________________________________________________________________________________________________________  */ 
         
-        public void delete(int ctx) throws UALException
+        public void delete(int ctx) throws ALException
         {
         String strNodePath = null;
         
@@ -1476,7 +1476,7 @@
         </xsl:when>
         <xsl:otherwise>
           strNodePath = "<xsl:value-of select="@path"/>";
-          LowLevel.ual_delete_data(ctx, strNodePath);
+          LowLevel.al_delete_data(ctx, strNodePath);
         </xsl:otherwise>
       </xsl:choose>
     </xsl:template>
@@ -1866,17 +1866,17 @@
             try{
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
-            aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+            aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
-            LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
+            LowLevel.al_iterate_over_arraystruct(aosCtx, 1); 
             }
             }
             
             finally { 
             if(aosCtx >= 0)
-            LowLevel.ual_end_action(aosCtx);
+            LowLevel.al_end_action(aosCtx);
             }
             }
           </xsl:when>
@@ -1897,17 +1897,17 @@
             try{
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
-            aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+            aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
-            LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
+            LowLevel.al_iterate_over_arraystruct(aosCtx, 1); 
             }
             }
             
             finally { 
             if(aosCtx >= 0)
-            LowLevel.ual_end_action(aosCtx);
+            LowLevel.al_end_action(aosCtx);
             }
             }
           </xsl:when>
@@ -1936,17 +1936,17 @@
             try{
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
-            aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+            aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
-            LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
+            LowLevel.al_iterate_over_arraystruct(aosCtx, 1); 
             }
             }
             
             finally { 
             if(aosCtx >= 0)
-            LowLevel.ual_end_action(aosCtx);
+            LowLevel.al_end_action(aosCtx);
             }
             }
           </xsl:when>
@@ -2044,7 +2044,7 @@
           strTimeBasePath = "";
           try{       
           int tmpArray[] = new int[1];
-          aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+          aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
           arraySize = tmpArray[0];
           if(arraySize &lt;= 0)
           {
@@ -2059,13 +2059,13 @@
           {
           this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "@name"/>Class();
           this.<xsl:value-of select="@name"/>[i].get(aosCtx, idsTimeMode);
-          LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
+          LowLevel.al_iterate_over_arraystruct(aosCtx, 1); 
           }
           }
           }     
           finally { 
           if(aosCtx >= 0)
-          LowLevel.ual_end_action(aosCtx);
+          LowLevel.al_end_action(aosCtx);
           }
           
           
@@ -2083,7 +2083,7 @@
           strTimeBasePath = "";
           try{       
           int tmpArray[] = new int[1];
-          aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+          aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
           arraySize = tmpArray[0];
           if(arraySize &lt;= 0)
           {
@@ -2098,13 +2098,13 @@
           {
           this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "@name"/>Class();
           this.<xsl:value-of select="@name"/>[i].get(aosCtx, idsTimeMode);
-          LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
+          LowLevel.al_iterate_over_arraystruct(aosCtx, 1); 
           }
           }
           }     
           finally { 
           if(aosCtx >= 0)
-          LowLevel.ual_end_action(aosCtx);
+          LowLevel.al_end_action(aosCtx);
           }
         </xsl:when>
         <xsl:when test="@data_type='struct_array' and @maxoccur='unbounded' and @type='dynamic'">
@@ -2129,7 +2129,7 @@
           </xsl:choose>
           try{       
           int tmpArray[] = new int[1];
-          aosCtx = LowLevel.ual_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+          aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
           arraySize = tmpArray[0];
           if(arraySize &lt;= 0)
           {
@@ -2144,13 +2144,13 @@
           {
           this.<xsl:value-of select="@name"/>[i] = new <xsl:value-of select = "@name"/>Class();
           this.<xsl:value-of select="@name"/>[i].get(aosCtx, idsTimeMode);
-          LowLevel.ual_iterate_over_arraystruct(aosCtx, 1); 
+          LowLevel.al_iterate_over_arraystruct(aosCtx, 1); 
           }
           }
           }     
           finally { 
           if(aosCtx >= 0)
-          LowLevel.ual_end_action(aosCtx);
+          LowLevel.al_end_action(aosCtx);
           }
           }
         </xsl:when>
