@@ -893,11 +893,11 @@
         int ctx = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
 
-        String isValidatedBeforePut;
+        String disableValidation;
             
-        isValidatedBeforePut = System.getenv("IMAS_AL_ENABLE_VALIDATION_AT_PUT");
+        disableValidation = System.getenv("IMAS_DISABLE_VALIDATE");
 
-        if (isValidatedBeforePut != null &amp;&amp; !isValidatedBeforePut.equals("0")) validate();
+        if (disableValidation == null || !disableValidation.equals("1")) validate();
  
         int idsTimeMode = this.ids_properties.homogeneous_time;
 
@@ -987,11 +987,11 @@
             int storedTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
             int idsTimeMode = this.ids_properties.homogeneous_time;
 
-            String isValidatedBeforePut;
+            String disableValidation;
             
-            isValidatedBeforePut = System.getenv("IMAS_AL_ENABLE_VALIDATION_AT_PUT");
+            disableValidation = System.getenv("IMAS_DISABLE_VALIDATE");
 
-            if (isValidatedBeforePut != null &amp;&amp; !isValidatedBeforePut.equals("0")) validate();
+            if (disableValidation == null || !disableValidation.equals("1")) validate();
             
             if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
