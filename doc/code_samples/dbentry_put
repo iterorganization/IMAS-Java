@@ -1,0 +1,24 @@
+// Import the Access Layer
+import imasjava.imas;
+import imasjava.wrapper.LowLevel;
+
+public class store_ids {
+    public static void main(String[] args) throws Exception {
+        // Create the database entry by providing an IMAS URI
+        int data_entry = imas.open(
+            "imas:hdf5?path=my-data", LowLevel.FORCE_CREATE_PULSE);
+
+        // Create an empty pf_active IDS
+        imas.pf_active pf_active = new imas.pf_active();
+        // Set the mandatory ids_properties.homogeneous_time field
+        pf_active.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
+        // Continue filling the pf_active IDS here
+        // ...
+
+        // Store the pf_active IDS
+        pf_active.put(data_entry, "pf_active", pf_active);
+
+        // Alternatively, store the pf_active IDS as occurrence 1
+        pf_active.put(data_entry, "pf_active/1", pf_active);
+    }
+}
