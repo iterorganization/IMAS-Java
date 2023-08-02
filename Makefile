@@ -87,6 +87,15 @@ junit-download: junit-dirs
 	-o junit_jar/$(JUnit.JAR) \
 	http://central.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/$(JUnit)/$(JUnit.JAR)
 
+#----------------------- documentation -------------------
+
+.PHONY: docs clean-docs
+docs:
+	$(MAKE) -C doc html
+
+clean-docs:
+	$(MAKE) -C doc clean
+
 #----------------------- identifiers ---------------------
 include ../Makefile.identifiers
 

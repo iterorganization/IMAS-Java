@@ -1,0 +1,16 @@
+// Import the Access Layer
+import imasjava.imas;
+import imasjava.wrapper.LowLevel;
+
+public class load_ids_slice {
+    public static void main(String[] args) throws Exception {
+        // Open the database entry by providing an IMAS URI
+        int data_entry = imas.open(
+            "imas:mdsplus?user=public;shot=131024;run=41;database=ITER?version=3",
+            LowLevel.OPEN_PULSE);
+
+        // Retrieve the time slice just before t=370 of the core_profiles IDS
+        imas.core_profiles cp = imas.core_profiles.getSlice(
+            data_entry, "core_profiles", 370, LowLevel.PREVIOUS_INTERP);
+    }
+}

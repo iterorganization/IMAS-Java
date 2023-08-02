@@ -1,0 +1,15 @@
+// Import the Access Layer
+import imasjava.imas;
+import imasjava.wrapper.LowLevel;
+
+public class open_data_entry {
+    public static void main(String[] args) throws Exception {
+        // Open the database entry by providing an IMAS URI
+        int data_entry = imas.open(
+            "imas:mdsplus?user=public;shot=131024;run=41;database=ITER?version=3",
+            LowLevel.OPEN_PULSE);
+
+        // Alternatively, we can open an IDS providing legacy arguments
+        int data_entry2 = imas.openEnv(131024, 41, "public", "ITER", "3");
+    }
+}
