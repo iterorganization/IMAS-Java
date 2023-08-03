@@ -1,0 +1,25 @@
+// Import the Access Layer
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+
+public class ids_aos {
+    public static void main(String[] args) {
+        // Create an empty core_profiles IDS
+        imas.core_profiles core_profiles = new imas.core_profiles();
+
+        // core_profiles/profiles_1d is an array of structures
+        System.out.println(core_profiles.profiles_1d);  // -> null
+        // It currently has no elements, so let's create one
+        // 1. Create array:
+        core_profiles.profiles_1d = new imas.core_profiles.profiles_1dClass[1];
+        // 2. Initialize array element:
+        core_profiles.profiles_1d[0] = new imas.core_profiles.profiles_1dClass();
+
+        System.out.println(core_profiles.profiles_1d.length);  // -> 1
+
+        // Use array indexation to get a specific structure from the array,
+        // then we can address child nodes as usual (for example, the average
+        // ion temperature, which is a null data array):
+        System.out.println(core_profiles.profiles_1d[0].t_i_average);  // -> null
+    }
+}
