@@ -101,7 +101,7 @@
         public static final int al_dd_patch_version = <xsl:value-of select="$DD_PATCH"/>;
 
         public static String get_al_version() {
-            return LowLevel.ual_get_version();
+            return LowLevel.al_get_version();
         }
         
         

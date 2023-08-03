@@ -241,10 +241,10 @@ JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_al_1get_1backendID
 
 /*
  * Class:     imasjava_wrapper_LowLevel
- * Method:    ual_get_version
+ * Method:    al_get_version
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_imasjava_wrapper_LowLevel_ual_1get_1version
+JNIEXPORT jstring JNICALL Java_imasjava_wrapper_LowLevel_al_1get_1version
   (JNIEnv *, jclass);
 
 #ifdef __cplusplus
