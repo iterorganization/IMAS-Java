@@ -1535,20 +1535,7 @@
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_1D"/>
 
         <!-- 2D field coordinate validation -->
-        <!-- split of the code due to byte code size limit: a limitation case only for distributions/distribution/profiles_2d -->
-          <!-- <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'"> -->
-        <!-- the 2D field of the current node (profiles_2d) -->
-          <!-- <xsl:apply-templates select="field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
-            <xsl:with-param name="currpath" select="@path_doc"/>
-          </xsl:apply-templates> -->
-        <!-- the 2D field of each children node  -->
-          <!-- <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
-          validate_2d_<xsl:value-of select="@name"/>(idsTimeMode, idsTimeSize);
-          </xsl:for-each>
-          </xsl:if>
-          <xsl:if test="not(ancestor::IDS/@name='distributions' and @name='profiles_2d')"> -->
-          <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_2D"/>
-          <!-- </xsl:if> -->
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_2D"/>
 
         <!-- 3D+ field coordinate validation -->
         <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_3D"/>
@@ -1558,18 +1545,6 @@
         <!-- FIXED_SIZE field coordinate validation -->
         <xsl:apply-templates select="field" mode="VALIDATE_CHILD_FIXED_SIZE"/>
       }
-
-      <!-- <xsl:if test="ancestor::IDS/@name='distributions' and @name='profiles_2d'">
-      <xsl:for-each select="field[@data_type='struct_array' or @data_type='structure']">
-        private void validate_2d_<xsl:value-of select="@name"/>(int idsTimeMode, int idsTimeSize) throws ValidationException
-        {
-
-          <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
-          <xsl:with-param name="currpath" select="../@path_doc"/>
-          </xsl:apply-templates>
-        }
-        </xsl:for-each>
-      </xsl:if> -->
       }
       
       /* ____________________________________________________________________________________________________________  */
@@ -2691,7 +2666,6 @@
     </xsl:if>
     </xsl:variable >
       <!-- find the relative coordinate from the current field path and the checked field -->
-    <!-- <xsl:variable name="relativepath" select="substring-after(concat($prefix,'/',@name),concat($currpath,'/'))"/> -->
     <xsl:variable name="relativepath">
     <xsl:if test="not($currpath='')">
         <xsl:value-of select="substring-after(concat($prefix,'/',@name),concat($currpath,'/'))"/>
@@ -3003,6 +2977,33 @@
         </xsl:if>
        }
       </xsl:if> 
+      <xsl:if test="not(contains($newpath,'/')) and $istimeslice='yes'">
+      <xsl:if test="@type='dynamic' and contains($coord,'/time')">
+      <xsl:choose>
+      <xsl:when test="@data_type='struct_array'">
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+      int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
+      </xsl:when>
+      <xsl:otherwise>
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+      int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+      </xsl:otherwise>
+      </xsl:choose>
+      if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
+        if(arraySize != idsTimeSize) {
+          throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)"/>.");
+        }
+      }
+      if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
+        for (int itime = 1; itime&lt;arraySize;itime++) {
+            if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
+              throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. ids.<xsl:value-of select="@name"/>[itime].time is invalid.");
+            }
+          }
+        }
+      }
+      </xsl:if>
+    </xsl:if>
       </xsl:template> 
 
       <xsl:template match='field' mode="possible-coordinates">
@@ -3340,6 +3341,19 @@
           throw new ValidationException("array size of <xsl:value-of select="@path"/> wrong dimension.");
         }
     }
+    <xsl:variable name="coord" select="@coordinate1"/>
+    // inside <xsl:value-of select=".//field[@path_doc=$coord and (@data_type='int_type' or @data_type='INT_0D' or 
+    @data_type='flt_type' or @data_type='FLT_0D' or 
+    @data_type='CPX_0D')]/@path"/>
+    <xsl:if test=".//field[@path_doc=$coord and (@data_type='flt_type' or @data_type='FLT_0D')]">
+    if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
+        for (int itime = 1; itime&lt;arraySize;itime++) {
+        if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
+          throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. ids.<xsl:value-of select="@name"/>[itime].time is invalid.");
+        }
+        }
+      }
+    </xsl:if>
     </xsl:if>
     <xsl:if test="not(contains(@coordinate1,'/time'))">
     <xsl:variable name="mesure_string">
