@@ -129,7 +129,7 @@
             check = false;
           } 
           if (i&gt;1) { 
-            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+dim+"). Exactly one of the coordinate must be verified. ("+coordinates+")");
+            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+dim+"). Exactly one of the possible coordinate must be allocated. ("+coordinates+")");
           }
           if(check) {
             error = imas.check_possible_coordinate(arraySize, objdim ,objs);
@@ -3013,21 +3013,22 @@
       <xsl:param name="relativepathdoc"/>
       <xsl:param name="self"/>
       <xsl:if test="contains($coord,' OR')">
-      <xsl:variable name="target">
+        <xsl:variable name="target">
           <xsl:if test="not($relativepathdoc='/')">
             <xsl:value-of select="replace(substring-before(substring-after($coord,$relativepathdoc),' OR'),'/','.')"/>
           </xsl:if>
           <xsl:if test="$relativepathdoc='/'">
-            <xsl:if test="ancestor::IDS/@name='amns_data'">
-              <xsl:value-of select="replace(concat(substring-before(substring-before($coord,' OR'),'process(i1)/coordinate_index'),'this.process(i1)/coordinate_index', substring-after(substring-before($coord,' OR'),'process(i1)/coordinate_index')),'/','.')"/>
-            </xsl:if>
-            <xsl:if test="not(ancestor::IDS/@name='amns_data')">
               <xsl:value-of select="replace(substring-before($coord,' OR'),'/','.')"/>
-            </xsl:if>
           </xsl:if>
-      </xsl:variable>
+        </xsl:variable>
+        <xsl:variable name="resolved_target">
+        <xsl:apply-templates select="." mode="resolve_indices">
+          <xsl:with-param name="target" select="$target"/>
+          <xsl:with-param name="string-resolved" select="''"/>
+        </xsl:apply-templates>
+        </xsl:variable>
       <xsl:if test="not(contains(substring-before($coord,' OR'),'1...'))">
-        ,(Object) this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/>
+        ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
       </xsl:if>
       <xsl:apply-templates select="." mode="possible-coordinates">
         <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
@@ -3037,20 +3038,21 @@
       </xsl:if>
       <xsl:if test="not(contains($coord,' OR'))">
       <xsl:variable name="target">
-          <xsl:if test="not($relativepathdoc='/')">
-            <xsl:value-of select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
-          </xsl:if>
-          <xsl:if test="$relativepathdoc='/'">
-            <xsl:if test="ancestor::IDS/@name='amns_data'">
-              <xsl:value-of select="replace(concat(substring-before($coord,'process(i1)/coordinate_index'),'this.process(i1)/coordinate_index', substring-after($coord,'process(i1)/coordinate_index')),'/','.')"/>
-            </xsl:if>
-            <xsl:if test="not(ancestor::IDS/@name='amns_data')">
-              <xsl:value-of select="replace($coord,'/','.')"/>
-            </xsl:if>
-          </xsl:if>
+        <xsl:if test="not($relativepathdoc='/')">
+          <xsl:value-of select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
+        </xsl:if>
+        <xsl:if test="$relativepathdoc='/'">
+            <xsl:value-of select="replace($coord,'/','.')"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name="resolved_target">
+      <xsl:apply-templates select="." mode="resolve_indices">
+        <xsl:with-param name="target" select="$target"/>
+        <xsl:with-param name="string-resolved" select="''"/>
+      </xsl:apply-templates>
       </xsl:variable>
       <xsl:if test="not(contains($coord,'1...'))">
-          ,(Object) this.<xsl:value-of select="replace(replace($target,'\(','['),'\)',']')"/>
+          ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
       </xsl:if>
       </xsl:if>
       </xsl:template>
@@ -3095,72 +3097,6 @@
       </xsl:if>
       <xsl:if test="not(contains($partialindex,'('))">
         <xsl:value-of select="$partialindex"/>
-      </xsl:if>
-      </xsl:template>
-
-
-      <xsl:template match='field' mode="check-possible-coordinates">
-      <xsl:param name="coord"/>
-      <xsl:param name="relativepathdoc"/>
-      <xsl:param name="dimension"/>
-      <xsl:param name="self"/>
-      <xsl:param name="targetdim"/>
-      <xsl:if test="contains($coord,' OR')">
-            <xsl:variable name="mesure_string">
-              <xsl:if test="//field[contains(@path_doc,substring-before($coord,' OR')) and @data_type='struct_array']">length
-              </xsl:if>
-              <xsl:if test="not(//field[contains(@path_doc,substring-before($coord,' OR')) and @data_type='struct_array'])">getDim(<xsl:value-of select="number($targetdim)"/>)
-              </xsl:if>
-            </xsl:variable>
-            <xsl:variable name="target">
-              <xsl:if test="not($relativepathdoc='/')">
-                <xsl:value-of select="replace(substring-before(substring-after($coord,$relativepathdoc),' OR'),'/','.')"/>
-              </xsl:if>
-              <xsl:if test="$relativepathdoc='/'">
-                  <xsl:value-of select="replace(substring-before($coord,' OR'),'/','.')"/>
-              </xsl:if>
-            </xsl:variable>
-            <xsl:variable name="resolved_target">
-            <xsl:apply-templates select="." mode="resolve_indices">
-              <xsl:with-param name="target" select="$target"/>
-              <xsl:with-param name="string-resolved" select="''"/>
-            </xsl:apply-templates>
-            </xsl:variable>
-            <xsl:if test="not(contains(substring-before($coord,' OR'),'1...'))">
-              ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
-            </xsl:if>
-      <xsl:apply-templates select="." mode="check-possible-coordinates">
-        <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
-        <xsl:with-param name="relativepathdoc" select="$relativepathdoc"/>
-        <xsl:with-param  name="dimension" select="$dimension"/>
-        <xsl:with-param  name="self" select="$self"/>
-        <xsl:with-param  name="targetdim" select="$targetdim"/>
-      </xsl:apply-templates>
-      </xsl:if>
-      <xsl:if test="not(contains($coord,' OR'))">
-            <xsl:variable name="mesure_string">
-              <xsl:if test="//field[contains(@path_doc, $coord) and @data_type='struct_array']">length
-              </xsl:if>
-              <xsl:if test="not(//field[contains(@path_doc, $coord) and @data_type='struct_array'])">getDim(<xsl:value-of select="number($targetdim)"/>)
-              </xsl:if>
-            </xsl:variable>
-            <xsl:variable name="target">
-              <xsl:if test="not($relativepathdoc='/')">
-                <xsl:value-of select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
-              </xsl:if>
-              <xsl:if test="$relativepathdoc='/'">
-                  <xsl:value-of select="replace($coord,'/','.')"/>
-              </xsl:if>
-            </xsl:variable>
-            <xsl:variable name="resolved_target">
-            <xsl:apply-templates select="." mode="resolve_indices">
-              <xsl:with-param name="target" select="$target"/>
-              <xsl:with-param name="string-resolved" select="''"/>
-            </xsl:apply-templates>
-            </xsl:variable>
-            <xsl:if test="not(contains($coord,'1...'))">
-              ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
-            </xsl:if>
       </xsl:if>
       </xsl:template>
 
