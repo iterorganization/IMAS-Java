@@ -1359,7 +1359,7 @@
               throw new ValidationException("the time array must not be empty");
         }
 
-        idsTimeSize = this.time.getDim();
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) idsTimeSize = this.time.getDim();
   
 
         <xsl:apply-templates select = "field" mode = "VALIDATE_CHILD"/>
@@ -2996,8 +2996,10 @@
       }
       if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         for (int itime = 1; itime&lt;arraySize;itime++) {
-            if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
-              throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. ids.<xsl:value-of select="@name"/>[itime].time is invalid.");
+            if (this.<xsl:value-of select="@name"/>[itime] != null) {
+              if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
+                throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. ids.<xsl:value-of select="@name"/>[itime].time is invalid.");
+              }
             }
           }
         }
@@ -3348,8 +3350,10 @@
     <xsl:if test=".//field[@path_doc=$coord and (@data_type='flt_type' or @data_type='FLT_0D')]">
     if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         for (int itime = 1; itime&lt;arraySize;itime++) {
+        if (this.<xsl:value-of select="@name"/>[itime] != null) {
         if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
           throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. ids.<xsl:value-of select="@name"/>[itime].time is invalid.");
+        }
         }
         }
       }
