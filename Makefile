@@ -2,7 +2,7 @@
 include ../Makefile.common
 
 ifneq ("yes","$(strip $(IMAS_JAVA))")
-all sources sources_install install uninstall clean clean-src:
+all sources sources_install install uninstall clean clean-src test:
 	$(warning "Ignoring javainterface (IMAS_JAVA=no).")
 else
 
@@ -20,8 +20,8 @@ IDSSOURCES = $(addprefix src/imasjava/ids/,$(addsuffix _IDSBase.java,$(IDSNAMES)
 # Generated sources (not all sources)
 GENSOURCES = src/imasjava/imas.java $(IDSSOURCES)
 # Static sources
-STA2SOURCES = $(addprefix src/imasjava/,$(addsuffix .java,UALLowLevel))
-STA1SOURCES = $(addprefix src/imasjava/,$(addsuffix .java,UALException utilities/ImasReflection Vect1DBoolean Vect1DDouble Vect1DFloat Vect1DInt Vect1DString Vect2DDouble Vect2DFloat Vect2DInt Vect3DDouble Vect3DFloat Vect3DInt Vect4DDouble Vect5DDouble Vect6DDouble Vect7DDouble Complex Vect1DComplex Vect2DComplex Vect3DComplex Vect4DComplex Vect5DComplex Vect6DComplex wrapper/Wrapper wrapper/LowLevel ))
+STA2SOURCES = $(addprefix src/imasjava/,$(addsuffix .java,ALLowLevel))
+STA1SOURCES = $(addprefix src/imasjava/,$(addsuffix .java,ALException utilities/ImasReflection Vect1DBoolean Vect1DDouble Vect1DFloat Vect1DInt Vect1DString Vect2DDouble Vect2DFloat Vect2DInt Vect3DDouble Vect3DFloat Vect3DInt Vect4DDouble Vect5DDouble Vect6DDouble Vect7DDouble Complex Vect1DComplex Vect2DComplex Vect3DComplex Vect4DComplex Vect5DComplex Vect6DComplex wrapper/Wrapper wrapper/LowLevel ))
 SOURCES = $(GENSOURCES) $(STA2SOURCES) $(STA1SOURCES)
 
 # We can do with just one class file target
@@ -67,7 +67,7 @@ $(CLASSFILE): build/%.class:src/%.java | build
 $(GENSOURCES): gensources
 	$(if $(wildcard $@~),@echo Correcting indentation of $@ ; $(BEAUTIFY) $@ && $(RM) $@~)
 gensources: IDSDef2Java.xsl | saxonicajar
-	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(SAXON) -t -s:$(IDSDEF) -xsl:$< SYSTEM=$(SYSTEM) DD_VERSION=$(DD_GIT_DESCRIBE) AL_VERSION=$(UAL_GIT_DESCRIBE) && \
+	$(if $(call allnewerthan,$(GENSOURCES),$^),, $(SAXON) -t -s:$(IDSDEF) -xsl:$< SYSTEM=$(SYSTEM) DD_VERSION=$(DD_GIT_DESCRIBE) AL_VERSION=$(AL_GIT_DESCRIBE) && \
 	  touch $(addsuffix ~,$(GENSOURCES)) )
 beautify: $(GENSOURCES) | javaformatjar
 	$(JAVA) com.google.googlejavaformat.java.Main -i $^

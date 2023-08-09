@@ -18,7 +18,7 @@
     .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version)
     .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version, String options)
     .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType)
-    .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws UALException
+    .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
 
         Open the Data Entry defined by the provided parameters.
 

@@ -3,7 +3,7 @@ import imasjava.*;
 import imasjava.wrapper.LowLevel;
 
 public class copy_ids {
-    public static void main(String[] args) throws UALException {
+    public static void main(String[] args) throws ALException {
         // Create an empty core_profiles IDS, and fill with some data
         imas.core_profiles core_profiles = new imas.core_profiles();
         core_profiles.ids_properties.homogeneous_time = 

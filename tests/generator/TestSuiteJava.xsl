@@ -100,7 +100,7 @@
     </xsl:template>
 
     <xsl:template match="IDS" mode="set_static">
-        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_setStatic(imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids) throws UALException {&#10;</xsl:text>
+        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_setStatic(imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids) throws ALException {&#10;</xsl:text>
         <xsl:text>&#9;&#9;System.out.println(" --- --- --- Calling setStatic() on IDS: </xsl:text><xsl:value-of select="@name"/><xsl:text>");&#10;</xsl:text>
         <xsl:apply-templates select="field" mode="putStatic"/>
         <xsl:text>}&#10;</xsl:text>
@@ -108,7 +108,7 @@
     </xsl:template>
 
     <xsl:template match="IDS" mode="set_dynamic">
-        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_setDynamic(imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids, int timeIdx) throws UALException {&#10;</xsl:text>
+        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_setDynamic(imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids, int timeIdx) throws ALException {&#10;</xsl:text>
         <xsl:text>&#9;&#9;System.out.println(" --- --- --- Calling setDynamic() on IDS: </xsl:text><xsl:value-of select="@name"/><xsl:text>");&#10;</xsl:text>
         <xsl:apply-templates select="field" mode="putDynamic"/>
         <xsl:text>}&#10;</xsl:text>
@@ -117,7 +117,7 @@
 
 
     <xsl:template match="IDS" mode="get_static">
-        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_getStatic(imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids) throws UALException {&#10;</xsl:text>
+        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_getStatic(imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids) throws ALException {&#10;</xsl:text>
         <xsl:text>&#9;&#9;boolean status = false;&#10;</xsl:text>
         <xsl:text>&#9;&#9;System.out.println(" --- --- --- Calling getStatic() on IDS: </xsl:text><xsl:value-of select="@name"/><xsl:text>");&#10;</xsl:text>
         <xsl:apply-templates select="field" mode="getStatic"/>
@@ -126,7 +126,7 @@
     </xsl:template>
 
     <xsl:template match="IDS" mode="get_dynamic">
-        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_getDynamic(imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids, int timeIdx) throws UALException {&#10;</xsl:text>
+        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_getDynamic(imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids, int timeIdx) throws ALException {&#10;</xsl:text>
         <xsl:text>&#9;&#9;boolean status = false;&#10;</xsl:text>
         <xsl:text>&#9;&#9;System.out.println(" --- --- --- Calling getDynamic() on IDS: </xsl:text><xsl:value-of select="@name"/><xsl:text>");&#10;</xsl:text>
         <xsl:apply-templates select="field" mode="getDynamic"/>
@@ -137,7 +137,7 @@
 
     <!-- IDS put()-->
     <xsl:template match="IDS" mode="put">
-        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_put() throws UALException {&#10;</xsl:text>
+        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_put() throws ALException {&#10;</xsl:text>
         <xsl:text>&#9;&#9;System.out.println("Testing put() on </xsl:text><xsl:value-of select="@name"/><xsl:text>");&#10;</xsl:text>
         <xsl:text>&#9;&#9;Generator.clearSeed();&#10;</xsl:text>
         <xsl:text>&#9;&#9;imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids = new imas.</xsl:text><xsl:value-of select="@name"/><xsl:text>();&#10;</xsl:text>
@@ -160,7 +160,7 @@
         <xsl:text>//====================================================================================&#10;</xsl:text>
         <xsl:text>//&#9;&#9; PUT SLICE </xsl:text><xsl:value-of select="@name"/> <xsl:text> &#10;</xsl:text>
         <xsl:text>//====================================================================================&#10;</xsl:text>
-        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_putSlice() throws UALException {&#10;</xsl:text>
+        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_putSlice() throws ALException {&#10;</xsl:text>
         <xsl:text>&#9;&#9;System.out.println("Testing putSlice() on </xsl:text><xsl:value-of select="@name"/><xsl:text>");&#10;</xsl:text>
         <xsl:text>&#9;&#9;Generator.clearSeed();&#10;</xsl:text>
         <xsl:text>&#9;&#9;imas.</xsl:text><xsl:value-of select="@name"/><xsl:text> ids = new imas.</xsl:text><xsl:value-of select="@name"/><xsl:text>();&#10;</xsl:text>
@@ -193,7 +193,7 @@
 
     <!-- IDS get()-->
     <xsl:template match="IDS" mode="get">
-        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_get() throws UALException, IllegalAccessException, NoSuchFieldException {&#10;</xsl:text>
+        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_get() throws ALException, IllegalAccessException, NoSuchFieldException {&#10;</xsl:text>
         <xsl:text>&#9;&#9;boolean status = false;&#10;</xsl:text>
         <xsl:text>&#9;&#9;System.out.println("Testing get() on </xsl:text><xsl:value-of select="@name"/><xsl:text>");&#10;</xsl:text>
         <xsl:text>&#9;&#9;Generator.clearSeed();&#10;</xsl:text>
@@ -214,7 +214,7 @@
         <xsl:text>//====================================================================================&#10;</xsl:text>
         <xsl:text>//&#9;&#9; GET SLICE </xsl:text><xsl:value-of select="@name"/> <xsl:text> &#10;</xsl:text>
         <xsl:text>//====================================================================================&#10;</xsl:text>
-        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_getSlice() throws UALException, IllegalAccessException, NoSuchFieldException {&#10;</xsl:text>
+        <xsl:text>&#9;public static void </xsl:text><xsl:value-of select="@name"/><xsl:text>_getSlice() throws ALException, IllegalAccessException, NoSuchFieldException {&#10;</xsl:text>
         <xsl:text>&#9;&#9;boolean status = false;&#10;</xsl:text>
         <xsl:text>&#9;&#9;System.out.println("Testing getSlice() on </xsl:text><xsl:value-of select="@name"/><xsl:text>");&#10;</xsl:text>
         <xsl:text>&#9;&#9;Generator.clearSeed();&#10;</xsl:text>
