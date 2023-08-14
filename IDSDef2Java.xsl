@@ -129,7 +129,7 @@
             check = false;
           } 
           if (i&gt;1) { 
-            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+dim+"). Exactly one of the possible coordinate must be allocated. ("+coordinates+")");
+            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+(dim+1)+"). Exactly one of the possible coordinate must be allocated. ("+coordinates+")");
           }
           if(check) {
             error = imas.check_possible_coordinate(arraySize, objdim ,objs);
@@ -144,7 +144,7 @@
           // Dimension sizz not validated?
             
           if (error) { 
-            throw new ValidationException("Wrong dimension "+dim+" for "+name+". ("+coordinates+")");
+            throw new ValidationException("Wrong dimension "+(dim+1)+" for "+name+". ("+coordinates+")");
           }
 
         }
@@ -2966,12 +2966,12 @@
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
           if(arraySize != idsTimeSize) {
-            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)"/>.");
+            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)+1"/>.");
           }
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT ) {
           if(arraySize != 0) {
-            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)"/>.");
+            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)+1"/>.");
           }
         }
         </xsl:if>
@@ -2991,7 +2991,7 @@
       </xsl:choose>
       if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
         if(arraySize != idsTimeSize) {
-          throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)"/>.");
+          throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)+1"/>.");
         }
       }
       if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
@@ -3253,7 +3253,7 @@
         </xsl:choose>
           if (arraySize != 0) {
             if (arraySize != <xsl:value-of select = "substring-after($coord,'1...')"/>) {
-              throw new ValidationException("array_size of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)"/>. Must be <xsl:value-of select = "substring-after($coord,'1...')"/>.");
+              throw new ValidationException("array_size of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)+1"/>. Must be <xsl:value-of select = "substring-after($coord,'1...')"/>.");
             }
           }
         }
