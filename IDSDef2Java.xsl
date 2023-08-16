@@ -895,7 +895,7 @@
 
         String disableValidation;
             
-        disableValidation = System.getenv("IMAS_DISABLE_VALIDATE");
+        disableValidation = System.getenv("IMAS_AL_DISABLE_VALIDATE");
 
         if (disableValidation == null || !disableValidation.equals("1")) validate();
  
@@ -989,7 +989,7 @@
 
             String disableValidation;
             
-            disableValidation = System.getenv("IMAS_DISABLE_VALIDATE");
+            disableValidation = System.getenv("IMAS_AL_DISABLE_VALIDATE");
 
             if (disableValidation == null || !disableValidation.equals("1")) validate();
             
