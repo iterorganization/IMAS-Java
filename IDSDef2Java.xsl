@@ -898,8 +898,14 @@
             {
             <xsl:choose>
               <xsl:when test="not(./field[@name='time'])">
-           
-                put(pulseCtx, idsFullName, ids);
+                if (ids.ids_properties.homogeneous_time == 2)
+                {
+                  put(pulseCtx, idsFullName, ids);
+                }
+                else
+                {
+                  throw new ALException("ERROR: Homogeneous IDS " + "<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2."); 
+                }
               </xsl:when>
               <xsl:otherwise> 
             int iOccurrence = 0;
@@ -924,7 +930,14 @@
             {
             <xsl:choose>
               <xsl:when test="not(./field[@name='time'])">
-            put(iOccurrence);
+            if (this.ids_properties.homogeneous_time == 2)
+            {
+              put(iOccurrence);
+            }
+            else
+            {
+              throw new ALException("ERROR: Homogeneous IDS " +"<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2.");
+            }
                </xsl:when>
               <xsl:otherwise>
             int pulseCtx = this.pulseCtx;
@@ -1370,7 +1383,7 @@
         {
          <xsl:choose>
           <xsl:when test="not(./field[@name='time'])">
-          put(ctx, idsTimeMode, idsFullName);
+            put(ctx, idsTimeMode, idsFullName);
           </xsl:when>
           <xsl:otherwise>
         String strTimeBasePath = null;
