@@ -635,6 +635,12 @@
             **/
             public static void put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids)  throws ALException
             {
+              <xsl:if test="not(./field[@name='time'])">
+              if(ids.ids_properties.homogeneous_time != 2)
+              {
+                throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2.");
+              }
+              </xsl:if>  
             int iOccurrence = 0;
             
             /*     System.err.println("WARNING:\n"
@@ -831,6 +837,12 @@
 
     public void put(int iOccurrence)  throws ALException
     {
+        <xsl:if test="not(./field[@name='time'])">
+        if (this.ids_properties.homogeneous_time != 2)
+        {
+throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2.");
+        }
+        </xsl:if>  
         int pulseCtx = this.pulseCtx;
         int ctx = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
@@ -898,14 +910,7 @@
             {
             <xsl:choose>
               <xsl:when test="not(./field[@name='time'])">
-                if (ids.ids_properties.homogeneous_time == 2)
-                {
                   put(pulseCtx, idsFullName, ids);
-                }
-                else
-                {
-                  throw new ALException("ERROR: Homogeneous IDS " + "<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2."); 
-                }
               </xsl:when>
               <xsl:otherwise> 
             int iOccurrence = 0;
@@ -930,14 +935,7 @@
             {
             <xsl:choose>
               <xsl:when test="not(./field[@name='time'])">
-            if (this.ids_properties.homogeneous_time == 2)
-            {
               put(iOccurrence);
-            }
-            else
-            {
-              throw new ALException("ERROR: Homogeneous IDS " +"<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2.");
-            }
                </xsl:when>
               <xsl:otherwise>
             int pulseCtx = this.pulseCtx;
