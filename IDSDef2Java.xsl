@@ -3144,16 +3144,16 @@
 	<xsl:if test="$resolved_indexstr != ''">
 	  <xsl:if test="not(matches($resolved_indexstr, '^[0-9]+$'))">
           if (<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>==LowLevel.EMPTY_INT) {
-            throw new ValidationException("<xsl:value-of select="$resolved_indexstr"/> is not valid ("+LowLevel.EMPTY_INT+").");
+            throw new ValidationException("<xsl:value-of select="replace(replace($resolved_indexstr,'\(','(&quot;+'),'\)','+&quot;)')"/> is not valid ("+LowLevel.EMPTY_INT+").");
           }
           </xsl:if>
-	  if (<xsl:value-of select="concat('this.',$string-resolved,substring-before($target,'('))"/>.length&lt;<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>+1) { 
-	  throw new ValidationException("<xsl:value-of select="concat($string-resolved,substring-before($target,'('),'[',replace(replace($resolved_indexstr,'\(','['),'\)',']'),']')"/> is not allocated.");
+	        if (<xsl:value-of select="replace(replace(concat('this.',$string-resolved,substring-before($target,'(')),'\(','['),'\)',']')"/>.length&lt;<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>+1) { 
+	          throw new ValidationException("<xsl:value-of select="replace(replace(concat($string-resolved,substring-before($target,concat($indexstr,')')), concat(replace(replace($resolved_indexstr,'\(','['),'\)',']'),')') ),'\(','(&quot;+'),'\)','+&quot;)')"/> is not allocated.");
           }
         </xsl:if>
         <xsl:apply-templates select="." mode="check_indices">
             <xsl:with-param name="target" select="substring-after($target,concat($indexstr,')'))"/>
-            <xsl:with-param name="string-resolved" select="replace(replace(concat($string-resolved,substring-before($target,concat($indexstr,')')), concat($resolved_indexstr,')')),'\(','['),'\)',']')"/>
+            <xsl:with-param name="string-resolved" select="concat($string-resolved,substring-before($target,concat($indexstr,')')), concat(replace(replace($resolved_indexstr,'\(','['),'\)',']'),')') )"/>
         </xsl:apply-templates>
       </xsl:if>
       </xsl:template>
