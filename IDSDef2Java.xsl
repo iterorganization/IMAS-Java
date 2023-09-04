@@ -88,9 +88,32 @@
         public static String tokamak;
         public static String version;
         public static int shot; 
-        public static int run;
+	public static int run;
 
-        public static boolean check_possible_coordinate(int arraySize, int dim, Object... objs) {
+	public static boolean check_possible_coordinate(int dim, Object obj) {
+          boolean check = false;
+          java.lang.reflect.Method method;
+          if (obj == null) return false;
+          else {
+            try {
+            method = obj.getClass().getMethod("getDim",int.class);
+            } catch (SecurityException e) { return true; }
+              catch (NoSuchMethodException e) {method=null;}
+            if (method != null) {
+            try {
+	    	  int size = (int) method.invoke(obj,dim);
+                  if (size != 0) check = true;
+            } catch (IllegalArgumentException e) { return true; }
+              catch (IllegalAccessException e) { return true; }
+              catch (InvocationTargetException e) { return true; }
+            } else {
+            if (((Object[])obj).length != 0) check = true;
+            }
+          }
+          return check;
+          }
+
+        public static boolean validate_possible_coordinates(int arraySize, int dim, Object... objs) {
             boolean error = true; 
             java.lang.reflect.Method method;
             for (Object s : objs) {
@@ -101,7 +124,7 @@
                     catch (NoSuchMethodException e) {method=null;}
                   if (method != null) {
                   try {
-                        int size = (int) method.invoke(s,dim);
+		        int size = (int) method.invoke(s,dim);
                         if (arraySize == size) error = false;
                   } catch (IllegalArgumentException e) { return true; }
                     catch (IllegalAccessException e) { return true; }
@@ -122,30 +145,30 @@
           int i = 0;
 
           for (Object s : objs) {
-            if (s != null) i = i + 1;
-          }
+	  if (check_possible_coordinate( objdim, s))  i = i + 1;
+	  }
 
           if (i!=1) { 
             check = false;
           } 
           if (i&gt;1) { 
-            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+(dim+1)+"). Exactly one of the possible coordinate must be allocated. ("+coordinates+")");
+            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+(dim+1)+") ("+arraySize+"). Exactly one of the possible coordinate must be allocated. ("+coordinates+")");
           }
           if(check) {
-            error = imas.check_possible_coordinate(arraySize, objdim ,objs);
+            error = imas.validate_possible_coordinates(arraySize, objdim ,objs);
           }
 
           // Alternative fixed size?
 
-          if (!check &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
+          if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
             error = false; 
           }
 
           // Dimension sizz not validated?
             
           if (error) { 
-            throw new ValidationException("Wrong dimension "+(dim+1)+" for "+name+". ("+coordinates+")");
-          }
+	  throw new ValidationException("Wrong dimension "+(dim+1)+" for "+name+" ("+arraySize+"). ("+coordinates+")");
+	  }
 
         }
         
@@ -2951,9 +2974,11 @@
         int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
         </xsl:otherwise>
         </xsl:choose>
+        if (arraySize > 0) {
         <xsl:if test="@type='dynamic' and contains($coord,'/time')">
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         </xsl:if>
+        <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
 
           imas.validate_coordinate(arraySize,
                                   <xsl:value-of select="number($dimension)"/>, 
@@ -2975,7 +3000,8 @@
           }
         }
         </xsl:if>
-       }
+	}
+	}
       </xsl:if> 
       <xsl:if test="not(contains($newpath,'/')) and $istimeslice='yes'">
       <xsl:if test="@type='dynamic' and contains($coord,'/time')">
@@ -3004,8 +3030,9 @@
           }
         }
       }
+	
       </xsl:if>
-    </xsl:if>
+      </xsl:if>
       </xsl:template> 
 
       <xsl:template match='field' mode="possible-coordinates">
@@ -3054,6 +3081,80 @@
       <xsl:if test="not(contains($coord,'1...'))">
           ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
       </xsl:if>
+      </xsl:if>
+      </xsl:template>
+
+       <xsl:template match='field' mode="check-target-indices">
+      <xsl:param name="coord"/>
+      <xsl:param name="relativepathdoc"/>
+      <xsl:if test="contains($coord,' OR')">
+        <xsl:variable name="target">
+          <xsl:if test="not($relativepathdoc='/')">
+            <xsl:value-of select="replace(substring-before(substring-after($coord,$relativepathdoc),' OR'),'/','.')"/>
+          </xsl:if>
+          <xsl:if test="$relativepathdoc='/'">
+              <xsl:value-of select="replace(substring-before($coord,' OR'),'/','.')"/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:apply-templates select="." mode="check_indices">
+            <xsl:with-param name="target" select="$target"/>
+            <xsl:with-param name="string-resolved" select="''"/>
+        </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="check-target-indices">
+        <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
+        <xsl:with-param name="relativepathdoc" select="$relativepathdoc"/>
+      </xsl:apply-templates>
+      </xsl:if>
+      <xsl:if test="not(contains($coord,' OR'))">
+      <xsl:variable name="target">
+        <xsl:if test="not($relativepathdoc='/')">
+          <xsl:value-of select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
+        </xsl:if>
+        <xsl:if test="$relativepathdoc='/'">
+            <xsl:value-of select="replace($coord,'/','.')"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:apply-templates select="." mode="check_indices">
+            <xsl:with-param name="target" select="$target"/>
+            <xsl:with-param name="string-resolved" select="''"/>
+        </xsl:apply-templates>
+      </xsl:if>
+      </xsl:template>
+
+      <xsl:template match='field' mode="check_indices">
+      <xsl:param name="target"/>
+      <xsl:param name="string-resolved"/>
+      <xsl:if test="contains($target,'(')">
+        <xsl:variable name="indexstr">
+          <xsl:apply-templates select="." mode="get_indices">
+            <xsl:with-param name="target" select="$target"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+        <xsl:variable name="resolved_indexstr">
+        <xsl:if test="matches($indexstr, '^[0-9]+$')">
+          <xsl:value-of select="$indexstr"/>
+        </xsl:if>
+        <xsl:if test="matches($indexstr, '^itime|i[1-9]$')">
+          <xsl:value-of select="''"/>
+        </xsl:if>
+        <xsl:if test="not(matches($indexstr, '^[0-9]+$')) and not(matches($indexstr, '^itime|i[1-9]$'))">
+          <xsl:value-of select="concat('this.',$indexstr)"/>
+        </xsl:if>
+	</xsl:variable>
+	<xsl:if test="$resolved_indexstr != ''">
+	  <xsl:if test="not(matches($resolved_indexstr, '^[0-9]+$'))">
+          if (<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>==LowLevel.EMPTY_INT) {
+            throw new ValidationException("<xsl:value-of select="$resolved_indexstr"/> is not valid ("+LowLevel.EMPTY_INT+").");
+          }
+          </xsl:if>
+	  if (<xsl:value-of select="concat('this.',$string-resolved,substring-before($target,'('))"/>.length&lt;<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>+1) { 
+	  throw new ValidationException("<xsl:value-of select="concat($string-resolved,substring-before($target,'('),'[',replace(replace($resolved_indexstr,'\(','['),'\)',']'),']')"/> is not allocated.");
+          }
+        </xsl:if>
+        <xsl:apply-templates select="." mode="check_indices">
+            <xsl:with-param name="target" select="substring-after($target,concat($indexstr,')'))"/>
+            <xsl:with-param name="string-resolved" select="replace(replace(concat($string-resolved,substring-before($target,concat($indexstr,')')), concat($resolved_indexstr,')')),'\(','['),'\)',']')"/>
+        </xsl:apply-templates>
       </xsl:if>
       </xsl:template>
 
@@ -3285,7 +3386,7 @@
     @data_type='CPX_0D')]/@path"/>
     <xsl:if test=".//field[@path_doc=$coord and (@data_type='flt_type' or @data_type='FLT_0D')]">
     if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
-        for (int itime = 1; itime&lt;arraySize;itime++) {
+        for (int itime = 0; itime&lt;arraySize;itime++) {
         if (this.<xsl:value-of select="@name"/>[itime] != null) {
         if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
           throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. ids.<xsl:value-of select="@name"/>[itime].time is invalid.");
