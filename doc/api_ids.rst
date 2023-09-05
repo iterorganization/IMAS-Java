@@ -142,3 +142,9 @@ IDS API
 
         :param byte[] data: data representing a serialized IDS.
         :example: See :java:ref:`serialize`.
+
+    .. java:method:: public void validate()
+
+        Validate the IDS coordinate consistency.
+
+        :example: .. literalinclude:: code_samples/ids_validate
