@@ -145,6 +145,6 @@ IDS API
 
     .. java:method:: public void validate()
 
-        Validate the IDS coordinate consistency.
+        Validate the IDS coordinate consistency. The method should always be tested for exception/errors while it is being executed. A ValidationException can be raised if a coordinate inconsistency is found. Nothing occurs if the data are valids.
 
         :example: .. literalinclude:: code_samples/ids_validate
