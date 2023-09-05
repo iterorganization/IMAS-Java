@@ -90,6 +90,13 @@
         public static int shot; 
 	public static int run;
 
+  /**
+  * Methods returning true if the object obj is allocated and of size different to 0. False otherwise.
+  *
+  * @param dim The dimension that is checked.
+  * @param obj Object of the possible coordinates.
+  * @return False if the size is validated.
+  */
 	public static boolean check_possible_coordinate(int dim, Object obj) {
           boolean check = false;
           java.lang.reflect.Method method;
@@ -113,6 +120,14 @@
           return check;
           }
 
+          /**
+          * Methods returning false if the coordinate is verified. True otherwise.
+          *
+          * @param arraySize Size of the dimension to check.
+          * @param dim The dimension that is checked.
+          * @param objs Object list of the possible coordinates.
+          * @return False if the size is validated.
+          */
         public static boolean validate_possible_coordinates(int arraySize, int dim, Object... objs) {
             boolean error = true; 
             java.lang.reflect.Method method;
@@ -158,6 +173,8 @@
           boolean error = true;
           int i = 0;
 
+          // We check all the possible coordinates allocation
+
           for (Object s : objs) {
 	  if (check_possible_coordinate( objdim, s))  i = i + 1;
 	  }
@@ -165,20 +182,27 @@
           if (i!=1) { 
             check = false;
           } 
+
+          // If more of one alternatives coordinates is allocated we raise an exception
+
           if (i&gt;1) { 
             throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+(dim+1)+") ("+arraySize+"). Exactly one of the possible coordinate must be allocated. ("+coordinates+")");
           }
+
+          // We check all the possible coordinates (one is allocated)
+
+
           if(check) {
             error = imas.validate_possible_coordinates(arraySize, objdim ,objs);
           }
 
-          // Alternative fixed size?
+          // Last chance: possible alternative fixed size?
 
           if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
             error = false; 
           }
 
-          // Dimension sizz not validated?
+          // The size of the target dimension not validated - we raise an error
             
           if (error) { 
 	  throw new ValidationException("Wrong dimension "+(dim+1)+" for "+name+" ("+arraySize+"). ("+coordinates+")");
