@@ -3099,6 +3099,7 @@
         <xsl:apply-templates select="." mode="check_indices">
             <xsl:with-param name="target" select="$target"/>
             <xsl:with-param name="string-resolved" select="''"/>
+            <xsl:with-param name="string-error" select="''"/>
         </xsl:apply-templates>
       <xsl:apply-templates select="." mode="check-target-indices">
         <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
@@ -3117,6 +3118,7 @@
       <xsl:apply-templates select="." mode="check_indices">
             <xsl:with-param name="target" select="$target"/>
             <xsl:with-param name="string-resolved" select="''"/>
+            <xsl:with-param name="string-error" select="''"/>
         </xsl:apply-templates>
       </xsl:if>
       </xsl:template>
@@ -3124,6 +3126,7 @@
       <xsl:template match='field' mode="check_indices">
       <xsl:param name="target"/>
       <xsl:param name="string-resolved"/>
+      <xsl:param name="string-error"/>
       <xsl:if test="contains($target,'(')">
         <xsl:variable name="indexstr">
           <xsl:apply-templates select="." mode="get_indices">
@@ -3141,11 +3144,22 @@
           <xsl:value-of select="concat('this.',$indexstr)"/>
         </xsl:if>
 	</xsl:variable>
+  <xsl:variable name="indexid_str">
+    <xsl:if test="starts-with($target,'.')">  <xsl:value-of select="substring-before(substring-after($target,'.'),'(')"/>_id </xsl:if>
+    <xsl:if test="not(starts-with($target,'.'))">  <xsl:value-of select="substring-before($target,'(')"/>_id </xsl:if>
+  </xsl:variable>
 	<xsl:if test="$resolved_indexstr != ''">
 	  <xsl:if test="not(matches($resolved_indexstr, '^[0-9]+$'))">
           if (<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>==LowLevel.EMPTY_INT) {
             throw new ValidationException("<xsl:value-of select="replace(replace($resolved_indexstr,'\(','(&quot;+'),'\)','+&quot;)')"/> is not valid ("+LowLevel.EMPTY_INT+").");
           }
+          </xsl:if>
+          String <xsl:value-of select="$indexid_str"/> =
+          <xsl:if test="matches($indexstr, '^[0-9]+$')">
+            Integer.toString(<xsl:value-of select="$resolved_indexstr"/>-1);
+          </xsl:if>
+          <xsl:if test="not(matches($indexstr, '^[0-9]+$')) and not(matches($indexstr, '^itime|i[1-9]$'))">
+            Integer.toString(Integer.valueOf(<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>)-1);
           </xsl:if>
 	        if (<xsl:value-of select="replace(replace(concat('this.',$string-resolved,substring-before($target,'(')),'\(','['),'\)',']')"/>.length&lt;<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>+1) { 
 	          throw new ValidationException("<xsl:value-of select="replace(replace(concat($string-resolved,substring-before($target,concat($indexstr,')')), concat(replace(replace($resolved_indexstr,'\(','['),'\)',']'),')') ),'\(','(&quot;+'),'\)','+&quot;)')"/> is not allocated.");
@@ -3154,7 +3168,8 @@
         <xsl:apply-templates select="." mode="check_indices">
             <xsl:with-param name="target" select="substring-after($target,concat($indexstr,')'))"/>
             <xsl:with-param name="string-resolved" select="concat($string-resolved,substring-before($target,concat($indexstr,')')), concat(replace(replace($resolved_indexstr,'\(','['),'\)',']'),')') )"/>
-        </xsl:apply-templates>
+            <xsl:with-param name="string-error" select="concat($string-resolved,substring-before($target,'(&quot;+'),$indexid_str,'+&quot;(')"/>
+          </xsl:apply-templates>
       </xsl:if>
       </xsl:template>
 
