@@ -136,7 +136,21 @@
             }
             return error;
         }
-        
+
+	/**
+        * Coordinate validation method.
+        *
+        * @param arraySize Size of the dimension to check.
+        * @param dim The dimension that is checked.
+        * @param name The name of the object that we want to check the dim dimension size.
+        * @param objdim The target dimension of the coordinate.
+        * @param coordinates The targets names
+        * @param fixedcoord True if a fixed size is allowed. False if not
+        * @param fixeddim Eventual allowed fixed size. set to 0 if fixedcoord = false.
+        * @param objs Object list of the possible coordinates.
+        * @return void
+        * @exception ValidationException is thrown if the coordinate is wrong.
+        */
         public static void validate_coordinate(int arraySize, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
         {
 
@@ -1375,11 +1389,11 @@
         if (idsTimeMode != LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp;
             idsTimeMode != LowLevel.IDS_TIME_MODE_HETEROGENEOUS &amp;&amp;
             idsTimeMode != LowLevel.IDS_TIME_MODE_INDEPENDENT) {
-              throw new ValidationException("ids_properties.homogeneous_time wrong value");
+              throw new ValidationException("ids_properties.homogeneous_time wrong value ("+idsTimeMode+")");
         }
 
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1))) { 
-              throw new ValidationException("the time array must not be empty");
+              throw new ValidationException("With the time mode 'HOMOGENEOUS', the time array must be allocated and not be empty.");
         }
 
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) idsTimeSize = this.time.getDim();
@@ -2979,7 +2993,6 @@
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         </xsl:if>
         <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
-
           imas.validate_coordinate(arraySize,
                                   <xsl:value-of select="number($dimension)"/>, 
                                   "<xsl:value-of select="@path"/>",
@@ -2991,12 +3004,12 @@
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
           if(arraySize != idsTimeSize) {
-            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)+1"/>.");
+            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be the size of time ("+idsTimeSize+")");
           }
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT ) {
           if(arraySize != 0) {
-            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)+1"/>.");
+            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. In INDEPENDENT time mode, it must be empty.");
           }
         }
         </xsl:if>
@@ -3017,14 +3030,14 @@
       </xsl:choose>
       if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
         if(arraySize != idsTimeSize) {
-          throw new ValidationException("arraySize of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)+1"/>.");
+          throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be the size of time ("+idsTimeSize+")");
         }
       }
       if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         for (int itime = 1; itime&lt;arraySize;itime++) {
             if (this.<xsl:value-of select="@name"/>[itime] != null) {
               if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
-                throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. ids.<xsl:value-of select="@name"/>[itime].time is invalid.");
+                throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. <xsl:value-of select="@name"/>[itime].time is invalid Must be the size of time ("+this.<xsl:value-of select="@name"/>[itime].time+").");
               }
             }
           }
@@ -3148,7 +3161,7 @@
     <xsl:if test="starts-with($target,'.')">  <xsl:value-of select="substring-before(substring-after($target,'.'),'(')"/>_id </xsl:if>
     <xsl:if test="not(starts-with($target,'.'))">  <xsl:value-of select="substring-before($target,'(')"/>_id </xsl:if>
   </xsl:variable>
-	<xsl:if test="$resolved_indexstr != ''">
+   <xsl:if test="$resolved_indexstr != ''">
 	  <xsl:if test="not(matches($resolved_indexstr, '^[0-9]+$'))">
           if (<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>==LowLevel.EMPTY_INT) {
             throw new ValidationException("<xsl:value-of select="replace(replace($resolved_indexstr,'\(','(&quot;+'),'\)','+&quot;)')"/> is not valid ("+LowLevel.EMPTY_INT+").");
@@ -3161,17 +3174,17 @@
           <xsl:if test="not(matches($indexstr, '^[0-9]+$')) and not(matches($indexstr, '^itime|i[1-9]$'))">
             Integer.toString(Integer.valueOf(<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>)-1);
           </xsl:if>
-	        if (<xsl:value-of select="replace(replace(concat('this.',$string-resolved,substring-before($target,'(')),'\(','['),'\)',']')"/>.length&lt;<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>+1) { 
-	          throw new ValidationException("<xsl:value-of select="replace(replace(concat($string-resolved,substring-before($target,concat($indexstr,')')), concat(replace(replace($resolved_indexstr,'\(','['),'\)',']'),')') ),'\(','(&quot;+'),'\)','+&quot;)')"/> is not allocated.");
+	        if (<xsl:value-of select="replace(replace(concat('this.',$string-resolved,substring-before($target,'(')),'\(','['),'\)',']')"/>.length&lt;=<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>-1) { 
+            throw new ValidationException("<xsl:value-of select="concat($string-error,replace(replace(concat(substring-before($target,concat($indexstr,')')), concat($indexid_str,')') ),'\(','(&quot;+'),'\)','+&quot;)'))"/> is not allocated.");
           }
         </xsl:if>
         <xsl:apply-templates select="." mode="check_indices">
             <xsl:with-param name="target" select="substring-after($target,concat($indexstr,')'))"/>
-            <xsl:with-param name="string-resolved" select="concat($string-resolved,substring-before($target,concat($indexstr,')')), concat(replace(replace($resolved_indexstr,'\(','['),'\)',']'),')') )"/>
-            <xsl:with-param name="string-error" select="concat($string-resolved,substring-before($target,'(&quot;+'),$indexid_str,'+&quot;(')"/>
+            <xsl:with-param name="string-resolved" select="concat($string-resolved,substring-before($target,concat($indexstr,')')), concat(replace(replace(concat($resolved_indexstr,'-1'),'\(','['),'\)',']'),')') )"/>
+            <xsl:with-param name="string-error" select="concat($string-error,replace(replace(concat(substring-before($target,concat($indexstr,')')), concat($indexid_str,')') ),'\(','(&quot;+'),'\)','+&quot;)'))"/>
           </xsl:apply-templates>
-      </xsl:if>
-      </xsl:template>
+      </xsl:if>      
+</xsl:template>
 
       <xsl:template match='field' mode="resolve_indices">
       <xsl:param name="target"/>
@@ -3183,14 +3196,17 @@
           </xsl:apply-templates>
         </xsl:variable>
         <xsl:variable name="resolved_indexstr">
-        <xsl:if test="matches($indexstr, '^[0-9]+$') or matches($indexstr, '^itime|i[1-9]$')">
+        <xsl:if test="matches($indexstr, '^[0-9]+$')">
+          <xsl:value-of select="concat($indexstr,'-1')"/>
+        </xsl:if>
+        <xsl:if test="matches($indexstr, '^itime|i[1-9]$')">
           <xsl:value-of select="$indexstr"/>
         </xsl:if>
         <xsl:if test="not(matches($indexstr, '^[0-9]+$') or matches($indexstr, '^itime|i[1-9]$'))">
-          <xsl:value-of select="concat('this.',$indexstr)"/>
+          <xsl:value-of select="concat('this.',$indexstr,'-1')"/>
         </xsl:if>
-        </xsl:variable>
-        <xsl:apply-templates select="." mode="resolve_indices">
+	</xsl:variable>
+	<xsl:apply-templates select="." mode="resolve_indices">
             <xsl:with-param name="target" select="substring-after($target,concat($indexstr,')'))"/>
             <xsl:with-param name="string-resolved" select="concat($string-resolved,substring-before($target,concat($indexstr,')')), concat($resolved_indexstr,')'))"/>
         </xsl:apply-templates>
@@ -3369,7 +3385,7 @@
         </xsl:choose>
           if (arraySize != 0) {
             if (arraySize != <xsl:value-of select = "substring-after($coord,'1...')"/>) {
-              throw new ValidationException("array_size of <xsl:value-of select="@path"/> wrong dimension <xsl:value-of select="number($dimension)+1"/>. Must be <xsl:value-of select = "substring-after($coord,'1...')"/>.");
+              throw new ValidationException("array_size of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be <xsl:value-of select = "substring-after($coord,'1...')"/>.");
             }
           }
         }
@@ -3392,7 +3408,7 @@
     <xsl:if test="contains(@coordinate1,'/time')">
     if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
         if(arraySize != idsTimeSize) {
-          throw new ValidationException("array size of <xsl:value-of select="@path"/> wrong dimension.");
+          throw new ValidationException("array size of <xsl:value-of select="@path"/> ("+arraySize+") wrong. Must be the size of time ("+idsTimeSize+")");
         }
     }
     <xsl:variable name="coord" select="@coordinate1"/>
@@ -3404,7 +3420,7 @@
         for (int itime = 0; itime&lt;arraySize;itime++) {
         if (this.<xsl:value-of select="@name"/>[itime] != null) {
         if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
-          throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. ids.<xsl:value-of select="@name"/>[itime].time is invalid.");
+          throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. <xsl:value-of select="@name"/>[itime].time is invalid ("+this.<xsl:value-of select="@name"/>[itime].time+") .");
         }
         }
         }
@@ -3418,7 +3434,7 @@
       <xsl:if test="not(@data_type='struct_array')">getDim(0)</xsl:if>
     </xsl:variable>
     if (arraySize != this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>) {
-      throw new ValidationException("array size of <xsl:value-of select="@path"/> wrong dimension. Must be the size of <xsl:value-of select="@coordinate1"/>.");
+      throw new ValidationException("array size of <xsl:value-of select="@path"/> ("+arraySize+") wrong. Must be the size of <xsl:value-of select="@coordinate1"/> ("+this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>+").");
     }
     </xsl:if>
     }
