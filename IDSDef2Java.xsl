@@ -543,6 +543,17 @@
         public static int getMaxOccurences() {
         return maxOccurences;
         }
+
+        public boolean isEmpty() {
+          if(    (this.ids_properties == null) 
+              || (    this.ids_properties.homogeneous_time != 0 
+                   &amp;&amp; this.ids_properties.homogeneous_time != 1
+                   &amp;&amp; this.ids_properties.homogeneous_time != 2)) {
+            return true;
+	  }
+
+          return false;
+        } 
         
         public static String getIdsName() 
         {
