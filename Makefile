@@ -10,7 +10,7 @@ else
 _JAVA_OPTIONS =
 JFLAGS = -g -Xmaxerrs 10 -J-Xmx1g -sourcepath ./src -d ./build
 
-JUnit = 1.5.2
+JUnit = 1.10.0
 JUnit.JAR = junit-platform-console-standalone-$(JUnit).jar
 
 # Get a list of IDS from IDSDEF file
@@ -85,7 +85,7 @@ junit-test-run: junit-test-compile
 junit-download: junit-dirs
 	curl -s -z junit_jar/$(JUnit.JAR) \
 	-o junit_jar/$(JUnit.JAR) \
-	http://central.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/$(JUnit)/$(JUnit.JAR)
+	https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/$(JUnit)/$(JUnit.JAR)
 
 #----------------------- documentation -------------------
 
