@@ -395,20 +395,20 @@ public class ALLowLevel {
     public static Vect7DDouble getVect7DDouble(int dim1, int dim2, int dim3, int dim4, int dim5, int dim6, int dim7, double []array) 
     	{return new Vect7DDouble(dim1, dim2, dim3, dim4, dim5, dim6, dim7, array);}
 
-    public static native int getUniqueRun(int shot);
+    public static native int getUniqueRun(int pulse);
     
     
     //Catalogue DB access methods
-    public static native void putIdsDb(String user, String machine, int shot, int run, String path, int occurrence, int isRef,
-	    	String refUser, String refMachine, int refShot, int refRun, int refOccurrence) throws ALException;
+    public static native void putIdsDb(String user, String machine, int pulse, int run, String path, int occurrence, int isRef,
+	    	String refUser, String refMachine, int refPulse, int refRun, int refOccurrence) throws ALException;
 
-    public static native int openDb(String user, String machine, int shot, int run, String idsName, int occurrence) throws ALException;
-    public static native int createNewRunDb(String user, String machine, int shot, String dataVersion) throws ALException;
-    public static native int createNewRunParentDb(String user, String machine, int shot, String dataV, String parentUser, 
-      String parentMachine, int parenShot, int parentRun) throws ALException;
-    public static native void createSpecifiedRunDb(String user, String machine, int shot, int run, String dataVersion) throws ALException;
-    public static native void createSpecifiedRunParentDb(String user, String machine, int shot, int run, String dataV,
-      String parentUser, String parentMachine, int parenShot, int parentRun) throws ALException;
+    public static native int openDb(String user, String machine, int pulse, int run, String idsName, int occurrence) throws ALException;
+    public static native int createNewRunDb(String user, String machine, int pulse, String dataVersion) throws ALException;
+    public static native int createNewRunParentDb(String user, String machine, int pulse, String dataV, String parentUser,
+      String parentMachine, int parenPulse, int parentRun) throws ALException;
+    public static native void createSpecifiedRunDb(String user, String machine, int pulse, int run, String dataVersion) throws ALException;
+    public static native void createSpecifiedRunParentDb(String user, String machine, int pulse, int run, String dataV,
+      String parentUser, String parentMachine, int parenPulse, int parentRun) throws ALException;
 
     //Helper functions
     public static native int getShot(int idx);
@@ -527,5 +527,5 @@ public class ALLowLevel {
     //IDS copies
 
     public static native void alCopyIds(int fromIdx, int toIdx, String idsName, int fromIdsOccur, int toIdsOccur);
-    public static native void alCopyIdsEnv(String tokamakFrom, String versionFrom, String userFrom, int shotFrom, int runFrom, int occurrenceFrom, String tokamakTo, String versionTo, String userTo, int shotTo, int runTo, int occurrenceTo, String idsName);
+    public static native void alCopyIdsEnv(String tokamakFrom, String versionFrom, String userFrom, int pulseFrom, int runFrom, int occurrenceFrom, String tokamakTo, String versionTo, String userTo, int pulseTo, int runTo, int occurrenceTo, String idsName);
 }

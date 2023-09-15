@@ -19,14 +19,14 @@ public class Wrapper {
                 System.out.println("Warning : while putting IDS " + idsName + ", the written IDS has non-empty obsolescent node " + fieldPath + ". Please consider updating the code to avoid using obsolescent nodes.");
         }
 
-        static public String alBuildUriFromLegacyParameters(int backendID, int shot, int run, String user, String tokamak, String version, String options) throws ALException
+        static public String alBuildUriFromLegacyParameters(int backendID, int pulse, int run, String user, String tokamak, String version, String options) throws ALException
         {
 
             user = user.trim();
             tokamak = tokamak.trim();
             version = version.trim();
             options = options.trim();
-            return LowLevel.al_build_uri_from_legacy_parameters(backendID, shot, run, user, tokamak, version, options);
+            return LowLevel.al_build_uri_from_legacy_parameters(backendID, pulse, run, user, tokamak, version, options);
         }
 
         static public int alBeginDataEntryAction(String uri, int mode) throws ALException

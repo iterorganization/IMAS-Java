@@ -87,7 +87,7 @@
         public static String user;
         public static String tokamak;
         public static String version;
-        public static int shot; 
+        public static int pulse;
         public static int run;
         
         
@@ -193,7 +193,7 @@
         }
 
         /* to be checked 
-        imas.shot = shot;
+        imas.pulse = pulse;
         imas.run = run;
         imas.user = user;
         imas.tokamak = tokamak;
@@ -206,7 +206,7 @@
         /**
         * Opens database instance.
         *
-        * @param shot Shot number.
+        * @param pulse Pulse number.
         * @param run Run Number.
         * @param user User name
         * @param tokamak Machine name
@@ -214,15 +214,15 @@
         * @return the database index to be used in subsequent get/put calls
         * @exception ALException is thrown if the database cannot be open.
         */
-        public static int openEnv(int shot, int run, String user, String tokamak, String version)
+        public static int openEnv(int pulse, int run, String user, String tokamak, String version)
         throws ALException {
-        return openEnv(shot, run, user, tokamak, version, defaultBackend(), "");
+        return openEnv(pulse, run, user, tokamak, version, defaultBackend(), "");
         }
         
         /**
         * Opens database instance.
         *
-        * @param shot Shot number.
+        * @param pulse Pulse number.
         * @param run Run Number.
         * @param user User name
         * @param tokamak Machine name
@@ -232,16 +232,16 @@
         * @exception ALException is thrown if the database cannot be open.
         */
         public static int openEnv(
-        int shot, int run, String user, String tokamak, String version, String options)
+        int pulse, int run, String user, String tokamak, String version, String options)
         throws ALException {
-        return openEnv(shot, run, user, tokamak, version, defaultBackend(), options);
+        return openEnv(pulse, run, user, tokamak, version, defaultBackend(), options);
         }
         
         /**
         * Opens database instance.
         *
         * @param backendType Type of the backend to be used
-        * @param shot Shot number.
+        * @param pulse Pulse number.
         * @param run Run Number.
         * @param user User name
         * @param tokamak Name of the machine
@@ -251,9 +251,9 @@
         * @exception ALException is thrown if the database cannot be open.
         */
         public static int openEnv(
-        int shot, int run, String user, String tokamak, String version, int backendType)
+        int pulse, int run, String user, String tokamak, String version, int backendType)
         throws ALException {
-        return openEnv(shot, run, user, tokamak, version, backendType, "");
+        return openEnv(pulse, run, user, tokamak, version, backendType, "");
         }
         
         
@@ -261,7 +261,7 @@
         /**
         * Opens database instance.
         * @param backendType Type of the backend to be used
-        * @param shot Shot number.
+        * @param pulse Pulse number.
         * @param run Run Number.
         * @param user User name
         * @param tokamak Name of the machine
@@ -271,26 +271,26 @@
         * @return the database index to be used in subsequent get/put calls
         * @exception ALException is thrown if the database cannot be open.
         */
-        public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
+        public static int openEnv(int pulse, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
         {
         int pulseCtx = -1;
         String uri;
         try{ 
-        uri = Wrapper.alBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
+        uri = Wrapper.alBuildUriFromLegacyParameters(backendType, pulse, run, user, tokamak, version, options);
 	pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
         } catch(Exception exc) {
 	int fallback = fallbackBackend();
 	if (fallback != LowLevel.NO_BACKEND) {
         System.out.println("WARNING: the pulse file is not available with the backend " + Integer.toString(backendType) + ", now attempting to access it with the fallback backend " + Integer.toString(fallback));
 	try {
-        uri = Wrapper.alBuildUriFromLegacyParameters(fallback, shot, run, user, tokamak, version, options);
+        uri = Wrapper.alBuildUriFromLegacyParameters(fallback, pulse, run, user, tokamak, version, options);
 	pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
 	} catch (Exception exc2) {
-        throw new ALException("[al_begin_pulse_action]: Error opening pulse file: " + user + "/" + tokamak + "/" + version + "/" + shot + "/" + run + "/" + fallback + ":\n" + exc.getMessage());
+        throw new ALException("[al_begin_pulse_action]: Error opening pulse file: " + user + "/" + tokamak + "/" + version + "/" + pulse + "/" + run + "/" + fallback + ":\n" + exc.getMessage());
 	}
 	}		
 	}
-        imas.shot = shot;
+        imas.pulse = pulse;
         imas.run = run;
         imas.user = user;
         imas.tokamak = tokamak;
@@ -303,7 +303,7 @@
         /**
         * Creates a new database instance.
         *
-        * @param shot Shot number.
+        * @param pulse Pulse number.
         * @param run Run Number.
         * @param user User name
         * @param tokamak Name of the machine
@@ -311,15 +311,15 @@
         * @return the database index to be used in subsequent get/put calls
         * @exception ALException is thrown if the database cannot be open.
         */
-        public static int createEnv(int shot, int run, String user, String tokamak, String version)
+        public static int createEnv(int pulse, int run, String user, String tokamak, String version)
         throws ALException {
-        return createEnv(shot, run, user, tokamak, version, defaultBackend(), "");
+        return createEnv(pulse, run, user, tokamak, version, defaultBackend(), "");
         }
         
         /**
         * Creates a new database instance.
         *
-        * @param shot Shot number.
+        * @param pulse Pulse number.
         * @param run Run Number.
         * @param user User name
         * @param tokamak Name of the machine
@@ -329,15 +329,15 @@
         * @exception ALException is thrown if the database cannot be open.
         */
         public static int createEnv(
-        int shot, int run, String user, String tokamak, String version, String options)
+        int pulse, int run, String user, String tokamak, String version, String options)
         throws ALException {
-        return createEnv(shot, run, user, tokamak, version, defaultBackend(), options);
+        return createEnv(pulse, run, user, tokamak, version, defaultBackend(), options);
         }
         
         
         /**
         *Creates a new database instance.
-        * @param shot Shot number.
+        * @param pulse Pulse number.
         * @param run Run Number.
         * @param user User name
         * @param tokamak Name of the machine
@@ -347,14 +347,14 @@
         * @exception ALException is thrown if the database cannot be open.
         */
         
-        public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType) throws ALException
+        public static int createEnv(int pulse, int run, String user, String tokamak, String version, int backendType) throws ALException
         {
-        return createEnv(shot, run, user, tokamak, version, backendType, "");
+        return createEnv(pulse, run, user, tokamak, version, backendType, "");
         }
         
         /**
         *Creates a new database instance.
-        * @param shot Shot number.
+        * @param pulse Pulse number.
         * @param run Run Number.
         * @param user User name
         * @param tokamak Name of the machine
@@ -364,18 +364,18 @@
         * @return the database index to be used in subsequent get/put calls
         * @exception ALException is thrown if the database cannot be open.
         */
-        public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
+        public static int createEnv(int pulse, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
         {
         int pulseCtx = -1;
         
         try { 
-        String uri = Wrapper.alBuildUriFromLegacyParameters(backendType, shot, run, user, tokamak, version, options);
+        String uri = Wrapper.alBuildUriFromLegacyParameters(backendType, pulse, run, user, tokamak, version, options);
         pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.FORCE_CREATE_PULSE);
         } catch(Exception exc){
-        throw new ALException("[al_begin_uri_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ shot + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
+        throw new ALException("[al_begin_uri_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ pulse + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
         }
         
-        imas.shot = shot;
+        imas.pulse = pulse;
         imas.run = run;
         imas.user = user;
         imas.tokamak = tokamak;
@@ -397,9 +397,9 @@
         close(imas.pulseCtx);
         }
         
-        static public void close(int refIdx, String name, int shot, int run) throws ALException{
+        static public void close(int refIdx, String name, int pulse, int run) throws ALException{
         System.err.println(  "WARNING:\n"
-        + "\"int close(int refIdx, String name, int shot, int run)\"  is DEPRECATED.\n"
+        + "\"int close(int refIdx, String name, int pulse, int run)\"  is DEPRECATED.\n"
         + "Please use \"close()\" instead");
         close(refIdx);
         }
@@ -409,7 +409,7 @@
         try{
         LowLevel.al_close_pulse(refIdx, LowLevel.CLOSE_PULSE);
         } catch (Exception exc) {
-        throw new ALException("[al_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.shot + "/" + imas.run + ":\n" + exc.getMessage()  );
+        throw new ALException("[al_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.pulse + "/" + imas.run + ":\n" + exc.getMessage()  );
         } finally {
         if(refIdx >= 0)
         LowLevel.al_end_action(refIdx);
@@ -606,20 +606,20 @@
             * @param srcUser User of the source database
             * @param srcTokamak Tokamak of the source database
             * @param srcVersion Version of the source database
-            * @param srcShot Shot number of the source database
+            * @param srcPulse Pulse number of the source database
             * @param srcRun Run number of the source database
             * @param srcOccur The occurence of the IDS in the source database.
             * @param destUser User of the destination database
             * @param destTokamak Tokamak of the destination database
             * @param destVersion Version of the destination database
-            * @param destShot Shot number of the destination database
+            * @param destPulse Pulse number of the destination database
             * @param destRun Run number of the destination database
             * @param destOccur The occurence of the IDS in the destination database.
             * @exception ALException Issued when the operation fails for any reason.
             **/
-            public static void copyEnv(String srcUser, String srcTokamak, String srcVersion, int srcShot, int srcRun, int srcOccur, String destUser, String destTokamak, String destVersion, int destShot, int destRun, int destOccur) throws ALException
+            public static void copyEnv(String srcUser, String srcTokamak, String srcVersion, int srcPulse, int srcRun, int srcOccur, String destUser, String destTokamak, String destVersion, int destPulse, int destRun, int destOccur) throws ALException
             {
-            ALLowLevel.alCopyIdsEnv(srcTokamak, srcVersion, srcUser, srcShot, srcRun, srcOccur, destTokamak, destVersion, destUser, destShot, destRun, destOccur, "<xsl:value-of select="@name"/>");
+            ALLowLevel.alCopyIdsEnv(srcTokamak, srcVersion, srcUser, srcPulse, srcRun, srcOccur, destTokamak, destVersion, destUser, destPulse, destRun, destOccur, "<xsl:value-of select="@name"/>");
             }
             
             

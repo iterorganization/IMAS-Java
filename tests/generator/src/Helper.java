@@ -4,7 +4,7 @@ import imasjava.*;
 
 
 public class Helper {
-    private static final int TESTSHOT = 9999;
+    private static final int TESTPULSE = 9999;
     private static final int TESTRUN = 9999;
     private static final Random RANDOM = new Random();
     private static final String PRINTABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r";
@@ -58,7 +58,7 @@ public class Helper {
         String tokamak = Helper.getTokamak(); 
         String version = Helper.getDataVersion();
         
-        idx = imas.createEnv(TESTSHOT, TESTRUN, user, tokamak, version);
+        idx = imas.createEnv(TESTPULSE, TESTRUN, user, tokamak, version);
         
         return idx;
     }
@@ -68,7 +68,7 @@ public class Helper {
         String user = Helper.getUserName();
         String tokamak = Helper.getTokamak(); 
         String version =Helper.getDataVersion();
-        idx = imas.openEnv(TESTSHOT, TESTRUN, user, tokamak, version);
+        idx = imas.openEnv(TESTPULSE, TESTRUN, user, tokamak, version);
 
         return idx;
     }
