@@ -544,11 +544,11 @@
         return maxOccurences;
         }
 
-        public boolean isEmpty() {
-          if(    (this.ids_properties == null) 
-              || (    this.ids_properties.homogeneous_time != 0 
-                   &amp;&amp; this.ids_properties.homogeneous_time != 1
-                   &amp;&amp; this.ids_properties.homogeneous_time != 2)) {
+        public boolean isDefined() {
+          if(    (this.ids_properties != null) 
+              &amp;&amp; (    this.ids_properties.homogeneous_time == 0 
+                           || this.ids_properties.homogeneous_time == 1
+                           || this.ids_properties.homogeneous_time == 2) ) {
             return true;
 	  }
 
