@@ -832,6 +832,12 @@
     }
     public void put()  throws ALException
     {
+        <xsl:if test="not(./field[@name='time'])">
+        if (this.ids_properties.homogeneous_time != 2)
+        {
+          throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2.");
+        }
+        </xsl:if> 
         this.put(0);
     }
 
@@ -960,12 +966,11 @@ throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + "
             System.err.println("Warning: IDS '<xsl:value-of select="@name"/>' time mode 'independent'. PUTSLICE quits with no action.");
             return;
             }
-            <xsl:if test="(./field[@name='time'])">
+
             if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
             {
             throw new ALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
         }
-        </xsl:if>  
 
 
         /***   Checking homogeneous_time read from file   ***/
