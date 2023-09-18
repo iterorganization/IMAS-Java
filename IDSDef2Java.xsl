@@ -544,6 +544,10 @@
         return maxOccurences;
         }
 
+       /**
+        * Checks whether IDS was initialized or not.
+        * @return true in case ids_properties is initialized and homogenous_time is set to either 0, or 1, or 2
+        **/
         public boolean isDefined() {
           if(    (this.ids_properties != null) 
               &amp;&amp; (    this.ids_properties.homogeneous_time == 0 
