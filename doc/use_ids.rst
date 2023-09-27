@@ -38,5 +38,5 @@
 .. |tm_heterogeneous| replace:: :java:ref:`IDS_TIME_MODE_HETEROGENEOUS`
 .. |tm_independent| replace:: :java:ref:`IDS_TIME_MODE_INDEPENDENT`
 
-.. |ids_validate| replace:: `not implemented yet for Java`
+.. |ids_validate| replace:: :java:ref:`ids_validate`
 .. |validate_error| replace:: throws an error
