@@ -635,10 +635,11 @@
             **/
             public static void put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids)  throws ALException
             {
-              <xsl:if test="not(./field[@name='time'])">
+              <xsl:if test="@type='constant'">
               if(ids.ids_properties.homogeneous_time != 2)
               {
-                throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2.");
+                System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
+                ids.ids_properties.homogeneous_time = 2;
               }
               </xsl:if>  
             int iOccurrence = 0;
@@ -832,10 +833,11 @@
     }
     public void put()  throws ALException
     {
-        <xsl:if test="not(./field[@name='time'])">
-        if (this.ids_properties.homogeneous_time != 2)
+        <xsl:if test="@type='constant'">
+        if(this.ids_properties.homogeneous_time != 2)
         {
-          throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2.");
+          System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
+          this.ids_properties.homogeneous_time = 2;
         }
         </xsl:if> 
         this.put(0);
@@ -843,12 +845,13 @@
 
     public void put(int iOccurrence)  throws ALException
     {
-        <xsl:if test="not(./field[@name='time'])">
-        if (this.ids_properties.homogeneous_time != 2)
+        <xsl:if test="@type='constant'">
+        if(this.ids_properties.homogeneous_time != 2)
         {
-throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + " must have ids_properties/homogeneous_time = 2.");
+          System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
+          this.ids_properties.homogeneous_time = 2;
         }
-        </xsl:if>  
+        </xsl:if> 
         int pulseCtx = this.pulseCtx;
         int ctx = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
@@ -866,12 +869,7 @@ throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + "
             }
             
             
-            <xsl:if test="(./field[@name='time'])">
-            if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
-            {
-            throw new ALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
-            }
-            </xsl:if>  
+
             delete(iOccurrence);
             
             try{
@@ -915,7 +913,8 @@ throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + "
             public static void putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) throws ALException
             {
             <xsl:choose>
-              <xsl:when test="not(./field[@name='time'])">
+               <xsl:when test="@type='constant'">
+
                   put(pulseCtx, idsFullName, ids);
               </xsl:when>
               <xsl:otherwise> 
@@ -939,11 +938,13 @@ throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + "
             }
             public void putSlice(int iOccurrence) throws ALException
             {
-            <xsl:choose>
-              <xsl:when test="not(./field[@name='time'])">
-              put(iOccurrence);
-               </xsl:when>
-              <xsl:otherwise>
+            <xsl:if test="@type='constant'">
+            if(this.ids_properties.homogeneous_time != 2)
+            {
+              System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
+              this.ids_properties.homogeneous_time = 2;
+            }
+            </xsl:if>  
             int pulseCtx = this.pulseCtx;
             int ctx = -1;
             int aosCtx = -1;
@@ -967,10 +968,7 @@ throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + "
             return;
             }
 
-            if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
-            {
-            throw new ALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
-        }
+
 
 
         /***   Checking homogeneous_time read from file   ***/
@@ -1136,8 +1134,9 @@ throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + "
             public void getSlice(int iOccurrence, double time, int interpolMode) throws ALException
             {
             <xsl:choose>
-              <xsl:when test="not(./field[@name='time'])">
-              get(iOccurrence);
+                <xsl:when test="@type='constant'">
+                // for static IDSes only GET method is called
+	             this.get(iOccurrence);
               </xsl:when>
               <xsl:otherwise>
             int pulseCtx = this.pulseCtx;
@@ -1241,8 +1240,7 @@ throw new ALException("ERROR: Static IDS " +"<xsl:value-of select="@name"/>" + "
             <xsl:apply-templates select = "field" mode = "RESET"/>
             }
             
-          </xsl:otherwise>
-        </xsl:choose>
+
         
         
         
