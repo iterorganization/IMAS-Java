@@ -833,25 +833,11 @@
     }
     public void put()  throws ALException
     {
-        <xsl:if test="@type='constant'">
-        if(this.ids_properties.homogeneous_time != 2)
-        {
-          System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
-          this.ids_properties.homogeneous_time = 2;
-        }
-        </xsl:if> 
         this.put(0);
     }
 
     public void put(int iOccurrence)  throws ALException
     {
-        <xsl:if test="@type='constant'">
-        if(this.ids_properties.homogeneous_time != 2)
-        {
-          System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
-          this.ids_properties.homogeneous_time = 2;
-        }
-        </xsl:if> 
         int pulseCtx = this.pulseCtx;
         int ctx = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
@@ -867,7 +853,13 @@
             System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
             return;
             }
-            
+             <xsl:if test="@type='constant'">
+            if(this.ids_properties.homogeneous_time != 2)
+            {
+              System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
+              this.ids_properties.homogeneous_time = 2;
+            }
+            </xsl:if>       
             
 
             delete(iOccurrence);
