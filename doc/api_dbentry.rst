@@ -15,14 +15,14 @@
         :return: Opened data entry context
         :example: See :ref:`Open an existing IMAS Database Entry`.
 
-    .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version)
-    .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version, String options)
-    .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType)
-    .. java:method:: public static int openEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
+    .. java:method:: public static int openEnv(int pulse, int run, String user, String tokamak, String version)
+    .. java:method:: public static int openEnv(int pulse, int run, String user, String tokamak, String version, String options)
+    .. java:method:: public static int openEnv(int pulse, int run, String user, String tokamak, String version, int backendType)
+    .. java:method:: public static int openEnv(int pulse, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
 
         Open the Data Entry defined by the provided parameters.
 
-        :param int shot: Shot number
+        :param int pulse: Pulse number
         :param int run: Run number
         :param String user: User name
         :param String tokamak: Tokamak name, also known as Database name
@@ -33,14 +33,14 @@
         :param String options: Backend specific options
         :return: Opened data entry context
 
-    .. java:method:: public static int createEnv(int shot, int run, String user, String tokamak, String version)
-    .. java:method:: public static int createEnv(int shot, int run, String user, String tokamak, String version, String options)
-    .. java:method:: public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType)
-    .. java:method:: public static int createEnv(int shot, int run, String user, String tokamak, String version, int backendType, String options)
+    .. java:method:: public static int createEnv(int pulse, int run, String user, String tokamak, String version)
+    .. java:method:: public static int createEnv(int pulse, int run, String user, String tokamak, String version, String options)
+    .. java:method:: public static int createEnv(int pulse, int run, String user, String tokamak, String version, int backendType)
+    .. java:method:: public static int createEnv(int pulse, int run, String user, String tokamak, String version, int backendType, String options)
 
         Create the Data Entry defined by the provided parameters.
 
-        :param int shot: Shot number
+        :param int pulse: Pulse number
         :param int run: Run number
         :param String user: User name
         :param String tokamak: Tokamak name, also known as Database name

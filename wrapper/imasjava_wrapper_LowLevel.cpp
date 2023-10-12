@@ -201,7 +201,7 @@ extern "C" {
  * Signature: (IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
  JNIEXPORT jstring JNICALL Java_imasjava_wrapper_LowLevel_al_1build_1uri_1from_1legacy_1parameters
-  (JNIEnv *env, jclass jWrapperClass, jint jBackendId, jint jShot, jint jRun, jstring jUser, jstring jTokamak, jstring jVersion, jstring jOptions)
+  (JNIEnv *env, jclass jWrapperClass, jint jBackendId, jint jPulse, jint jRun, jstring jUser, jstring jTokamak, jstring jVersion, jstring jOptions)
 {
     al_status_t al_status;
 
@@ -212,7 +212,7 @@ extern "C" {
     char *uri;
 
     // - - - - - - - - - - AL LowLevel method call - - - - - - - - - - - -
-    al_status = al_build_uri_from_legacy_parameters(jBackendId, (int)jShot, (int)jRun, user, tokamak, version, options, &uri);
+    al_status = al_build_uri_from_legacy_parameters(jBackendId, (int)jPulse, (int)jRun, user, tokamak, version, options, &uri);
 
     if (al_status.code < 0)
         raiseLowLevelException( env, al_status);

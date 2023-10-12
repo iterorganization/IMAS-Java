@@ -84,7 +84,7 @@ public class LowLevel {
   /**
      Builds an URI from legacy parameters.
      @param[in] backendID name/ID of the back-end
-     @param[in] shot shot number
+     @param[in] pulse pulse number
      @param[in] run run number
      @param[in] user username [_optional, "" for default_]
      @param[in] tokamak tokamak name
@@ -93,7 +93,7 @@ public class LowLevel {
      @return uri
 
   int al_build_uri_from_legacy_parameters(final int backendID, 
-			     const int shot, 
+			     const int pulse,
 			     const int run, 
 			     const char *user, 
 			     const char *tokamak, 
@@ -102,7 +102,7 @@ public class LowLevel {
                  char* uri) throws ALException;
   */
   public static native String al_build_uri_from_legacy_parameters(final int backendID, 
-			     final int shot, 
+			     final int pulse,
 			     final int run, 
 			     final String user, 
 			     final String tokamak, 

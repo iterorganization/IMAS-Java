@@ -27,6 +27,15 @@ IDS API
         :return: The loaded IDS
         :example: .. literalinclude:: code_samples/dbentry_get
 
+    .. java:method:: public boolean isDefined()
+        
+        Checks whether IDS was initialized or not.
+        
+        This method returns true in case `ids_properties` field inside `IDS` is initialized and `homogenous_time` is set to either `0`, or `1`, or `2`
+
+        :return: `true` in case `IDS` is already initialized, `false` otherwise
+        :example: .. literalinclude:: code_samples/ids_is_defined
+
     .. java:method:: public static ids_type getSlice(int pulseCtx, String idsFullName, double time, int interpolMode)
 
         Read a single time slice from an IDS in this Database Entry.
