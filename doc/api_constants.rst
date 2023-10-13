@@ -127,3 +127,57 @@ IMAS constants
         opens it at the same time.
 
 
+.. java:package:: imasjava
+
+Version constants
+-----------------
+
+.. java:type:: public class imas
+    :noindex:
+
+    .. java:method:: public static String get_al_version()
+
+        Get the Access Layer low-level version.
+
+        Returns the version string of the low-level component of the Access
+        Layer, for example ``"5.1.0"``.
+
+    .. java:field:: public final static String al_java_version
+
+        Get the version string of the Java Access Layer library, for
+        example ``'5.1.0'``.
+
+    .. java:field:: public static final int al_java_major_version
+
+        Get the major version of the Java Access Layer library, for example
+        ``5``.
+
+    .. java:field:: public static final int al_java_minor_version
+
+        Get the minor version of the Java Access Layer library, for example
+        ``1``.
+        
+    .. java:field:: public static final int al_java_patch_version
+
+        Get the patch version of the Java Access Layer library, for example
+        ``0``.
+
+    .. java:field:: public static final String al_dd_version
+
+        Get the version string of the Data Dictionary definitions that are used,
+        for example ``'3.39.0'``.
+
+    .. java:field:: public static final int al_dd_major_version
+
+        Get the major version of the Data Dictionary definitions that are used,
+        for example ``3``.
+
+    .. java:field:: public static final int al_dd_minor_version
+
+        Get the minor version of the Data Dictionary definitions that are used,
+        for example ``39``.
+
+    .. java:field:: public static final int al_dd_patch_version
+
+        Get the patch version of the Data Dictionary definitions that are used,
+        for example ``0``.
