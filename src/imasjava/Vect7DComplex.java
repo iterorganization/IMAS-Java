@@ -138,7 +138,7 @@ public class Vect7DComplex extends VectComplex {
    *
    * @param array row-major ordered array
    */
-  public void set(Complex[][][][][][] array) {
+  public void set(Complex[][][][][][][] array) {
     for (int i = 0; i < dim1; i++) {
       for (int p = 0; p < dim2; p++) {
         for (int q = 0; q < dim3; q++) {
