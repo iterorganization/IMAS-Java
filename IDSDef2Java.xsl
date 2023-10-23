@@ -635,13 +635,6 @@
             **/
             public static void put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids)  throws ALException
             {
-              <xsl:if test="@type='constant'">
-              if(ids.ids_properties.homogeneous_time != 2)
-              {
-                System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
-                ids.ids_properties.homogeneous_time = 2;
-              }
-              </xsl:if>  
             int iOccurrence = 0;
             
             /*     System.err.println("WARNING:\n"
