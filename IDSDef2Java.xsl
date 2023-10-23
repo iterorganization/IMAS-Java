@@ -884,14 +884,15 @@
             System.err.println("Warning: IDS <xsl:value-of select="@name"/> is found to be EMPTY (homogeneous_time undefined). PUT quits with no action.");
             return;
             }
-            
-            
-            
-            if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
+             <xsl:if test="@type='constant'">
+            if(this.ids_properties.homogeneous_time != 2)
             {
-            throw new ALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
+              System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
+              this.ids_properties.homogeneous_time = 2;
             }
+            </xsl:if>       
             
+
             delete(iOccurrence);
             
             try{
@@ -934,7 +935,12 @@
             **/
             public static void putSlice(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) throws ALException
             {
-            
+            <xsl:choose>
+               <xsl:when test="@type='constant'">
+
+                  put(pulseCtx, idsFullName, ids);
+              </xsl:when>
+              <xsl:otherwise> 
             int iOccurrence = 0;
             /*
             System.err.println("WARNING:\n"
@@ -950,10 +956,18 @@
             
             ids.setPulseCtx(pulseCtx);
             ids.putSlice(iOccurrence);
-            
+              </xsl:otherwise>
+            </xsl:choose>
             }
             public void putSlice(int iOccurrence) throws ALException
             {
+            <xsl:if test="@type='constant'">
+            if(this.ids_properties.homogeneous_time != 2)
+            {
+              System.out.println("AL warning: ids_properties/homogeneous_time has been set to 2 for the constant IDS <xsl:value-of select="@name"/>, please check the program which has filled this IDS since this is the mandatory value for a constant IDS");
+              this.ids_properties.homogeneous_time = 2;
+            }
+            </xsl:if>  
             int pulseCtx = this.pulseCtx;
             int ctx = -1;
             int aosCtx = -1;
@@ -976,11 +990,8 @@
             System.err.println("Warning: IDS '<xsl:value-of select="@name"/>' time mode 'independent'. PUTSLICE quits with no action.");
             return;
             }
-            
-            if(idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1)))
-            {
-            throw new ALException("ERROR: Time vector of homogeneous IDS '<xsl:value-of select="@name"/>' cannot be EMPTY!.");
-        }
+
+
 
 
         /***   Checking homogeneous_time read from file   ***/
@@ -1012,9 +1023,11 @@
             if(ctx >= 0)
             LowLevel.al_end_action(ctx);
             }
+              </xsl:otherwise>
+            </xsl:choose>
             }
             
-            
+
             public void putSliceRootFields(int ctx, int idsTimeMode, String idsFullName) throws ALException
             {
             int aosCtx = -1;
@@ -1027,12 +1040,12 @@
               <xsl:with-param name="dynamic_only" select="'yes'"/>
             </xsl:apply-templates>
             }
+
             
             
             
             
-            
-            
+
             /* ------------------------------------------------------------------------------------------------------------ */
             /* -----------------------------------       GET       ------------------------------------------------------- */  
             /* ------------------------------------------------------------------------------------------------------------ */
@@ -1114,6 +1127,11 @@
             **/
             public static imas.<xsl:value-of select="@name"/>  getSlice(int pulseCtx, String idsFullName, double time, int interpolMode) throws ALException
             {
+              <xsl:choose>
+                <xsl:when test="not(./field[@name='time'])">
+              return get(pulseCtx, idsFullName);
+                </xsl:when>
+                <xsl:otherwise>
             imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
             int iOccurrence = 0;
             /*
@@ -1132,10 +1150,18 @@
             ids.getSlice(iOccurrence, time, interpolMode);
             
             return ids;
+              </xsl:otherwise>
+            </xsl:choose>
             
             }
             public void getSlice(int iOccurrence, double time, int interpolMode) throws ALException
             {
+            <xsl:choose>
+                <xsl:when test="@type='constant'">
+                // for static IDSes only GET method is called
+	             this.get(iOccurrence);
+              </xsl:when>
+              <xsl:otherwise>
             int pulseCtx = this.pulseCtx;
             int ctx = -1;
             String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
@@ -1159,11 +1185,14 @@
             if(ctx >= 0)
             LowLevel.al_end_action(ctx);
             }
+              </xsl:otherwise>
+            </xsl:choose>
             }
             
             
             public void getSliceRootFields(int ctx, int idsTimeMode) throws ALException
             {
+
             int aosCtx = -1;
             int arraySize = -1;
             
@@ -1171,7 +1200,6 @@
             String strNodePath;
             
             <xsl:apply-templates select="field" mode="GET_SINGLE"/>
-            
             }
             
             /* ------------------------------------------------------------------------------------------------------------ */
@@ -1235,8 +1263,7 @@
             <xsl:apply-templates select = "field" mode = "RESET"/>
             }
             
-          </xsl:otherwise>
-        </xsl:choose>
+
         
         
         
@@ -1378,6 +1405,11 @@
         /* ____________________________________________________________________________________________________________  */
         public void putSlice(int ctx, int idsTimeMode, String idsFullName)  throws ALException
         {
+         <xsl:choose>
+          <xsl:when test="not(./field[@name='time'])">
+            put(ctx, idsTimeMode, idsFullName);
+          </xsl:when>
+          <xsl:otherwise>
         String strTimeBasePath = null;
         String strNodePath = null;
         int arraySize = -1;
@@ -1387,10 +1419,12 @@
         <xsl:apply-templates select="field" mode="PUT_SINGLE">
           <xsl:with-param name="dynamic_only" select="'yes'"/>
         </xsl:apply-templates>
+          </xsl:otherwise>
+        </xsl:choose>    
         }       
-        
+    
       </xsl:if>
-      
+
       
       
       /* ____________________________________________________________________________________________________________  */
@@ -1415,12 +1449,19 @@
       /* ____________________________________________________________________________________________________________  */
       public void getSlice(int ctx, int idsTimeMode)   throws ALException
       {
+      <xsl:choose>
+        <xsl:when test="not(./field[@name='time'])">
+      get(ctx, idsTimeMode);
+        </xsl:when>
+        <xsl:otherwise>
       String strTimeBasePath = null;
       String strNodePath = null;
       int arraySize = -1;
       int aosCtx = -1;
       
       <xsl:apply-templates select = "field" mode = "GET_SINGLE"/> 
+        </xsl:otherwise>
+      </xsl:choose>
       }   
       
       
@@ -1428,7 +1469,7 @@
         /* ____________________________________________________________________________________________________________  */
         /* ________________________________________       DELETE     ___________________________________________________ */  
         /* ____________________________________________________________________________________________________________  */ 
-        
+
         public void delete(int ctx) throws ALException
         {
         String strNodePath = null;
