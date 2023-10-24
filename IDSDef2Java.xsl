@@ -110,9 +110,128 @@
         public static String user;
         public static String tokamak;
         public static String version;
-        public static int pulse;
-        public static int run;
-        
+        public static int pulse; 
+	public static int run;
+
+  /**
+  * Methods returning true if the object obj is allocated and of size different to 0. False otherwise.
+  *
+  * @param dim The dimension that is checked.
+  * @param obj Object of the possible coordinates.
+  * @return False if the size is validated.
+  */
+	public static boolean check_possible_coordinate(int dim, Object obj) {
+          boolean check = false;
+          java.lang.reflect.Method method;
+          if (obj == null) return false;
+          else {
+            try {
+            method = obj.getClass().getMethod("getDim",int.class);
+            } catch (SecurityException e) { return true; }
+              catch (NoSuchMethodException e) {method=null;}
+            if (method != null) {
+            try {
+	    	  int size = (int) method.invoke(obj,dim);
+                  if (size != 0) check = true;
+            } catch (IllegalArgumentException e) { return true; }
+              catch (IllegalAccessException e) { return true; }
+              catch (InvocationTargetException e) { return true; }
+            } else {
+            if (((Object[])obj).length != 0) check = true;
+            }
+          }
+          return check;
+          }
+
+          /**
+          * Methods returning false if the coordinate is verified. True otherwise.
+          *
+          * @param arraySize Size of the dimension to check.
+          * @param dim The dimension that is checked.
+          * @param objs Object list of the possible coordinates.
+          * @return False if the size is validated.
+          */
+        public static boolean validate_possible_coordinates(int arraySize, int dim, Object... objs) {
+            boolean error = true; 
+            java.lang.reflect.Method method;
+            for (Object s : objs) {
+                if (s != null) {
+                  try {
+                  method = s.getClass().getMethod("getDim",int.class);
+                  } catch (SecurityException e) { return true; }
+                    catch (NoSuchMethodException e) {method=null;}
+                  if (method != null) {
+                  try {
+		        int size = (int) method.invoke(s,dim);
+                        if (arraySize == size) error = false;
+                  } catch (IllegalArgumentException e) { return true; }
+                    catch (IllegalAccessException e) { return true; }
+                    catch (InvocationTargetException e) { return true; } 
+                  } else {
+                  if (arraySize == ((Object[])s).length) error = false;
+                  }
+                }
+            }
+            return error;
+        }
+
+	/**
+        * Coordinate validation method.
+        *
+        * @param arraySize Size of the dimension to check.
+        * @param dim The dimension that is checked.
+        * @param name The name of the object that we want to check the dim dimension size.
+        * @param objdim The target dimension of the coordinate.
+        * @param coordinates The targets names
+        * @param fixedcoord True if a fixed size is allowed. False if not
+        * @param fixeddim Eventual allowed fixed size. set to 0 if fixedcoord = false.
+        * @param objs Object list of the possible coordinates.
+        * @return void
+        * @exception ValidationException is thrown if the coordinate is wrong.
+        */
+        public static void validate_coordinate(int arraySize, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
+        {
+
+          boolean check = true;
+          boolean error = true;
+          int i = 0;
+
+          // We check all the possible coordinates allocation
+
+          for (Object s : objs) {
+	  if (check_possible_coordinate( objdim, s))  i = i + 1;
+	  }
+
+          if (i!=1) { 
+            check = false;
+          } 
+
+          // If more of one alternatives coordinates is allocated we raise an exception
+
+          if (i&gt;1) { 
+            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+(dim+1)+") ("+arraySize+"). Exactly one of the possible coordinate must be allocated. ("+coordinates+")");
+          }
+
+          // We check all the possible coordinates (one is allocated)
+
+
+          if(check) {
+            error = imas.validate_possible_coordinates(arraySize, objdim ,objs);
+          }
+
+          // Last chance: possible alternative fixed size?
+
+          if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
+            error = false; 
+          }
+
+          // The size of the target dimension not validated - we raise an error
+            
+          if (error) { 
+	  throw new ValidationException("Wrong dimension "+(dim+1)+" for "+name+" ("+arraySize+"). ("+coordinates+")");
+	  }
+
+        }
         
         public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException {
         Class ids = ImasReflection.getIdsClass(idsName);
@@ -174,9 +293,9 @@
 
 	public static int defaultBackend() 
 	{
-	int backend = LowLevel.MDSPLUS_BACKEND;
-	String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
-	if (backend_value != null)
+  int backend = LowLevel.MDSPLUS_BACKEND;
+  String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
+  if (backend_value != null)
         backend = Integer.parseInt(backend_value);
 	return backend;
 	}
@@ -674,13 +793,13 @@
             public static void put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids)  throws ALException
             {
             int iOccurrence = 0;
-            
+           
             /*     System.err.println("WARNING:\n"
             + "\"put(int pulseCtx, String idsFullName, imas.<xsl:value-of select="@name"/> ids) \"  is DEPRECATED.\n"
             + "Please use \"put()\" instead");
             */
             //<xsl:value-of select="@name"/>_IDSBase.setIdsTime(ids.time);
-            
+                        
             if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
             {
             String tokens[] = idsFullName.split("/");
@@ -872,8 +991,13 @@
         int pulseCtx = this.pulseCtx;
         int ctx = -1;
         String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
- 
 
+        String disableValidation;
+            
+        disableValidation = System.getenv("IMAS_AL_DISABLE_VALIDATE");
+
+        if (disableValidation == null || !disableValidation.equals("1")) validate();
+ 
         int idsTimeMode = this.ids_properties.homogeneous_time;
 
         if(iOccurrence > 0)
@@ -975,6 +1099,12 @@
             String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
             int storedTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
             int idsTimeMode = this.ids_properties.homogeneous_time;
+
+            String disableValidation;
+            
+            disableValidation = System.getenv("IMAS_AL_DISABLE_VALIDATE");
+
+            if (disableValidation == null || !disableValidation.equals("1")) validate();
             
             if(iOccurrence > 0)
             idsFullName = idsFullName + "/" + iOccurrence;
@@ -1339,11 +1469,40 @@
         </xsl:apply-templates>
         System.out.println("******************");
         }
-        
+
+        public void validate() throws ValidationException
+      {
+        int idsTimeMode = this.ids_properties.homogeneous_time;;
+        int idsTimeSize = 0;
+
+        if (idsTimeMode != LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp;
+            idsTimeMode != LowLevel.IDS_TIME_MODE_HETEROGENEOUS &amp;&amp;
+            idsTimeMode != LowLevel.IDS_TIME_MODE_INDEPENDENT) {
+              throw new ValidationException("ids_properties.homogeneous_time wrong value ("+idsTimeMode+")");
+        }
+
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1))) { 
+              throw new ValidationException("With the time mode 'HOMOGENEOUS', the time array must be allocated and not be empty.");
+        }
+
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) idsTimeSize = this.time.getDim();
+  
+
+        <xsl:apply-templates select = "field" mode = "VALIDATE_CHILD"/>
+        <xsl:apply-templates select="field[@data_type='struct_array']" mode="VALIDATE_CHILD_1D"/>
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_1D"/>
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_2D"/>
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_3D"/>
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_4D"/>
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_5D"/>
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_6D"/>
+        <xsl:apply-templates select="field" mode="VALIDATE_CHILD_FIXED_SIZE"/>
+      }
         
         <xsl:apply-templates select=".//field[@data_type='structure' or @data_type='struct_array']"/>
         
-        }
+       }
+      
       </xsl:result-document>
     </xsl:template>
     
@@ -1502,11 +1661,64 @@
       <xsl:apply-templates select = "field" mode = "DUMP"/>
       System.out.println("******************");
       }
-      
+
+      /* ____________________________________________________________________________________________________________  */
+      /* ___________________________________        VALIDATE      ________________________________________________________ */  
+      /* ____________________________________________________________________________________________________________  */
+      public void validate(int idsTimeMode, int idsTimeSize ) throws ValidationException
+      {
+        // validate definition <xsl:value-of select="@path"/>
+        <!-- validation logic  -->
+        <xsl:apply-templates select = "field" mode = "VALIDATE_CHILD"/>
+
+        <!-- 1D field coordinate validation -->
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_1D"/>
+
+        <!-- 2D field coordinate validation -->
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_2D"/>
+
+        <!-- 3D+ field coordinate validation -->
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_3D"/>
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_4D"/> 
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_5D"/>
+        <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_6D"/>
+        <!-- FIXED_SIZE field coordinate validation -->
+        <xsl:apply-templates select="field" mode="VALIDATE_CHILD_FIXED_SIZE"/>
+      }
       }
       
       /* ____________________________________________________________________________________________________________  */
     </xsl:template>
+    
+<xsl:template match="field" mode="VALIDATE_CHILD">
+    <xsl:choose>
+      <xsl:when test="@data_type='structure'">
+  // Validation of <xsl:value-of select = "@path"/>
+        try{
+        this.<xsl:value-of select="@name"/>.validate(idsTimeMode, idsTimeSize );
+        }
+        catch (ValidationException ve) {
+          throw new ValidationException("Error with <xsl:value-of select = "@path"/>.\n\r"+ve.getMessage());
+        }
+      </xsl:when>
+      <xsl:when test="@data_type='struct_array'">
+        if (!(this.<xsl:value-of select = "@name"/>==null)) {
+          int arraySize = this.<xsl:value-of select = "@name"/>.length;
+          // Validation of <xsl:value-of select = "@path"/>
+          for(int i = 0; i &lt;arraySize; i++)
+          {
+            try {
+              if (this.<xsl:value-of select = "@name"/>[i] != null)
+                this.<xsl:value-of select = "@name"/>[i].validate(idsTimeMode, idsTimeSize );
+            }
+            catch (ValidationException ve) {
+              throw new ValidationException("Error with <xsl:value-of select = "@path"/>["+i+"].\n\r"+ve.getMessage());
+            }
+          }
+        }
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
     
     <!-- ============================================================= SUBCLASS == 'structure' type element - END ============================================================== -->
     
@@ -2287,6 +2499,1054 @@
       
       <xsl:value-of select="replace($elementPath,concat($AoSPath,'/'),'')"/>
     </xsl:template>
+
+    <xsl:template match="IDS" mode="VALIDATE_DESCENDANT_1D">
+    <xsl:apply-templates select=".//field[@data_type='struct_array' or  @data_type='flt_1d_type' or @data_type='FLT_1D'
+    or @data_type='int_1d_type' or @data_type='INT_1D'
+    or @data_type='cpx_1d_type' or @data_type='CPX_1D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'0'"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_1D">
+    <xsl:apply-templates select="descendant-or-self::field[@data_type='struct_array' or  @data_type='flt_1d_type' or @data_type='FLT_1D'
+    or @data_type='int_1d_type' or @data_type='INT_1D'
+    or @data_type='cpx_1d_type' or @data_type='CPX_1D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="@path_doc"/>
+    <xsl:with-param name="dimension" select="'0'"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="IDS" mode="VALIDATE_DESCENDANT_2D">
+    <xsl:apply-templates select=".//field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'0'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'1'"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_2D">
+    <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D']" mode="VALIDATE_DESCENDANT_SINGLE_2D">
+    <xsl:with-param name="currpath" select="@path_doc"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="IDS" mode="VALIDATE_DESCENDANT_3D">
+    <xsl:apply-templates select=".//field[@data_type='FLT_3D' or @data_type='INT_3D' or @data_type='CPX_3D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'0'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_3D' or @data_type='INT_3D' or @data_type='CPX_3D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'1'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_3D' or @data_type='INT_3D' or @data_type='CPX_3D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'2'"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_3D">
+    <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_3D' or @data_type='INT_3D' or @data_type='CPX_3D']" mode="VALIDATE_DESCENDANT_SINGLE_3D">
+    <xsl:with-param name="currpath" select="@path_doc"/>
+    </xsl:apply-templates>
+    </xsl:template>  
+
+    <xsl:template match="IDS" mode="VALIDATE_DESCENDANT_4D">
+    <xsl:apply-templates select=".//field[@data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'0'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'1'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'2'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'3'"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_4D">
+    <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D']" mode="VALIDATE_DESCENDANT_SINGLE_4D">
+    <xsl:with-param name="currpath" select="@path_doc"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="IDS" mode="VALIDATE_DESCENDANT_5D">
+    <xsl:apply-templates select=".//field[@data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'0'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'1'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'2'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'3'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'4'"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_5D">
+    <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D']" mode="VALIDATE_DESCENDANT_SINGLE_5D">
+    <xsl:with-param name="currpath" select="@path_doc"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="IDS" mode="VALIDATE_DESCENDANT_6D">
+    <xsl:apply-templates select=".//field[@data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'0'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'1'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'2'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'3'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'4'"/>
+    </xsl:apply-templates>
+    <xsl:apply-templates select=".//field[@data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D']" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:with-param name="currpath" select="''"/>
+    <xsl:with-param name="dimension" select="'5'"/>
+    </xsl:apply-templates>
+    </xsl:template>
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_6D">
+    <xsl:apply-templates select="descendant-or-self::field[@data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D']" mode="VALIDATE_DESCENDANT_SINGLE_6D">
+    <xsl:with-param name="currpath" select="@path_doc"/>
+    </xsl:apply-templates>
+    </xsl:template> 
+
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_2D">
+      <xsl:param name="currpath"/>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'0'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'1'"/>
+      </xsl:apply-templates>
+    </xsl:template>
+
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_3D">
+      <xsl:param name="currpath"/>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'0'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'1'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'2'"/>
+      </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_4D">
+      <xsl:param name="currpath"/>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'0'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'1'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'2'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'3'"/>
+      </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_5D">
+      <xsl:param name="currpath"/>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'0'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'1'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'2'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'3'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'4'"/>
+      </xsl:apply-templates>
+    </xsl:template> 
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_6D">
+      <xsl:param name="currpath"/>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'0'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'1'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'2'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'3'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'4'"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="'5'"/>
+      </xsl:apply-templates>
+    </xsl:template> 
+
+    <!-- write the check statements to check the <dimension> of the current field -->
+    <!-- <currpath> is the deeper comon ancestor of the reference coordinate and the current field -->
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE">
+    <xsl:param name="currpath"/>
+    <xsl:param name="dimension"/>
+    <!-- target field coordinate we want to check (specific and relative coordinate) -->
+    <xsl:variable name="coord">
+    <xsl:apply-templates select="." mode="get_coordinate">
+      <xsl:with-param name="dimension" select="$dimension"/>
+    </xsl:apply-templates>
+    </xsl:variable >
+    <!-- target field dimension we want to check -->
+    <xsl:variable name="targetdim">
+    <xsl:apply-templates select="." mode="get_targetdim">
+      <xsl:with-param name="dimension" select="$dimension"/>
+    </xsl:apply-templates>
+    </xsl:variable >
+    <!-- variable to check if the specified coordinate is present or not. 
+    this variable is a safeguard that prevents wrong code generation-->
+    <xsl:variable name="ispresent">
+      <xsl:choose>
+      <xsl:when test="$currpath='' and not($coord='') and not(contains($coord, '1...'))">
+          <xsl:value-of select="'yes'"/>
+      </xsl:when>
+      <xsl:when test="contains($coord,'OR')">
+      <xsl:apply-templates select="ancestor::field[@path_doc = $currpath]" mode="ISPRESENT_PATH_DOC">
+        <xsl:with-param name="path_doc_to_check" select="substring-before($coord,' OR')"/>
+      </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="ancestor::field[@path_doc = $currpath]" mode="ISPRESENT_PATH_DOC">
+        <xsl:with-param name="path_doc_to_check" select="$coord"/>
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable >
+    <xsl:variable name="prefix" select="substring-before(@path_doc,concat('/',@name))"/>
+    <!-- find the relative coordinate from the current field path and the target field path -->
+    <xsl:variable name="relativecoord">
+    <xsl:if test="not($currpath='')">
+    <xsl:choose>
+      <xsl:when test="contains($coord,'OR')">
+        <xsl:value-of select="substring-after(substring-before($coord,'OR'),concat($currpath,'/'))"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="substring-after($coord,concat($currpath,'/'))"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:if>
+    <xsl:if test="$currpath=''">
+    <xsl:choose>
+      <xsl:when test="contains($coord,'OR')">
+        <xsl:value-of select="substring-before($coord,'OR')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$coord"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:if>
+    </xsl:variable >
+      <!-- find the relative coordinate from the current field path and the checked field -->
+    <xsl:variable name="relativepath">
+    <xsl:if test="not($currpath='')">
+        <xsl:value-of select="substring-after(concat($prefix,'/',@name),concat($currpath,'/'))"/>
+    </xsl:if>
+    <xsl:if test="$currpath=''">
+        <xsl:value-of select="$prefix"/>
+    </xsl:if>
+    </xsl:variable >
+    <xsl:variable name="child">
+      <xsl:choose>
+          <xsl:when test="contains($relativepath,'/')">
+          <xsl:value-of select="substring-before($relativepath,'/')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$relativepath"/>
+        </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable>
+    <!-- verify if the current field is the deeper common ancestor of the target coordinate field and the checked field -->
+    <xsl:variable name="test">
+      <xsl:choose>
+        <!-- validation logic: the time coordinate are passed by argument of each validation routines so no need to check if at level of IDS -->
+        <xsl:when test="(contains(@name,'/time') or contains($coord,'/time') or $coord='time' or contains($coord,'IDS:')) and $currpath=''">
+          <xsl:value-of select="''"/>
+        </xsl:when>
+        <xsl:when test="contains($relativecoord,'/')">
+          <xsl:value-of select="$child=substring-before($relativecoord,'/')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$child=$relativecoord"/>
+        </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable> 
+    <!-- missing IDS coordinate exception--> 
+    <xsl:if test="starts-with($coord,$currpath) and contains($ispresent,'yes')">
+      <xsl:if test="$test='false'">
+    // validation of <xsl:value-of select="@path"/> dimension <xsl:value-of select="number($dimension)"/>
+        <xsl:variable name="newpath">
+          <xsl:if test="not($currpath='')">
+            <xsl:value-of select="substring-after(@path,concat(ancestor::field[@path_doc = $currpath]/@path,'/'))"/>
+          </xsl:if>
+          <xsl:if test="$currpath=''">
+            <xsl:value-of select="@path"/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="root">
+          <xsl:if test="not($currpath='')">
+            <xsl:value-of select="concat($currpath,'/')"/>
+          </xsl:if>
+          <xsl:if test="$currpath=''">
+            <xsl:value-of select="concat($currpath,'/')"/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:apply-templates select="." mode="VALIDATE_PATH_SINGLE">
+        <xsl:with-param name="newpath" select="$newpath"/>
+        <xsl:with-param name="root" select="$root"/>
+        <xsl:with-param name="string" select="''"/>
+        <xsl:with-param name="dimension" select="$dimension"/>
+        <xsl:with-param name="coord" select="$coord"/>
+        <xsl:with-param name="targetdim" select="$targetdim"/>
+        </xsl:apply-templates>
+      </xsl:if>
+    </xsl:if>
+    </xsl:template>
+
+    <!-- return yes if some field exist like @path_doc equals to the parameter path_doc_to_check -->
+    <xsl:template match="field" mode="ISPRESENT_PATH_DOC">
+    <xsl:param name="path_doc_to_check"/>
+      <xsl:if test="descendant-or-self::field[contains(@path_doc,$path_doc_to_check)]">
+        <xsl:value-of select="'yes'"/>
+      </xsl:if >
+    </xsl:template> 
+    <!-- get the target coordinate (if 'as_parent' or not) -->
+    <xsl:template match="field" mode="get_coordinate">
+    <xsl:param name="dimension"/>
+    <xsl:variable name="string_coord">
+    <xsl:apply-templates select="." mode="get_coordinate_string">
+    <xsl:with-param name="dimension" select="$dimension"/>
+    </xsl:apply-templates>
+    </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="not($string_coord='1...N')">
+          <xsl:value-of select="$string_coord"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:template>
+
+
+    <xsl:template match="field" mode="get_coordinate_string">
+    <xsl:param name="dimension"/>
+      <xsl:choose>
+        <xsl:when test="$dimension='0'">
+          <xsl:if test="@coordinate1='1...N' and @coordinate1_same_as">
+          <xsl:value-of select="@coordinate1_same_as"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate1_same_as)">
+          <xsl:value-of select="@coordinate1"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='1'">
+          <xsl:if test="@coordinate2='1...N' and @coordinate2_same_as">
+          <xsl:value-of select="@coordinate2_same_as"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate2_same_as)">
+          <xsl:value-of select="@coordinate2"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='2'">
+          <xsl:if test="@coordinate3='1...N' and @coordinate3_same_as">
+          <xsl:value-of select="@coordinate3_same_as"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate3_same_as)">
+          <xsl:value-of select="@coordinate3"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='3'">
+          <xsl:if test="@coordinate4='1...N' and @coordinate4_same_as">
+          <xsl:value-of select="@coordinate4_same_as"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate4_same_as)">
+          <xsl:value-of select="@coordinate4"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='4'">
+          <xsl:if test="@coordinate5='1...N' and @coordinate5_same_as">
+          <xsl:value-of select="@coordinate5_same_as"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate5_same_as)">
+          <xsl:value-of select="@coordinate5"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='5'">
+          <xsl:if test="@coordinate6='1...N' and @coordinate6_same_as">
+          <xsl:value-of select="@coordinate6_same_as"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate6_same_as)">
+          <xsl:value-of select="@coordinate6"/>
+          </xsl:if>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:template>
+
+    <!-- get the target coordinate dimension-->
+    <xsl:template match="field" mode="get_targetdim">
+    <xsl:param name="dimension"/>
+      <xsl:choose>
+        <xsl:when test="$dimension='0'">
+          <xsl:if test="@coordinate1='1...N' and @coordinate1_same_as">
+          <xsl:value-of select="'0'"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate1='1...N') and not(@coordinate1_same_as)">
+          <xsl:value-of select="'0'"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='1'">
+          <xsl:if test="@coordinate2='1...N' and @coordinate2_same_as">
+          <xsl:value-of select="'1'"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate2='1...N') and not(@coordinate2_same_as)">
+          <xsl:value-of select="'0'"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='2'">
+          <xsl:if test="@coordinate3='1...N' and @coordinate3_same_as">
+          <xsl:value-of select="'2'"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate3='1...N') and not(@coordinate3_same_as)">
+          <xsl:value-of select="'0'"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='3'">
+          <xsl:if test="@coordinate4='1...N' and @coordinate4_same_as">
+          <xsl:value-of select="'3'"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate4='1...N') and not(@coordinate4_same_as)">
+          <xsl:value-of select="'0'"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='4'">
+          <xsl:if test="@coordinate5='1...N' and @coordinate5_same_as">
+          <xsl:value-of select="'4'"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate5='1...N') and not(@coordinate5_same_as)">
+          <xsl:value-of select="'0'"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$dimension='5'">
+          <xsl:if test="@coordinate6='1...N' and @coordinate6_same_as">
+          <xsl:value-of select="'5'"/>
+          </xsl:if>
+          <xsl:if test="not(@coordinate6='1...N') and not(@coordinate6_same_as)">
+          <xsl:value-of select="'0'"/>
+          </xsl:if>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="field" mode="VALIDATE_PATH_SINGLE">
+      <xsl:param name="newpath"/>
+      <xsl:param name="root"/>
+      <xsl:param name="string"/>
+      <xsl:param name="dimension"/>
+      <xsl:param name="coord"/>
+      <xsl:param name="targetdim"/>
+      <xsl:if test="contains($newpath,'/')">
+      <xsl:choose>
+        <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='structure'">
+          <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name" />
+          <xsl:apply-templates select="." mode="VALIDATE_PATH_SINGLE">
+          <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
+          <xsl:with-param name="root" select="$root"/>
+          <xsl:with-param name="string" select="concat($string,$act_struct,'.')"/>
+          <xsl:with-param name="dimension" select="$dimension"/>
+          <xsl:with-param name="coord" select="$coord"/>
+          <xsl:with-param name="targetdim" select="$targetdim"/>
+          </xsl:apply-templates>
+        </xsl:when>
+        <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='struct_array'">
+        <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name" />
+        <xsl:variable name="act_index" select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat($act_struct,'(')),')')"/>
+        if (!(this.<xsl:value-of select="$string"/><xsl:value-of select="$act_struct"/>==null)) {
+        for(int <xsl:value-of select="$act_index"/>=0; <xsl:value-of select="$act_index"/>&lt;this.<xsl:value-of select="$string"/><xsl:value-of select="$act_struct"/>.length; <xsl:value-of select="$act_index"/>++) {
+          if (!(this.<xsl:value-of select="$string"/><xsl:value-of select="$act_struct"/>[<xsl:value-of select="$act_index"/>]==null)) {
+          <xsl:apply-templates select="." mode="VALIDATE_PATH_SINGLE">
+          <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
+          <xsl:with-param name="root" select="$root"/>
+          <xsl:with-param name="string" select="concat($string,$act_struct,'[',$act_index,'].')"/>
+          <xsl:with-param name="dimension" select="$dimension"/>
+          <xsl:with-param name="coord" select="$coord"/>
+          <xsl:with-param name="targetdim" select="$targetdim"/>
+        </xsl:apply-templates>
+          }
+          }
+        }
+        </xsl:when>
+      </xsl:choose>
+      </xsl:if>
+
+      <xsl:variable name="istimeslice">
+      <xsl:if test="contains($coord,' OR')">
+      <xsl:if test="not($root='/')">
+        <xsl:if test="contains(substring-before(substring-after($coord,$root),' OR'),'(itime)')">
+          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
+            <xsl:value-of select="'yes'"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      <xsl:if test="$root='/'">
+        <xsl:if test="contains(substring-before($coord,' OR'),'(itime)')">
+          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
+            <xsl:value-of select="'yes'"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      </xsl:if>
+      <xsl:if test="not($root='/')">
+      <xsl:if test="not(contains($coord,' OR'))">
+        <xsl:if test="contains(substring-after($coord,$root),'(itime)')">
+          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
+            <xsl:value-of select="'yes'"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      </xsl:if>
+      <xsl:if test="$root='/'">
+      <xsl:if test="not(contains($coord,' OR'))">
+        <xsl:if test="contains($coord,'(itime)')">
+          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
+            <xsl:value-of select="'yes'"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      </xsl:if>
+      </xsl:variable>
+      <xsl:if test="not(contains($newpath,'/')) and not($istimeslice='yes')"> <!-- and ( (contains($string,'(itime)') and contains($coord,'(itime)')) or  (not(contains($string,'(itime)')) and not(contains($coord,'(itime)'))) )-->
+        <xsl:choose>
+        <xsl:when test="@data_type='struct_array'">
+       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
+        </xsl:when>
+        <xsl:otherwise>
+       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+        </xsl:otherwise>
+        </xsl:choose>
+        if (arraySize > 0) {
+        <xsl:if test="@type='dynamic' and contains($coord,'/time')">
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
+        </xsl:if>
+        <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
+          imas.validate_coordinate(arraySize,
+                                  <xsl:value-of select="number($dimension)"/>, 
+                                  "<xsl:value-of select="@path"/>",
+                                  <xsl:value-of select="number($targetdim)"/>,
+                                  "<xsl:value-of select="$coord"/>"
+                                  <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
+                                  <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>);
+      <xsl:if test="@type='dynamic' and contains($coord,'/time')">
+        }
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
+          if(arraySize != idsTimeSize) {
+            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be the size of time ("+idsTimeSize+")");
+          }
+        }
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT ) {
+          if(arraySize != 0) {
+            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. In INDEPENDENT time mode, it must be empty.");
+          }
+        }
+        </xsl:if>
+	}
+	}
+      </xsl:if> 
+      <xsl:if test="not(contains($newpath,'/')) and $istimeslice='yes'">
+      <xsl:if test="@type='dynamic' and contains($coord,'/time')">
+      <xsl:choose>
+      <xsl:when test="@data_type='struct_array'">
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+      int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
+      </xsl:when>
+      <xsl:otherwise>
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+      int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+      </xsl:otherwise>
+      </xsl:choose>
+      if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
+        if(arraySize != idsTimeSize) {
+          throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be the size of time ("+idsTimeSize+")");
+        }
+      }
+      if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
+        for (int itime = 1; itime&lt;arraySize;itime++) {
+            if (this.<xsl:value-of select="@name"/>[itime] != null) {
+              if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
+                throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. <xsl:value-of select="@name"/>[itime].time is invalid Must be the size of time ("+this.<xsl:value-of select="@name"/>[itime].time+").");
+              }
+            }
+          }
+        }
+      }
+	
+      </xsl:if>
+      </xsl:if>
+      </xsl:template> 
+
+      <xsl:template match='field' mode="possible-coordinates">
+      <xsl:param name="coord"/>
+      <xsl:param name="relativepathdoc"/>
+      <xsl:param name="self"/>
+      <xsl:if test="contains($coord,' OR')">
+        <xsl:variable name="target">
+          <xsl:if test="not($relativepathdoc='/')">
+            <xsl:value-of select="replace(substring-before(substring-after($coord,$relativepathdoc),' OR'),'/','.')"/>
+          </xsl:if>
+          <xsl:if test="$relativepathdoc='/'">
+              <xsl:value-of select="replace(substring-before($coord,' OR'),'/','.')"/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="resolved_target">
+        <xsl:apply-templates select="." mode="resolve_indices">
+          <xsl:with-param name="target" select="$target"/>
+          <xsl:with-param name="string-resolved" select="''"/>
+        </xsl:apply-templates>
+        </xsl:variable>
+      <xsl:if test="not(contains(substring-before($coord,' OR'),'1...'))">
+        ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
+      </xsl:if>
+      <xsl:apply-templates select="." mode="possible-coordinates">
+        <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
+        <xsl:with-param name="relativepathdoc" select="$relativepathdoc"/>
+        <xsl:with-param name="self" select="$self"/>
+      </xsl:apply-templates>
+      </xsl:if>
+      <xsl:if test="not(contains($coord,' OR'))">
+      <xsl:variable name="target">
+        <xsl:if test="not($relativepathdoc='/')">
+          <xsl:value-of select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
+        </xsl:if>
+        <xsl:if test="$relativepathdoc='/'">
+            <xsl:value-of select="replace($coord,'/','.')"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name="resolved_target">
+      <xsl:apply-templates select="." mode="resolve_indices">
+        <xsl:with-param name="target" select="$target"/>
+        <xsl:with-param name="string-resolved" select="''"/>
+      </xsl:apply-templates>
+      </xsl:variable>
+      <xsl:if test="not(contains($coord,'1...'))">
+          ,(Object) this.<xsl:value-of select="replace(replace($resolved_target,'\(','['),'\)',']')"/>
+      </xsl:if>
+      </xsl:if>
+      </xsl:template>
+
+       <xsl:template match='field' mode="check-target-indices">
+      <xsl:param name="coord"/>
+      <xsl:param name="relativepathdoc"/>
+      <xsl:if test="contains($coord,' OR')">
+        <xsl:variable name="target">
+          <xsl:if test="not($relativepathdoc='/')">
+            <xsl:value-of select="replace(substring-before(substring-after($coord,$relativepathdoc),' OR'),'/','.')"/>
+          </xsl:if>
+          <xsl:if test="$relativepathdoc='/'">
+              <xsl:value-of select="replace(substring-before($coord,' OR'),'/','.')"/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:apply-templates select="." mode="check_indices">
+            <xsl:with-param name="target" select="$target"/>
+            <xsl:with-param name="string-resolved" select="''"/>
+            <xsl:with-param name="string-error" select="''"/>
+        </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="check-target-indices">
+        <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
+        <xsl:with-param name="relativepathdoc" select="$relativepathdoc"/>
+      </xsl:apply-templates>
+      </xsl:if>
+      <xsl:if test="not(contains($coord,' OR'))">
+      <xsl:variable name="target">
+        <xsl:if test="not($relativepathdoc='/')">
+          <xsl:value-of select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
+        </xsl:if>
+        <xsl:if test="$relativepathdoc='/'">
+            <xsl:value-of select="replace($coord,'/','.')"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:apply-templates select="." mode="check_indices">
+            <xsl:with-param name="target" select="$target"/>
+            <xsl:with-param name="string-resolved" select="''"/>
+            <xsl:with-param name="string-error" select="''"/>
+        </xsl:apply-templates>
+      </xsl:if>
+      </xsl:template>
+
+      <xsl:template match='field' mode="check_indices">
+      <xsl:param name="target"/>
+      <xsl:param name="string-resolved"/>
+      <xsl:param name="string-error"/>
+      <xsl:if test="contains($target,'(')">
+        <xsl:variable name="indexstr">
+          <xsl:apply-templates select="." mode="get_indices">
+            <xsl:with-param name="target" select="$target"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+        <xsl:variable name="resolved_indexstr">
+        <xsl:if test="matches($indexstr, '^[0-9]+$')">
+          <xsl:value-of select="$indexstr"/>
+        </xsl:if>
+        <xsl:if test="matches($indexstr, '^itime|i[1-9]$')">
+          <xsl:value-of select="''"/>
+        </xsl:if>
+        <xsl:if test="not(matches($indexstr, '^[0-9]+$')) and not(matches($indexstr, '^itime|i[1-9]$'))">
+          <xsl:value-of select="concat('this.',$indexstr)"/>
+        </xsl:if>
+	</xsl:variable>
+  <xsl:variable name="indexid_str">
+    <xsl:if test="starts-with($target,'.')">  <xsl:value-of select="substring-before(substring-after($target,'.'),'(')"/>_id </xsl:if>
+    <xsl:if test="not(starts-with($target,'.'))">  <xsl:value-of select="substring-before($target,'(')"/>_id </xsl:if>
+  </xsl:variable>
+   <xsl:if test="$resolved_indexstr != ''">
+	  <xsl:if test="not(matches($resolved_indexstr, '^[0-9]+$'))">
+          if (<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>==LowLevel.EMPTY_INT) {
+            throw new ValidationException("<xsl:value-of select="replace(replace($resolved_indexstr,'\(','(&quot;+'),'\)','+&quot;)')"/> is not valid ("+LowLevel.EMPTY_INT+").");
+          }
+          </xsl:if>
+          String <xsl:value-of select="$indexid_str"/> =
+          <xsl:if test="matches($indexstr, '^[0-9]+$')">
+            Integer.toString(<xsl:value-of select="$resolved_indexstr"/>-1);
+          </xsl:if>
+          <xsl:if test="not(matches($indexstr, '^[0-9]+$')) and not(matches($indexstr, '^itime|i[1-9]$'))">
+            Integer.toString(Integer.valueOf(<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>)-1);
+          </xsl:if>
+	        if (<xsl:value-of select="replace(replace(concat('this.',$string-resolved,substring-before($target,'(')),'\(','['),'\)',']')"/>.length&lt;=<xsl:value-of select="replace(replace($resolved_indexstr,'\(','['),'\)',']')"/>-1) { 
+            throw new ValidationException("<xsl:value-of select="concat($string-error,replace(replace(concat(substring-before($target,concat($indexstr,')')), concat($indexid_str,')') ),'\(','(&quot;+'),'\)','+&quot;)'))"/> is not allocated.");
+          }
+        </xsl:if>
+        <xsl:apply-templates select="." mode="check_indices">
+            <xsl:with-param name="target" select="substring-after($target,concat($indexstr,')'))"/>
+            <xsl:with-param name="string-resolved" select="concat($string-resolved,substring-before($target,concat($indexstr,')')), concat(replace(replace(concat($resolved_indexstr,'-1'),'\(','['),'\)',']'),')') )"/>
+            <xsl:with-param name="string-error" select="concat($string-error,replace(replace(concat(substring-before($target,concat($indexstr,')')), concat($indexid_str,')') ),'\(','(&quot;+'),'\)','+&quot;)'))"/>
+          </xsl:apply-templates>
+      </xsl:if>      
+</xsl:template>
+
+      <xsl:template match='field' mode="resolve_indices">
+      <xsl:param name="target"/>
+      <xsl:param name="string-resolved"/>
+      <xsl:if test="contains($target,'(')">
+        <xsl:variable name="indexstr">
+          <xsl:apply-templates select="." mode="get_indices">
+            <xsl:with-param name="target" select="$target"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+        <xsl:variable name="resolved_indexstr">
+        <xsl:if test="matches($indexstr, '^[0-9]+$')">
+          <xsl:value-of select="concat($indexstr,'-1')"/>
+        </xsl:if>
+        <xsl:if test="matches($indexstr, '^itime|i[1-9]$')">
+          <xsl:value-of select="$indexstr"/>
+        </xsl:if>
+        <xsl:if test="not(matches($indexstr, '^[0-9]+$') or matches($indexstr, '^itime|i[1-9]$'))">
+          <xsl:value-of select="concat('this.',$indexstr,'-1')"/>
+        </xsl:if>
+	</xsl:variable>
+	<xsl:apply-templates select="." mode="resolve_indices">
+            <xsl:with-param name="target" select="substring-after($target,concat($indexstr,')'))"/>
+            <xsl:with-param name="string-resolved" select="concat($string-resolved,substring-before($target,concat($indexstr,')')), concat($resolved_indexstr,')'))"/>
+        </xsl:apply-templates>
+      </xsl:if>
+      <xsl:if test="not(contains($target,'('))">
+        <xsl:value-of select="concat($string-resolved, $target)"/>
+      </xsl:if>
+      </xsl:template>
+
+      <!-- the get_indices function return the sub-string between parenthesis
+            process(i1)/coordinate_index ===> i1
+            struct(process(i1)/coordinate_index)/substruc ===> process(i1)/coordinate_index
+      -->
+      <xsl:template match='field' mode="get_indices">
+      <xsl:param name="target"/>
+      <xsl:variable name="partialindex" select="substring-before(substring-after($target,'('),')')"/>
+      <xsl:if test="contains($partialindex,'(')">
+        <xsl:value-of select="concat($partialindex,')',substring-before(substring-after($target,concat($partialindex,')')),')'))"/>
+        <!-- <xsl:value-of select="concat($partialindex,substring-before(substring-after($target,concat($partialindex,')')),')'))"/> -->
+      </xsl:if>
+      <xsl:if test="not(contains($partialindex,'('))">
+        <xsl:value-of select="$partialindex"/>
+      </xsl:if>
+      </xsl:template>
+
+      <xsl:template match='field' mode="check-specific-coordinates">
+      <xsl:param name="coord"/>
+      <xsl:param name="relativepathdoc"/>
+      <xsl:param name="dimension"/>
+      <xsl:param name="self"/>
+      <xsl:if test="contains($coord,' OR')">
+            <xsl:variable name="target" select="replace(substring-before(substring-after($coord,$relativepathdoc),' OR'),'/','.')"/>
+            <xsl:if test="contains(substring-before($coord,' OR'),'1...')">
+              ,true, <xsl:value-of select="substring-after($coord,'1...')"/>
+            </xsl:if>
+      <xsl:apply-templates select="." mode="check-specific-coordinates">
+        <xsl:with-param name="coord" select="substring-after($coord,' OR')"/>
+        <xsl:with-param name="relativepathdoc" select="$relativepathdoc"/>
+        <xsl:with-param  name="dimension" select="$dimension"/>
+        <xsl:with-param  name="self" select="$self"/>
+      </xsl:apply-templates>
+      </xsl:if>
+      <xsl:if test="not(contains($coord,' OR'))">
+            <xsl:variable name="target" select="replace(substring-after($coord,$relativepathdoc),'/','.')"/>
+            <xsl:if test="contains($coord,'1...')">
+              ,true, <xsl:value-of select="substring-after($coord,'1...')"/>
+            </xsl:if>
+            <xsl:if test="not(contains($coord,'1...'))">
+              ,false, 0
+            </xsl:if>
+      </xsl:if>
+      </xsl:template>
+
+      <xsl:template match="field" mode="VALIDATE_CHILD_FIXED_SIZE">
+        <xsl:choose>
+          <xsl:when test="@data_type='struct_array' or @data_type='flt_1d_type' or @data_type='FLT_1D'
+              or @data_type='int_1d_type' or @data_type='INT_1D'
+              or @data_type='cpx_1d_type' or @data_type='CPX_1D'">
+
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate1"/>
+                <xsl:with-param name="dimension" select="'0'"/>
+              </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="@data_type='FLT_2D' or @data_type='INT_2D' or @data_type='CPX_2D'">
+
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate1"/>
+                <xsl:with-param name="dimension" select="'0'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate2"/>
+                <xsl:with-param name="dimension" select="'1'"/>
+              </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="@data_type='FLT_3D' or @data_type='INT_3D' or @data_type='CPX_3D'">
+
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate1"/>
+                <xsl:with-param name="dimension" select="'0'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate2"/>
+                <xsl:with-param name="dimension" select="'1'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate3"/>
+                <xsl:with-param name="dimension" select="'2'"/>
+              </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="@data_type='FLT_4D' or @data_type='INT_4D' or @data_type='CPX_4D'">
+
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate1"/>
+                <xsl:with-param name="dimension" select="'0'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate2"/>
+                <xsl:with-param name="dimension" select="'1'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate3"/>
+                <xsl:with-param name="dimension" select="'2'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate4"/>
+                <xsl:with-param name="dimension" select="'3'"/>
+              </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="@data_type='FLT_5D' or @data_type='INT_5D' or @data_type='CPX_5D'">
+
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate1"/>
+                <xsl:with-param name="dimension" select="'0'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate2"/>
+                <xsl:with-param name="dimension" select="'1'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate3"/>
+                <xsl:with-param name="dimension" select="'2'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate4"/>
+                <xsl:with-param name="dimension" select="'3'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate5"/>
+                <xsl:with-param name="dimension" select="'4'"/>
+              </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="@data_type='FLT_6D' or @data_type='INT_6D' or @data_type='CPX_6D'">
+
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate1"/>
+                <xsl:with-param name="dimension" select="'0'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate2"/>
+                <xsl:with-param name="dimension" select="'1'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate3"/>
+                <xsl:with-param name="dimension" select="'2'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate4"/>
+                <xsl:with-param name="dimension" select="'3'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate5"/>
+                <xsl:with-param name="dimension" select="'4'"/>
+              </xsl:apply-templates>
+              <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_COORDINATES">
+                <xsl:with-param name="coord" select="@coordinate6"/>
+                <xsl:with-param name="dimension" select="'5'"/>
+              </xsl:apply-templates>
+          </xsl:when>
+        </xsl:choose>
+        </xsl:template>
+
+      <xsl:template match="field" mode="VALIDATE_FIXED_SIZE_COORDINATES">
+      <xsl:param name="coord"/>
+      <xsl:param name="dimension"/>
+        <xsl:if test="not(contains($coord,' OR ')) and contains($coord, '1...') and not(contains($coord, '1...N')) and not(string(number(substring-after($coord,'1...')))='NaN')">
+        // validation of <xsl:value-of select="@path"/> dimension <xsl:value-of select="number($dimension)"/>
+        if (this.<xsl:value-of select = "@name"/> != null) {
+        <xsl:choose>
+          <xsl:when test="@data_type='struct_array'">
+          int arraySize = this.<xsl:value-of select = "@name"/>.length;
+          </xsl:when>
+          <xsl:otherwise>
+          int arraySize = this.<xsl:value-of select = "@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+          </xsl:otherwise> 
+        </xsl:choose>
+          if (arraySize != 0) {
+            if (arraySize != <xsl:value-of select = "substring-after($coord,'1...')"/>) {
+              throw new ValidationException("array_size of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be <xsl:value-of select = "substring-after($coord,'1...')"/>.");
+            }
+          }
+        }
+        </xsl:if>
+      </xsl:template>
+
+      <xsl:template match="field[@data_type='struct_array']" mode="VALIDATE_CHILD_1D">
+      <xsl:choose>
+    <xsl:when test="not(contains(@coordinate1,' OR ')) and not(contains(@coordinate1, '1...'))">
+    // validation of <xsl:value-of select="@path"/>
+    if (this.<xsl:value-of select="@name"/> != null) {
+      <xsl:choose>
+        <xsl:when test="@data_type='struct_array'">
+        int arraySize = this.<xsl:value-of select = "@name"/>.length;
+        </xsl:when>
+        <xsl:otherwise>
+        int arraySize = this.<xsl:value-of select = "@name"/>.getDim(0);
+        </xsl:otherwise> 
+      </xsl:choose>
+    <xsl:if test="contains(@coordinate1,'/time')">
+    if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
+        if(arraySize != idsTimeSize) {
+          throw new ValidationException("array size of <xsl:value-of select="@path"/> ("+arraySize+") wrong. Must be the size of time ("+idsTimeSize+")");
+        }
+    }
+    <xsl:variable name="coord" select="@coordinate1"/>
+    // inside <xsl:value-of select=".//field[@path_doc=$coord and (@data_type='int_type' or @data_type='INT_0D' or 
+    @data_type='flt_type' or @data_type='FLT_0D' or 
+    @data_type='CPX_0D')]/@path"/>
+    <xsl:if test=".//field[@path_doc=$coord and (@data_type='flt_type' or @data_type='FLT_0D')]">
+    if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
+        for (int itime = 0; itime&lt;arraySize;itime++) {
+        if (this.<xsl:value-of select="@name"/>[itime] != null) {
+        if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
+          throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. <xsl:value-of select="@name"/>[itime].time is invalid ("+this.<xsl:value-of select="@name"/>[itime].time+") .");
+        }
+        }
+        }
+      }
+    </xsl:if>
+    </xsl:if>
+    <xsl:if test="not(contains(@coordinate1,'/time'))">
+    <xsl:variable name="mesure_string">
+      <!-- // <xsl:value-of select="ancestor::IDS/field[@path=@coordinate1]/@name"/> <xsl:value-of select="ancestor::IDS/field[@path=@coordinate1]/@data_type"/> -->
+      <xsl:if test="@data_type='struct_array'">length</xsl:if>
+      <xsl:if test="not(@data_type='struct_array')">getDim(0)</xsl:if>
+    </xsl:variable>
+    if (arraySize != this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>) {
+      throw new ValidationException("array size of <xsl:value-of select="@path"/> ("+arraySize+") wrong. Must be the size of <xsl:value-of select="@coordinate1"/> ("+this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>+").");
+    }
+    </xsl:if>
+    }
+    </xsl:when>
+    <xsl:otherwise>
+      // warning <xsl:value-of select="@path_doc"/> coordinates consistency not verified (<xsl:value-of select="@coordinate1"/>)
+    </xsl:otherwise>
+      </xsl:choose>
+      </xsl:template>
     
     
   </xsl:stylesheet>

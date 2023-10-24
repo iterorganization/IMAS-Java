@@ -15,6 +15,12 @@ public class Vect1DInt extends SummaryString {
     return array.length;
   }
 
+  public int getDim(int i) {
+    if (i==0) return array.length;
+    else return 0;
+  }
+
+
   public int getElementAt(int idx) {
     return array[idx];
   }

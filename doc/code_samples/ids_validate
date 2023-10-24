@@ -1,2 +1,37 @@
-// IDS Validation is not yet implemented in Java.
-// See https://jira.iter.org/browse/IMAS-4776
+// Import the Access Layer
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+
+public class validate_ids {
+    public static void main(String[] args) {
+
+        // Create an empty equilibrium IDS
+        imas.equilibrium equilibrium = new imas.equilibrium();
+
+
+
+        // |---> equilibrium is empty, -> raise of the ValidationException:
+        // "ids_properties.homogeneous_time wrong value (-999999999)"
+        try {
+            equilibrium.validate()
+   	}
+	catch (ValidationException e) {
+            System.err.println("Validation exception:");
+            System.err.println(e.getMessage());
+        } 
+
+
+
+        // Minimal equilibrium ids (homogeneous_time = 0 + time not empty)
+        equilibrium.ids_properties.homogeneous_time = 0; // (0 -> IDS_TIME_MODE_HOMOGENEOUS)
+        equilibrium.time= new Vect1DDouble(20);
+        try {
+            equilibrium.validate()
+        }
+        catch (ValidationException e) { // not occured here
+            System.err.println("Validation exception:");
+            System.err.println(e.getMessage());
+        }
+
+    }
+}

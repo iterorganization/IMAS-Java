@@ -13,6 +13,12 @@ public class Vect1DComplex extends VectComplex {
     return array.length;
   }
 
+  public int getDim(int i) {
+    if (i==0) return array.length;
+    else return 0;
+  }
+
+
   public int[] getDims() {
     int[] d = {array.length};
     return d;
