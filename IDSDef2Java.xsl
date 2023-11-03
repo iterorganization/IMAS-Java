@@ -694,9 +694,9 @@
         if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
 
                 File tmpdir;
-                String ASCII_SERIALIZER_TMP_DIR = System.getenv("ASCII_SERIALIZER_TMP_DIR");
-                if(ASCII_SERIALIZER_TMP_DIR != null){
-                        tmpdir = new File(ASCII_SERIALIZER_TMP_DIR);
+                String IMAS_AL_SERIALIZER_TMP_DIR = System.getenv("IMAS_AL_SERIALIZER_TMP_DIR");
+                if(IMAS_AL_SERIALIZER_TMP_DIR != null){
+                        tmpdir = new File(IMAS_AL_SERIALIZER_TMP_DIR);
                 }
                 else{
                         tmpdir=new File("/dev/shm") ;
@@ -793,9 +793,9 @@
 
         if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
                 File tmpdir;
-                String ASCII_SERIALIZER_TMP_DIR = System.getenv("ASCII_SERIALIZER_TMP_DIR");
-                if(ASCII_SERIALIZER_TMP_DIR != null){
-                        tmpdir = new File(ASCII_SERIALIZER_TMP_DIR);
+                String IMAS_AL_SERIALIZER_TMP_DIR = System.getenv("IMAS_AL_SERIALIZER_TMP_DIR");
+                if(IMAS_AL_SERIALIZER_TMP_DIR != null){
+                        tmpdir = new File(IMAS_AL_SERIALIZER_TMP_DIR);
                 }
                 else{
                         tmpdir=new File("/dev/shm") ;
