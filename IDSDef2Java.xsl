@@ -2158,6 +2158,12 @@
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
             aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+
+            if (this.<xsl:value-of select = "@name"/>.length == 0 &amp;&amp; tmpArray[0]&gt;0) {
+              arraySize = tmpArray[0];
+              this.<xsl:value-of select="@name"/> = new <xsl:value-of select = "@name"/>Class[arraySize];
+            }
+
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
@@ -2189,6 +2195,12 @@
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
             aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+
+            if (this.<xsl:value-of select = "@name"/>.length == 0 &amp;&amp; tmpArray[0]&gt;0) {
+              arraySize = tmpArray[0];
+              this.<xsl:value-of select="@name"/> = new <xsl:value-of select = "@name"/>Class[arraySize];
+            }
+
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
@@ -2228,6 +2240,12 @@
             arraySize = this.<xsl:value-of select = "@name"/>.length;
             int tmpArray[] = { arraySize };
             aosCtx = LowLevel.al_begin_arraystruct_action(ctx, strNodePath, strTimeBasePath, tmpArray);
+
+            if (this.<xsl:value-of select = "@name"/>.length == 0 &amp;&amp; tmpArray[0]&gt;0) {
+              arraySize = tmpArray[0];
+              this.<xsl:value-of select="@name"/> = new <xsl:value-of select = "@name"/>Class[arraySize];
+            }
+
             for( int i = 0; i &lt;arraySize; i++)
             {
             this.<xsl:value-of select="@name"/>[i].<xsl:value-of select="$methodName"/>(aosCtx, idsTimeMode, idsFullName);
