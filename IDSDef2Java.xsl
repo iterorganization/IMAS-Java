@@ -834,7 +834,15 @@
     public byte[] serialize(int protocol) throws ALException
     {
         if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
-                File tmpdir=new File("/dev/shm") ;
+
+                File tmpdir;
+                String IMAS_AL_SERIALIZER_TMP_DIR = System.getenv("IMAS_AL_SERIALIZER_TMP_DIR");
+                if(IMAS_AL_SERIALIZER_TMP_DIR != null){
+                        tmpdir = new File(IMAS_AL_SERIALIZER_TMP_DIR);
+                }
+                else{
+                        tmpdir=new File("/dev/shm") ;
+                }
                 if (!tmpdir.exists()) {
                         tmpdir =  new File(System.getProperty("user.dir"));
                 }
@@ -926,7 +934,14 @@
         int protocol = Integer.parseInt(protocolString);
 
         if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
-                File tmpdir=new File("/dev/shm") ;
+                File tmpdir;
+                String IMAS_AL_SERIALIZER_TMP_DIR = System.getenv("IMAS_AL_SERIALIZER_TMP_DIR");
+                if(IMAS_AL_SERIALIZER_TMP_DIR != null){
+                        tmpdir = new File(IMAS_AL_SERIALIZER_TMP_DIR);
+                }
+                else{
+                        tmpdir=new File("/dev/shm") ;
+                }
                 if (!tmpdir.exists()) {
                         tmpdir =  new File(System.getProperty("user.dir"));
                 }
