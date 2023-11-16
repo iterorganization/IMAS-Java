@@ -121,6 +121,14 @@ JNIEXPORT void JNICALL Java_imasjava_wrapper_LowLevel_al_1close_1pulse
 
 /*
  * Class:     imasjava_wrapper_LowLevel
+ * Method:    al_get_occurrences
+ * Signature: (ILjava/lang/String;)[I
+ */
+JNIEXPORT jintArray JNICALL Java_imasjava_wrapper_LowLevel_al_1get_1occurrences
+  (JNIEnv *, jclass, jint, jstring);
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
  * Method:    al_begin_global_action
  * Signature: (ILjava/lang/String;I)I
  */

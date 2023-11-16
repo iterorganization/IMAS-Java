@@ -43,6 +43,7 @@
         package imasjava;
         import java.io.File;
         import java.lang.reflect.*;
+        import java.util.*;
         
         import imasjava.utilities.ImasReflection;
         import imasjava.ids.*;
@@ -629,6 +630,72 @@
         
         }
         return strTimeMode;
+        }
+
+        static public void listAllOccurrences(int idx, String idsName, String nodePath)
+        {
+            int alOccurrenceList[] =  { };
+            String[] nodeContentist;
+            int[] occurrenceList;
+            int size = 0;
+            try {
+                alOccurrenceList = LowLevel.al_get_occurrences(idx, idsName);
+            } catch (Exception exc) {
+                System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_get_occurrences: " + exc);
+            }
+
+            if (alOccurrenceList != null &amp;&amp; !(alOccurrenceList.length == 0)) {
+              size = alOccurrenceList.length;
+            } else {
+              size = 0;
+            }
+
+            nodeContentist = new String[5];
+
+            if (nodePath != null &amp;&amp; !nodePath.trim().isEmpty()) {
+
+              for (int i = 0; i &lt; size; i++) {
+                int ctx = -1;
+                int retSize[] = new int[1];	
+                byte dataArr[] = null;
+                String str = null;
+                String occurrenceName = idsName;
+                if (i &gt; 0) occurrenceName += "/"+Integer.toString(i);
+                try {
+                ctx = LowLevel.al_begin_global_action(idx, occurrenceName, LowLevel.READ_OP);
+                } catch (Exception exc) {
+                System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_begin_global_action: " + exc);
+                return;
+                }
+
+                try {
+                dataArr = LowLevel.al_read_data_char(ctx, nodePath, "", 1, retSize);
+                } catch (Exception exc) {
+                System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_read_data_char: " + exc);
+                return;
+                }
+                
+                str = new String(dataArr);
+                //if (str.trim().isEmpty())  System.out.println("empty string");
+                nodeContentist[i] = str.trim();
+
+                try {
+                LowLevel.al_end_action(ctx);
+                } catch (Exception exc) {
+                System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_end_action: " + exc);
+                return;
+                }
+              }
+            }
+            else {
+               for (int i = 0; i &lt; size; i++) nodeContentist[i] = "";
+
+            }
+
+            System.out.println("Size: "+Integer.toString(size));
+            System.out.println(Arrays.toString(alOccurrenceList));
+            for (int i = 0; i &lt; size; i++) System.out.println(nodeContentist[i]);
+
         }
         
         <xsl:apply-templates select = "IDS" mode="DEFINE_IDS_MEMBER"/>
