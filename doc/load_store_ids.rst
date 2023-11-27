@@ -26,3 +26,5 @@
 .. |dbentry_put| replace:: :java:ref:`put`
 .. |dbentry_put_slice| replace:: :java:ref:`putSlice`
 
+.. |dbentry_list_all_occurrences| replace:: :java:ref:`listAllOccurrences`
+

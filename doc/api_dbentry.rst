@@ -50,3 +50,13 @@
             :java:ref:`MEMORY_BACKEND` or :java:ref:`UDA_BACKEND`.
         :param String options: Backend specific options
         :return: Opened data entry context
+
+    .. java:method:: public static HashMap<Integer, String> listAllOccurrences(int idx, String idsName, String nodePath)
+
+         Return a hashmap of the occurrence index and the node content of the IDS in the provided db entry.
+
+        :param int idx: Pulse number
+        :param String idsName: IDS name
+        :param String nodePath: Node path
+        :return: The HashMap <ids index, node contents> or null.
+
