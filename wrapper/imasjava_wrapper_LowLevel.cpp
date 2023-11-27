@@ -260,12 +260,6 @@ extern "C" {
 
     al_status = al_get_occurrences((int)jCtx, dataObjectName, (int**)&occurrencesList, &size);
 
-    printf("al_status: %d, %s\r\n",al_status.code, (al_status.code == 0) ? "" : al_status.message);
-    printf("size: %d\r\n",size);
-    printf("array:");
-    for (int j = 0; j<size; j++) printf(" %d",occurrencesList[j]);
-    printf("\r\n");
-
     jData = env->NewIntArray(size);
     if (jData == NULL) {
         raiseException( env, "Wrapper", "Out of memory error");

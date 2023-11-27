@@ -632,8 +632,9 @@
         return strTimeMode;
         }
 
-        static public void listAllOccurrences(int idx, String idsName, String nodePath)
+        static public HashMap&lt;Integer, String&gt; listAllOccurrences(int idx, String idsName, String nodePath)
         {
+            HashMap&lt;Integer, String&gt; OccurrenceList = new HashMap&lt;Integer, String&gt;();
             int alOccurrenceList[] =  { };
             String[] nodeContentist;
             int[] occurrenceList;
@@ -650,7 +651,7 @@
               size = 0;
             }
 
-            nodeContentist = new String[5];
+            nodeContentist = new String[size];
 
             if (nodePath != null &amp;&amp; !nodePath.trim().isEmpty()) {
 
@@ -665,36 +666,37 @@
                 ctx = LowLevel.al_begin_global_action(idx, occurrenceName, LowLevel.READ_OP);
                 } catch (Exception exc) {
                 System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_begin_global_action: " + exc);
-                return;
+                return null;
                 }
 
                 try {
                 dataArr = LowLevel.al_read_data_char(ctx, nodePath, "", 1, retSize);
                 } catch (Exception exc) {
                 System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_read_data_char: " + exc);
-                return;
+                return null;
                 }
                 
                 str = new String(dataArr);
-                //if (str.trim().isEmpty())  System.out.println("empty string");
                 nodeContentist[i] = str.trim();
 
                 try {
                 LowLevel.al_end_action(ctx);
                 } catch (Exception exc) {
                 System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_end_action: " + exc);
-                return;
+                return null;
                 }
               }
+
             }
             else {
                for (int i = 0; i &lt; size; i++) nodeContentist[i] = "";
-
             }
 
-            System.out.println("Size: "+Integer.toString(size));
-            System.out.println(Arrays.toString(alOccurrenceList));
-            for (int i = 0; i &lt; size; i++) System.out.println(nodeContentist[i]);
+            for (int i = 0; i &lt; size; i++) {
+              OccurrenceList.put(alOccurrenceList[i],nodeContentist[i]);
+            }
+
+            return OccurrenceList;
 
         }
         
