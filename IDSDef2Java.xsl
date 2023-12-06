@@ -1496,12 +1496,13 @@
               throw new ValidationException("ids_properties.homogeneous_time wrong value ("+idsTimeMode+")");
         }
 
-        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1))) { 
+	<xsl:if test="not(@type='constant')">
+	if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1))) { 
               throw new ValidationException("With the time mode 'HOMOGENEOUS', the time array must be allocated and not be empty.");
         }
 
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) idsTimeSize = this.time.getDim();
-  
+        </xsl:if>
 
         <xsl:apply-templates select = "field" mode = "VALIDATE_CHILD"/>
         <xsl:apply-templates select="field[@data_type='struct_array']" mode="VALIDATE_CHILD_1D"/>
