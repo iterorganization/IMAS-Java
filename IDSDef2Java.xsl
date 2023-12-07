@@ -1580,11 +1580,6 @@
         /* ____________________________________________________________________________________________________________  */
         public void putSlice(int ctx, int idsTimeMode, String idsFullName)  throws ALException
         {
-         <xsl:choose>
-          <xsl:when test="not(./field[@name='time'])">
-            put(ctx, idsTimeMode, idsFullName);
-          </xsl:when>
-          <xsl:otherwise>
         String strTimeBasePath = null;
         String strNodePath = null;
         int arraySize = -1;
@@ -1594,8 +1589,6 @@
         <xsl:apply-templates select="field" mode="PUT_SINGLE">
           <xsl:with-param name="dynamic_only" select="'yes'"/>
         </xsl:apply-templates>
-          </xsl:otherwise>
-        </xsl:choose>    
         }       
     
       </xsl:if>
