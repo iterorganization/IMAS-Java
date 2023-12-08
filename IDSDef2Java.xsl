@@ -21,13 +21,13 @@
     <xsl:param name="AL_VERSION" as="xs:string" required="yes"/>
 
     <xsl:variable name="version_regex" select="'^([0-9]+)\.([0-9]+)\.([0-9]+)(-.*)?$'"/>
-    <xsl:variable name="DD_MAJOR" as="xs:int" select="xs:int(replace($DD_VERSION, $version_regex, '$1'))"/>
-    <xsl:variable name="DD_MINOR" as="xs:int" select="xs:int(replace($DD_VERSION, $version_regex, '$2'))"/>
-    <xsl:variable name="DD_PATCH" as="xs:int" select="xs:int(replace($DD_VERSION, $version_regex, '$3'))"/>
+    <xsl:variable name="DD_MAJOR" as="xs:integer" select="xs:integer(replace($DD_VERSION, $version_regex, '$1'))"/>
+    <xsl:variable name="DD_MINOR" as="xs:integer" select="xs:integer(replace($DD_VERSION, $version_regex, '$2'))"/>
+    <xsl:variable name="DD_PATCH" as="xs:integer" select="xs:integer(replace($DD_VERSION, $version_regex, '$3'))"/>
 
-    <xsl:variable name="HLI_MAJOR" as="xs:int" select="xs:int(replace($AL_VERSION, $version_regex, '$1'))"/>
-    <xsl:variable name="HLI_MINOR" as="xs:int" select="xs:int(replace($AL_VERSION, $version_regex, '$2'))"/>
-    <xsl:variable name="HLI_PATCH" as="xs:int" select="xs:int(replace($AL_VERSION, $version_regex, '$3'))"/>
+    <xsl:variable name="HLI_MAJOR" as="xs:integer" select="xs:integer(replace($AL_VERSION, $version_regex, '$1'))"/>
+    <xsl:variable name="HLI_MINOR" as="xs:integer" select="xs:integer(replace($AL_VERSION, $version_regex, '$2'))"/>
+    <xsl:variable name="HLI_PATCH" as="xs:integer" select="xs:integer(replace($AL_VERSION, $version_regex, '$3'))"/>
     
     <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
     <!-- MODE can be set to get or put in the 2 transformations for generating the subroutines, this reduced editing requirements
