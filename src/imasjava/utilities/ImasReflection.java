@@ -5,7 +5,7 @@ import imasjava.ids.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-
+import java.util.Arrays;
 
 public class ImasReflection {
 
