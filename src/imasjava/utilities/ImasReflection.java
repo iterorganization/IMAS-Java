@@ -70,8 +70,10 @@ public class ImasReflection {
 		return nodeClass.getName();
 	}
 
-
-
+	public static Object[] getResizedClassObject(Object[] strClassName, int newSize) 
+	{
+		return Arrays.copyOf(strClassName, newSize);
+	}
 
 	public static void main(String [] arg) 
 	{
