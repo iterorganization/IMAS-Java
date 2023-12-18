@@ -1,0 +1,28 @@
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+import java.util.*;
+
+public class prog_list_all_occurrences {
+    public static void main(String[] args) throws ALException {
+        int data_entry = imas.open(
+            "imas:mdsplus?user=public;pulse=131024;run=41;database=ITER?version=3",
+            LowLevel.OPEN_PULSE);
+            
+        String nodeContentist[] = new String[] {};
+        int occurrenceList[] = new int[] {};
+        HashMap<Integer, String> occurrences;
+
+        System.out.printf("\n\rmagnetics occurrences ... \n\r");
+        occurrences = imas.listAllOccurrences(data_entry, "magnetics", "");
+        System.out.println(occurrences);
+
+        System.out.printf("\n\rmagnetics occurrences ids_properties/provider... \n\r");
+        occurrences = imas.listAllOccurrences(data_entry, "magnetics", "ids_properties/provider");
+        System.out.println(occurrences);
+
+        System.out.printf("\n\rmagnetics occurrences ids_properties/comment... \n\r");
+        occurrences = imas.listAllOccurrences(data_entry, "magnetics", "ids_properties/comment");
+        System.out.println(occurrences);
+    }
+}
+

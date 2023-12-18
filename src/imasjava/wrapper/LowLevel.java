@@ -139,6 +139,23 @@ public class LowLevel {
 */
   public static native void al_close_pulse(int pulseCtx, 
 		      int mode) ;
+
+  /**
+     Starts an I/O action on a DATAOBJECT.
+     This function gives a new operation context for the duration of an action on a DATAOBJECT.
+     @param[in] ctx pulse context id 
+     @param[in] dataobjectname name of the IDS
+     @param[in,out] occurrenceslist list of the occurrences id
+     @param[in,out] size length of the ouput occurrences array
+     @snippet al_low_level.c ex_al_get_occurrences
+
+  int[] al_get_occurrences(int ctx,
+			      final String dataobjectname, int[] occurrenceslist,
+			      int size) throws ALException;
+*/
+  public static native int[] al_get_occurrences(int ctx,
+			      final String dataobjectname) throws ALException;
+
   /**
      Starts an I/O action on a DATAOBJECT.
      This function gives a new operation context for the duration of an action on a DATAOBJECT.

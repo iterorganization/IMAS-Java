@@ -242,6 +242,39 @@ extern "C" {
     if (al_status.code < 0)
         raiseLowLevelException( env, al_status);
 }
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
+ * Method:    al_get_occurrences
+ * Signature: (ILjava/lang/String;)[I
+ */
+ jintArray JNICALL Java_imasjava_wrapper_LowLevel_al_1get_1occurrences
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jDataObjectName)
+{
+    al_status_t al_status;
+    int size = -1; 
+    const char *dataObjectName = env->GetStringUTFChars(jDataObjectName, 0);
+
+    jint *occurrencesList = NULL;
+    jintArray jData = NULL;
+
+    al_status = al_get_occurrences((int)jCtx, dataObjectName, (int**)&occurrencesList, &size);
+
+    jData = env->NewIntArray(size);
+    if (jData == NULL) {
+        raiseException( env, "Wrapper", "Out of memory error");
+        return NULL; /* out of memory error thrown */
+    }
+    env->SetIntArrayRegion(jData, 0, size, occurrencesList);
+
+    env->ReleaseStringUTFChars(jDataObjectName, dataObjectName);
+
+    return jData;         
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+}
+
 /*
  * Class:     imasjava_wrapper_LowLevel
  * Method:    al_begin_global_action
