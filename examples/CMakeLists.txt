@@ -101,7 +101,7 @@ foreach( TEST IN LISTS TESTS )
   set_al_example_properties( ${TEST_NAME} ${DISABLED} OFF "${TEST_ENVIRONMENT}" )
 
   # Execute the test with plugins
-  if( IMAS_PLUGINS )
+  if( AL_PLUGINS )
     add_test( NAME ${TEST_NAME}-with-plugins COMMAND ${TEST_COMMAND} )
     set_al_example_properties( ${TEST_NAME}-with-plugins ${DISABLED} ON "${TEST_ENVIRONMENT}" )
   endif()
