@@ -195,3 +195,7 @@ install_jar( al-identifiers-java DESTINATION jar )
 ################################################################################
 
 # No "test" rule existed in Makefile
+
+if( AL_EXAMPLES )
+  add_subdirectory( examples )
+endif()
