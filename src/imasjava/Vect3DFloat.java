@@ -29,6 +29,11 @@ public class Vect3DFloat extends SummaryString {
     }
   }
 
+  public int[] getDims() {
+    int[] d = {dim1, dim2, dim3};
+    return d;
+  }
+
   public Vect2DFloat getElementAt(int i) {
     float retArr[] = new float[dim1 * dim2];
     System.arraycopy(array, i * dim1 * dim2, retArr, 0, dim1 * dim2);

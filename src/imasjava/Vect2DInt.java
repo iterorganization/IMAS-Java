@@ -21,6 +21,11 @@ public class Vect2DInt extends SummaryString {
     else return dim2;
   }
 
+  public int[] getDims() {
+    int[] d = {dim1, dim2};
+    return d;
+  }
+
   public Vect1DInt getElementAt(int i) {
     int retArr[] = new int[dim1];
     System.arraycopy(array, i * dim1, retArr, 0, dim1);

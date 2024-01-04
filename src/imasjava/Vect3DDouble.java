@@ -29,6 +29,11 @@ public class Vect3DDouble extends SummaryString {
     }
   }
 
+  public int[] getDims() {
+    int[] d = {dim1, dim2, dim3};
+    return d;
+  }
+
   public Vect2DDouble getElementAt(int i) {
     double retArr[] = new double[dim1 * dim2];
     System.arraycopy(array, i * dim1 * dim2, retArr, 0, dim1 * dim2);

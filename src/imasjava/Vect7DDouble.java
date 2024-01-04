@@ -48,6 +48,11 @@ public class Vect7DDouble extends SummaryString {
     }
   }
 
+  public int[] getDims() {
+    int[] d = {dim1, dim2, dim3, dim4, dim5, dim6, dim7};
+    return d;
+  }
+
   public Vect6DDouble getElementAt(int i) {
     double retArr[] = new double[dim1 * dim2 * dim3 * dim4 * dim5 * dim6];
     System.arraycopy(

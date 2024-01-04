@@ -20,6 +20,11 @@ public class Vect1DDouble extends SummaryString {
     else return 0;
   }
 
+  public int[] getDims() {
+    int[] d = {array.length};
+    return d;
+  }
+
 
   public double getElementAt(int idx) {
     return array[idx];

@@ -114,6 +114,37 @@
         public static int pulse; 
 	public static int run;
 
+          /**
+          * Methods returning the size along the input dimension
+          *
+          * @param dim The dimension that is checked.
+          * @param objs Object input.
+          * @return the size
+          */
+  public static int get_possible_coordinate(int dim, Object obj) {
+      java.lang.reflect.Method method;
+
+          if (obj != null) {
+            try {
+            method = obj.getClass().getMethod("getDim",int.class);
+            } catch (SecurityException e) { return 0; }
+              catch (NoSuchMethodException e) {method=null;}
+            if (method != null) {
+            int size;
+            try {
+            size = (int) method.invoke(obj,dim);
+            } catch (IllegalArgumentException e) { return 0; }
+              catch (IllegalAccessException e) { return 0; }
+              catch (InvocationTargetException e) { return 0; }
+            return size;
+            } else {
+            return ((Object[])obj).length;
+            }
+          }
+    
+      return 0;
+}
+
   /**
   * Methods returning true if the object obj is allocated and of size different to 0. False otherwise.
   *
@@ -144,38 +175,6 @@
           return check;
           }
 
-          /**
-          * Methods returning false if the coordinate is verified. True otherwise.
-          *
-          * @param arraySize Size of the dimension to check.
-          * @param dim The dimension that is checked.
-          * @param objs Object list of the possible coordinates.
-          * @return False if the size is validated.
-          */
-        public static boolean validate_possible_coordinates(int arraySize, int dim, Object... objs) {
-            boolean error = true; 
-            java.lang.reflect.Method method;
-            for (Object s : objs) {
-                if (s != null) {
-                  try {
-                  method = s.getClass().getMethod("getDim",int.class);
-                  } catch (SecurityException e) { return true; }
-                    catch (NoSuchMethodException e) {method=null;}
-                  if (method != null) {
-                  try {
-		        int size = (int) method.invoke(s,dim);
-                        if (arraySize == size) error = false;
-                  } catch (IllegalArgumentException e) { return true; }
-                    catch (IllegalAccessException e) { return true; }
-                    catch (InvocationTargetException e) { return true; } 
-                  } else {
-                  if (arraySize == ((Object[])s).length) error = false;
-                  }
-                }
-            }
-            return error;
-        }
-
 	/**
         * Coordinate validation method.
         *
@@ -190,7 +189,7 @@
         * @return void
         * @exception ValidationException is thrown if the coordinate is wrong.
         */
-        public static void validate_coordinate(int arraySize, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
+        public static void validate_coordinate(int arraySize, int[] shape, String[] coordNames, int[] coordValues, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
         {
 
           boolean check = true;
@@ -210,14 +209,31 @@
           // If more of one alternatives coordinates is allocated we raise an exception
 
           if (i&gt;1) { 
-            throw new ValidationException("Coordinate consistency error for "+name+" (dimension "+(dim+1)+") ("+arraySize+"). Exactly one of the possible coordinate must be allocated. ("+coordinates+")");
+            String[] coordinateslist = {coordinates};
+            String errMsg = CoordinateValidation.coordinate_not_filled_message(name, coordNames, coordValues, shape, dim+1, coordinateslist);
+            throw new ValidationException(errMsg);
           }
 
           // We check all the possible coordinates (one is allocated)
 
 
           if(check) {
-            error = imas.validate_possible_coordinates(arraySize, objdim ,objs);
+            String[] coordinateslist = coordinates.split(" OR ");
+            int crd = 0;
+            for (Object s : objs) {
+            int objSize = imas.get_possible_coordinate(objdim, s);
+            if (objSize != 0) {
+              if (objSize == arraySize) {
+                error = false;
+              } else {
+                if (!fixedcoord) {
+                  String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, objSize, coordinateslist[crd]);
+                  throw new ValidationException(errMsg);
+                }
+              }
+            }
+            crd = crd + 1;
+            }
           }
 
           // Last chance: possible alternative fixed size?
@@ -229,8 +245,9 @@
           // The size of the target dimension not validated - we raise an error
             
           if (error) { 
-	  throw new ValidationException("Wrong dimension "+(dim+1)+" for "+name+" ("+arraySize+"). ("+coordinates+")");
-	  }
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, 0, coordinates);
+            throw new ValidationException(errMsg);
+	        }
 
         }
         
@@ -1558,11 +1575,13 @@
       {
         int idsTimeMode = this.ids_properties.homogeneous_time;;
         int idsTimeSize = 0;
+        int[] coordValues = {};
+        String[]  coordNames = {};
 
         if (idsTimeMode != LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp;
             idsTimeMode != LowLevel.IDS_TIME_MODE_HETEROGENEOUS &amp;&amp;
             idsTimeMode != LowLevel.IDS_TIME_MODE_INDEPENDENT) {
-              throw new ValidationException("ids_properties.homogeneous_time wrong value ("+idsTimeMode+")");
+              throw new ValidationException("ids_properties.homogeneous_time has an empty value ("+idsTimeMode+")");
         }
 
 	<xsl:if test="not(@type='constant')">
@@ -1743,7 +1762,7 @@
       /* ____________________________________________________________________________________________________________  */
       /* ___________________________________        VALIDATE      ________________________________________________________ */  
       /* ____________________________________________________________________________________________________________  */
-      public void validate(int idsTimeMode, int idsTimeSize ) throws ValidationException
+      public void validate(int idsTimeMode, int idsTimeSize, String[] coordNames, int[] coordValues) throws ValidationException
       {
         // validate definition <xsl:value-of select="@path"/>
         <!-- validation logic  -->
@@ -1772,26 +1791,23 @@
     <xsl:choose>
       <xsl:when test="@data_type='structure'">
   // Validation of <xsl:value-of select = "@path"/>
-        try{
-        this.<xsl:value-of select="@name"/>.validate(idsTimeMode, idsTimeSize );
-        }
-        catch (ValidationException ve) {
-          throw new ValidationException("Error with <xsl:value-of select = "@path"/>.\n\r"+ve.getMessage());
-        }
+        this.<xsl:value-of select="@name"/>.validate(idsTimeMode, idsTimeSize, coordNames, coordValues);
       </xsl:when>
       <xsl:when test="@data_type='struct_array'">
         if (!(this.<xsl:value-of select = "@name"/>==null)) {
           int arraySize = this.<xsl:value-of select = "@name"/>.length;
           // Validation of <xsl:value-of select = "@path"/>
+          int[] newCoordValues = {};
+          String[]  newCoordNames = {};
+          newCoordValues = Arrays.copyOf(coordValues, coordValues.length + 1);
+          newCoordNames  = Arrays.copyOf(coordNames,  coordNames.length  + 1);
+          newCoordNames[coordNames.length]  = "<xsl:value-of select = "substring-before(substring-after(@path_doc,concat(@name,'(')),')')"/>";
           for(int i = 0; i &lt;arraySize; i++)
           {
-            try {
-              if (this.<xsl:value-of select = "@name"/>[i] != null)
-                this.<xsl:value-of select = "@name"/>[i].validate(idsTimeMode, idsTimeSize );
-            }
-            catch (ValidationException ve) {
-              throw new ValidationException("Error with <xsl:value-of select = "@path"/>["+i+"].\n\r"+ve.getMessage());
-            }
+            newCoordValues[coordValues.length] = i;
+            if (this.<xsl:value-of select = "@name"/>[i] != null)
+              this.<xsl:value-of select = "@name"/>[i].validate(idsTimeMode, idsTimeSize, newCoordNames, newCoordValues);
+
           }
         }
       </xsl:when>
@@ -3180,21 +3196,21 @@
         <xsl:choose>
         <xsl:when test="@data_type='struct_array'">
        if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
+        int[] shape =  {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
         </xsl:when>
         <xsl:otherwise>
        if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+        int[] shape =  this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
         </xsl:otherwise>
         </xsl:choose>
-        if (arraySize > 0) {
+        if (shape[<xsl:value-of select="number($dimension)"/>] > 0) {
         <xsl:if test="@type='dynamic' and contains($coord,'/time')">
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         </xsl:if>
         <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
-          imas.validate_coordinate(arraySize,
+          imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
                                   <xsl:value-of select="number($dimension)"/>, 
-                                  "<xsl:value-of select="@path"/>",
+                                  "<xsl:value-of select="@path_doc"/>",
                                   <xsl:value-of select="number($targetdim)"/>,
                                   "<xsl:value-of select="$coord"/>"
                                   <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
@@ -3202,13 +3218,15 @@
       <xsl:if test="@type='dynamic' and contains($coord,'/time')">
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
-          if(arraySize != idsTimeSize) {
-            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be the size of time ("+idsTimeSize+")");
+          if(shape[<xsl:value-of select="number($dimension)"/>] != idsTimeSize) {
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
+            throw new ValidationException(errMsg);
           }
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT ) {
-          if(arraySize != 0) {
-            throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. In INDEPENDENT time mode, it must be empty.");
+          if(shape[<xsl:value-of select="number($dimension)"/>] != 0) {
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, 0, "time");
+            throw new ValidationException(errMsg);
           }
         }
         </xsl:if>
@@ -3220,23 +3238,26 @@
       <xsl:choose>
       <xsl:when test="@data_type='struct_array'">
       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+      int[] shape = {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
       int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
       </xsl:when>
       <xsl:otherwise>
       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+      int[] shape = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
       int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
       </xsl:otherwise>
       </xsl:choose>
       if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
         if(arraySize != idsTimeSize) {
-          throw new ValidationException("arraySize of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be the size of time ("+idsTimeSize+")");
+          String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
+          throw new ValidationException(errMsg);
         }
       }
       if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         for (int itime = 1; itime&lt;arraySize;itime++) {
             if (this.<xsl:value-of select="@name"/>[itime] != null) {
               if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
-                throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. <xsl:value-of select="@name"/>[itime].time is invalid Must be the size of time ("+this.<xsl:value-of select="@name"/>[itime].time+").");
+                throw new ValidationException("Time coordinate of '<xsl:value-of select="@name"/>' (<xsl:value-of select="@name"/>["+Integer.toString(itime)+"]/time)' has empty values");
               }
             }
           }
@@ -3576,15 +3597,18 @@
         if (this.<xsl:value-of select = "@name"/> != null) {
         <xsl:choose>
           <xsl:when test="@data_type='struct_array'">
+          int[] shape =  {this.<xsl:value-of select = "@name"/>.length};
           int arraySize = this.<xsl:value-of select = "@name"/>.length;
           </xsl:when>
           <xsl:otherwise>
+          int[] shape = this.<xsl:value-of select = "@name"/>.getDims();
           int arraySize = this.<xsl:value-of select = "@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
           </xsl:otherwise> 
         </xsl:choose>
           if (arraySize != 0) {
             if (arraySize != <xsl:value-of select = "substring-after($coord,'1...')"/>) {
-              throw new ValidationException("array_size of <xsl:value-of select="@path"/> ("+arraySize+") (dimension <xsl:value-of select="number($dimension)+1"/>) wrong. Must be <xsl:value-of select = "substring-after($coord,'1...')"/>.");
+              String errMsg = CoordinateValidation.coordinate_incorrect_fixedsize_message("<xsl:value-of select="@path_doc"/>",coordNames, coordValues, shape,<xsl:value-of select="number($dimension)+1"/>,<xsl:value-of select = "substring-after($coord,'1...')"/>);
+              throw new ValidationException(errMsg);
             }
           }
         }
@@ -3598,16 +3622,19 @@
     if (this.<xsl:value-of select="@name"/> != null) {
       <xsl:choose>
         <xsl:when test="@data_type='struct_array'">
+        int[] shape =  {this.<xsl:value-of select = "@name"/>.length};
         int arraySize = this.<xsl:value-of select = "@name"/>.length;
         </xsl:when>
         <xsl:otherwise>
+        int[] shape = this.<xsl:value-of select = "@name"/>.getDims();
         int arraySize = this.<xsl:value-of select = "@name"/>.getDim(0);
         </xsl:otherwise> 
       </xsl:choose>
     <xsl:if test="contains(@coordinate1,'/time')">
     if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
         if(arraySize != idsTimeSize) {
-          throw new ValidationException("array size of <xsl:value-of select="@path"/> ("+arraySize+") wrong. Must be the size of time ("+idsTimeSize+")");
+          String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, 1, idsTimeSize, "time");
+          throw new ValidationException(errMsg);
         }
     }
     <xsl:variable name="coord" select="@coordinate1"/>
@@ -3619,7 +3646,7 @@
         for (int itime = 0; itime&lt;arraySize;itime++) {
         if (this.<xsl:value-of select="@name"/>[itime] != null) {
         if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
-          throw new ValidationException("Time coordinate of <xsl:value-of select="@name"/> wrong. <xsl:value-of select="@name"/>[itime].time is invalid ("+this.<xsl:value-of select="@name"/>[itime].time+") .");
+          throw new ValidationException("Time coordinate of '<xsl:value-of select="@name"/>' (<xsl:value-of select="@coord"/>) has empty values.");
         }
         }
         }
@@ -3628,12 +3655,12 @@
     </xsl:if>
     <xsl:if test="not(contains(@coordinate1,'/time'))">
     <xsl:variable name="mesure_string">
-      <!-- // <xsl:value-of select="ancestor::IDS/field[@path=@coordinate1]/@name"/> <xsl:value-of select="ancestor::IDS/field[@path=@coordinate1]/@data_type"/> -->
       <xsl:if test="@data_type='struct_array'">length</xsl:if>
       <xsl:if test="not(@data_type='struct_array')">getDim(0)</xsl:if>
     </xsl:variable>
     if (arraySize != this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>) {
-      throw new ValidationException("array size of <xsl:value-of select="@path"/> ("+arraySize+") wrong. Must be the size of <xsl:value-of select="@coordinate1"/> ("+this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>+").");
+      String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, 1, this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>, "<xsl:value-of select="@coordinate1"/>");
+      throw new ValidationException(errMsg);
     }
     </xsl:if>
     }

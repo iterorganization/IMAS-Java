@@ -29,6 +29,11 @@ public class Vect3DInt extends SummaryString {
     }
   }
 
+  public int[] getDims() {
+    int[] d = {dim1, dim2, dim3};
+    return d;
+  }
+
   public Vect2DInt getElementAt(int i) {
     int retArr[] = new int[dim1 * dim2];
     System.arraycopy(array, i * dim1 * dim2, retArr, 0, dim1 * dim2);

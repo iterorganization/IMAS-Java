@@ -22,6 +22,11 @@ public class Vect2DDouble extends SummaryString {
     else return dim2;
   }
 
+  public int[] getDims() {
+    int[] d = {dim1, dim2};
+    return d;
+  }
+
   public double getElementAt(int i, int j) {
     return array[i + j * dim1];
   }

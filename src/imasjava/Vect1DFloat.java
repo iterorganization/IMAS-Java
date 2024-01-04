@@ -20,6 +20,11 @@ public class Vect1DFloat extends SummaryString {
     else return 0;
   }
 
+  public int[] getDims() {
+    int[] d = {array.length};
+    return d;
+  }
+
 
   public float getElementAt(int idx) {
     return array[idx];
