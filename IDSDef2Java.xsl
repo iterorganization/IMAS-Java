@@ -1022,7 +1022,8 @@
                 }
                 try{
                         OutputStream outputStream = new FileOutputStream(tmpfile);
-                        outputStream.write(Arrays.copyOfRange(data, 2, data.length));
+			outputStream.write(Arrays.copyOfRange(data, 2, data.length));
+			outputStream.close();
                 }catch(Exception exc) 
                 {
                         if (!tmpdir.exists()) 
