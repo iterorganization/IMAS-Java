@@ -45,6 +45,7 @@ set( TESTS
     TestPfActiveGetSlice
     TestPfActivePut
     TestPfActivePutSlice
+    TestResizeArray
     TestVersion
     TestWavesValidate
 )
