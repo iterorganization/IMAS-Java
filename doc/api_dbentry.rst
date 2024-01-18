@@ -60,3 +60,21 @@
         :param String nodePath: Node path
         :return: The HashMap <ids index, node contents> or null.
 
+
+``imasjava.wrapper.Wrapper`` API
+================================
+
+.. java:package:: imasjava.wrapper
+
+.. java:type:: public class Wrapper
+
+    .. java:method::   public static native String al_build_uri_from_legacy_parameters(final int backendID, final int pulse,final int run, final String user, final String tokamak, final String version,final String options) throws ALException
+
+        
+        :param int backendID: Backend id
+        :param int pulse: Pulse number
+        :param int run: Run number
+        :param String user: User name
+        :param String tokamak: Tokamak name, also known as Database name
+        :param String version: Major version of the data dictionary, e.g. ``"3"``
+        :param String options: Options
