@@ -30,6 +30,17 @@
     <xsl:variable name="HLI_PATCH" as="xs:integer" select="xs:integer(replace($AL_VERSION, $version_regex, '$3'))"/>
     
     <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
+
+
+    <xsl:function name="fn:getpathdoc">
+      <xsl:param name="string1"/>
+      <xsl:if test="contains($string1,'(:')">
+      <xsl:value-of select="substring-before($string1,'(:')"/>
+      </xsl:if>
+      <xsl:if test="not(contains($string1,'(:'))">
+      <xsl:value-of select="$string1"/>
+      </xsl:if>
+  </xsl:function>
     <!-- MODE can be set to get or put in the 2 transformations for generating the subroutines, this reduced editing requirements
          it could also be done with 2 xslt operations on a single file, but this might be overkill ??
          PUT HERE "get" OR "put"-->
@@ -3210,7 +3221,7 @@
         <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
           imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
                                   <xsl:value-of select="number($dimension)"/>, 
-                                  "<xsl:value-of select="@path_doc"/>",
+                                  "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
                                   <xsl:value-of select="number($targetdim)"/>,
                                   "<xsl:value-of select="$coord"/>"
                                   <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
@@ -3219,13 +3230,13 @@
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
           if(shape[<xsl:value-of select="number($dimension)"/>] != idsTimeSize) {
-            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
             throw new ValidationException(errMsg);
           }
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT ) {
           if(shape[<xsl:value-of select="number($dimension)"/>] != 0) {
-            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, 0, "time");
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, 0, "time");
             throw new ValidationException(errMsg);
           }
         }
@@ -3249,7 +3260,7 @@
       </xsl:choose>
       if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
         if(arraySize != idsTimeSize) {
-          String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
+          String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
           throw new ValidationException(errMsg);
         }
       }
@@ -3607,7 +3618,7 @@
         </xsl:choose>
           if (arraySize != 0) {
             if (arraySize != <xsl:value-of select = "substring-after($coord,'1...')"/>) {
-              String errMsg = CoordinateValidation.coordinate_incorrect_fixedsize_message("<xsl:value-of select="@path_doc"/>",coordNames, coordValues, shape,<xsl:value-of select="number($dimension)+1"/>,<xsl:value-of select = "substring-after($coord,'1...')"/>);
+              String errMsg = CoordinateValidation.coordinate_incorrect_fixedsize_message("<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",coordNames, coordValues, shape,<xsl:value-of select="number($dimension)+1"/>,<xsl:value-of select = "substring-after($coord,'1...')"/>);
               throw new ValidationException(errMsg);
             }
           }
@@ -3633,7 +3644,7 @@
     <xsl:if test="contains(@coordinate1,'/time')">
     if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
         if(arraySize != idsTimeSize) {
-          String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, 1, idsTimeSize, "time");
+          String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, 1, idsTimeSize, "time");
           throw new ValidationException(errMsg);
         }
     }
@@ -3646,7 +3657,7 @@
         for (int itime = 0; itime&lt;arraySize;itime++) {
         if (this.<xsl:value-of select="@name"/>[itime] != null) {
         if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
-          throw new ValidationException("Time coordinate of '<xsl:value-of select="@name"/>' (<xsl:value-of select="@coord"/>) has empty values.");
+          throw new ValidationException("Time coordinate of '<xsl:value-of select="@name"/>' ('<xsl:value-of select="$coord"/>') has empty values.");
         }
         }
         }
@@ -3659,7 +3670,7 @@
       <xsl:if test="not(@data_type='struct_array')">getDim(0)</xsl:if>
     </xsl:variable>
     if (arraySize != this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>) {
-      String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="@path_doc"/>" , coordNames, coordValues, shape, 1, this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>, "<xsl:value-of select="@coordinate1"/>");
+      String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, 1, this.<xsl:value-of select="@coordinate1"/>.<xsl:value-of select="$mesure_string"/>, "<xsl:value-of select="@coordinate1"/>");
       throw new ValidationException(errMsg);
     }
     </xsl:if>

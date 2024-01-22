@@ -12,7 +12,7 @@ public class CoordinateValidation {
             newPath = newPath.replace(coordNames[i],Integer.toString(coordvalues[i]));
         }
         output = output + newPath;
-        output = output + " must have its coordinate in dimension " + Integer.toString(dim);
+        output = output + "' must have its coordinate in dimension " + Integer.toString(dim);
         output = output + " (any of ";
         for (String str: coordList) {
             newPath = str;
@@ -34,7 +34,7 @@ public class CoordinateValidation {
             newPath = newPath.replace(coordNames[i],Integer.toString(coordvalues[i]));
         }
         output = output + newPath;
-        output = output + " has incorrect shape ";
+        output = output + "' has incorrect shape ";
         output = output + "(" + Integer.toString(Shape[0]);
         if (Shape.length>1) {
             for (int i=1;i<Shape.length;i++) {
@@ -47,8 +47,8 @@ public class CoordinateValidation {
         for (int i=0;i<coordNames.length;i++) {
             newPath = newPath.replace(coordNames[i],Integer.toString(coordvalues[i]));
         }
-        output = output + newPath + " ";
-        output = output + ") has size " +  Integer.toString(size);
+        output = output + newPath;
+        output = output + ") has size " + Integer.toString(size) +".";
         return output;
     }
 
@@ -60,7 +60,7 @@ public class CoordinateValidation {
             newPath = newPath.replace(coordNames[i],Integer.toString(coordvalues[i]));
         }
         output = output + newPath;
-        output = output + " has incorrect shape ";
+        output = output + "' has incorrect shape ";
         output = output + "(" + Integer.toString(Shape[0]);
         if (Shape.length>1) {
             for (int i=1;i<Shape.length;i++) {
