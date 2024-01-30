@@ -51,6 +51,7 @@ language.
    api_ids
    api_constants
    api_util
+   api_utilities
 
 Indices and tables
 ==================

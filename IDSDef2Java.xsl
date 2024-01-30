@@ -20,7 +20,7 @@
     <xsl:param name="DD_VERSION" as="xs:string" required="yes"/>
     <xsl:param name="AL_VERSION" as="xs:string" required="yes"/>
 
-    <xsl:variable name="version_regex" select="'^([0-9]+)\.([0-9]+)\.([0-9]+)(-.*)?$'"/>
+    <xsl:variable name="version_regex" select="'^([0-9]+)\.([0-9]+)\.([0-9]+)([+-].*)?$'"/>
     <xsl:variable name="DD_MAJOR" as="xs:integer" select="xs:integer(replace($DD_VERSION, $version_regex, '$1'))"/>
     <xsl:variable name="DD_MINOR" as="xs:integer" select="xs:integer(replace($DD_VERSION, $version_regex, '$2'))"/>
     <xsl:variable name="DD_PATCH" as="xs:integer" select="xs:integer(replace($DD_VERSION, $version_regex, '$3'))"/>
@@ -1051,6 +1051,7 @@
                 try{
                         OutputStream outputStream = new FileOutputStream(tmpfile);
                         outputStream.write(Arrays.copyOfRange(data, 2, data.length));
+                        outputStream.close();
                 }catch(Exception exc) 
                 {
                         if (!tmpdir.exists()) 

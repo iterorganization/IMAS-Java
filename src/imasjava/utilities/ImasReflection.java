@@ -5,7 +5,7 @@ import imasjava.ids.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-
+import java.util.Arrays;
 
 public class ImasReflection {
 
@@ -70,8 +70,10 @@ public class ImasReflection {
 		return nodeClass.getName();
 	}
 
-
-
+	public static Object[] getResizedClassObject(Object[] strClassName, int newSize) 
+	{
+		return Arrays.copyOf(strClassName, newSize);
+	}
 
 	public static void main(String [] arg) 
 	{
