@@ -50,12 +50,8 @@ set( TESTS
     TestWavesValidate
 )
 
-set( SOURCES
-    CommonValidateUtilities
-)
-
 # Report an error when a .java source file exists without corresponding test:
-error_on_missing_tests( "java" "${TESTS};${SOURCES}" )
+error_on_missing_tests( "java" "${TESTS}" )
 
 # Targets
 ################################################################################
@@ -64,26 +60,14 @@ get_target_property( AL_JAR_FILE al-java JAR_FILE )
 set( TEST_CLASSPATH "${CMAKE_CURRENT_BINARY_DIR}:${AL_JAR_FILE}" )
 
 
-# Dependencies of all tests
-set( SOURCE_CLASSES )
-foreach( SOURCE IN LISTS SOURCES )
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${SOURCE}.class
-    COMMAND ${Java_JAVAC_EXECUTABLE} --class-path ${TEST_CLASSPATH} ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE}.java -d ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS ${SOURCE}.java al-java
-  )
-  list( APPEND SOURCE_CLASSES ${CMAKE_CURRENT_BINARY_DIR}/${SOURCE}.class )
-endforeach()
-add_custom_target( example-java-sources ALL DEPENDS ${SOURCE_CLASSES} )
-
-add_custom_target( example-java-all DEPENDS example-java-sources )
+add_custom_target( example-java-all )
 
 foreach( TEST IN LISTS TESTS )
   set( TEST_NAME "example-java-${TEST}" )
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TEST}.class
     COMMAND ${Java_JAVAC_EXECUTABLE} --class-path ${TEST_CLASSPATH} ${CMAKE_CURRENT_SOURCE_DIR}/${TEST}.java -d ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS ${TEST}.java al-java example-java-sources
+    DEPENDS ${TEST}.java al-java
   )
   add_custom_target( ${TEST_NAME} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TEST}.class )
   add_dependencies( example-java-all ${TEST_NAME} )
