@@ -74,5 +74,3 @@ make -C build install
 
 # List installed files
 ls -lR test-install
-# and documentation
-ls -lR doc/_build/html
