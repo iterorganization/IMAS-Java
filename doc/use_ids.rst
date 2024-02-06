@@ -1,7 +1,7 @@
 
 .. highlight:: java
 
-.. include:: ../../doc_common/use_ids.rst
+.. include:: ./doc_common/use_ids.rst
 
 .. |lang| replace:: Java
 
