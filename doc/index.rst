@@ -53,6 +53,13 @@ language.
    api_util
    api_utilities
 
+.. toctree:: 
+    :maxdepth: 2
+    :caption: AL Developer documentation
+
+    building_installing
+    dev_guide
+
 Indices and tables
 ==================
 
