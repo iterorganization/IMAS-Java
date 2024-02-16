@@ -1,0 +1,151 @@
+package examples;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+import imasjava.*;
+import imasjava.wrapper.LowLevel;
+
+public class example001_OpenDatabase {
+
+    // This example focuses on creating DBEntry using legacy mode method
+    public static void createDBEntryLegacy() throws Exception {
+        String user = System.getenv("USER");
+        String dbName = "test";
+        String ddVersion = "3";
+        int shot = 1;
+        int run = 10;
+        int backendID = LowLevel.HDF5_BACKEND;
+
+        int entry = 0;
+        try {
+            // Create new entry, catch exceptions if failed
+            entry = imas.createEnv(shot, run, user, dbName, ddVersion, backendID);
+            /*
+             * You can access IDSes in here - take a look at sample code dealing with IDSes for details
+             */
+        } catch (Exception e) {
+            System.out.println("Failed to create DBEntry with legacy arguments\n" + e.getMessage());
+            throw e;
+        } finally {
+            imas.close(entry);
+        }
+    }
+
+    // This example focuses on opening DBEntry using URI
+    public static void openDBEntryURI() throws Exception {
+        String user = System.getenv("USER");
+        String dbName = "test";
+        String ddVersion = "3";
+        int shot = 1;
+        int run = 10;
+        String backend = "hdf5";
+
+        /*
+            Format URI with required data.
+            Available backends:
+
+            ascii - only for debugging purposes
+            mdsplus
+            hdf5
+            memory - data is lost after entry is closed
+            uda
+         */
+        String uri = String.format("imas:%s?user=%s;shot=%s;run=%s;database=%s;version=%s",
+                                    backend,user,shot,run,dbName,ddVersion);
+        int entry = 0;
+        try {
+            /*
+                Open existing entry with given mode, catch exceptions if failed
+                Available modes:
+
+                OPEN_PULSE - Opens the access to the data only if the Data Entry exists, returns error otherwise.
+                FORCE_OPEN_PULSE - Opens access to the data, creates the Data Entry if it does not exists yet.
+                CREATE_PULSE - Creates a new empty Data Entry (returns error if Data Entry already exists) and opens it at the same time.
+                FORCE_CREATE_PULSE - Creates an empty Data Entry (overwrites if Data Entry already exists) and opens it at the same time.
+            */
+            entry = imas.open(uri, LowLevel.OPEN_PULSE);
+            /*
+            * You can access IDSes in here - take a look at sample code dealing with IDSes for details
+            */
+        } catch (Exception e) {
+            System.out.println("Failed to open DBEntry with URI\n" + e.getMessage());
+            throw e;
+        } finally {
+            imas.close(entry);
+        }
+    }
+
+    // This example focuses on creating DBEntry using explicit path
+    public static void createDBEntryURIwithPath() throws Exception {
+        int entry = 0;
+
+        // example usage of uri with 'path' keyword pointing to relative location
+        try {
+            entry = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.CREATE_PULSE);
+            
+            // Content of ./testdb_mdsplus directory
+            try (Stream<Path> stream = Files.list(Paths.get("./testdb_mdsplus"))) {
+                stream.forEach(System.out::println);
+            } catch (Exception e) {
+                System.out.println("Error listing directory contents: " + e.getMessage());
+                throw e;
+            }
+    
+        } catch (Exception e) {
+            System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
+            throw e;
+        } finally {
+            imas.close(entry);
+        }
+
+        // example usage of uri with 'path' keyword pointing to relative location
+        try {
+            entry = imas.open("imas:hdf5?path=./testdb_hdf5", LowLevel.CREATE_PULSE);
+            
+            // Content of ./testdb_hdf5 directory
+            try (Stream<Path> stream = Files.list(Paths.get("./testdb_hdf5"))) {
+                stream.forEach(System.out::println);
+            } catch (Exception e) {
+                System.out.println("Error listing directory contents: " + e.getMessage());
+                throw e;
+            }
+    
+        } catch (Exception e) {
+            System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
+            throw e;
+        } finally {
+            imas.close(entry);
+        }
+
+        // example usage of uri with 'path' keyword pointing to relative location
+        try {
+            entry = imas.open("imas:ascii?path=./testdb_ascii", LowLevel.CREATE_PULSE);
+            
+            // Content of ./testdb_ascii directory
+            try (Stream<Path> stream = Files.list(Paths.get("./testdb_ascii"))) {
+                stream.forEach(System.out::println);
+            } catch (Exception e) {
+                System.out.println("Error listing directory contents: " + e.getMessage());
+                throw e;
+            }
+    
+        } catch (Exception e) {
+            System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
+            throw e;
+        } finally {
+            imas.close(entry);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        try {
+            createDBEntryLegacy();
+            openDBEntryURI();
+            createDBEntryURIwithPath();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+}
+
