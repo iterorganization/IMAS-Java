@@ -5,7 +5,7 @@ cmake_minimum_required( VERSION 3.16 )
 ################################################################################
 option( AL_DOWNLOAD_DEPENDENCIES "Automatically download common assets from the AL git repository" ON )
 set( AL_COMMON_GIT_REPOSITORY "ssh://git@git.iter.org/imas/al-common.git" CACHE STRING "Git repository of AL-common" )
-set( AL_COMMON_VERSION "4b4a6ecb83366f377a3bf9a0a9132ad3e25d2e56" CACHE STRING "Git commit/tag/branch of AL-common" )
+set( AL_COMMON_VERSION "b3adf7edd53dbdf731c844779a0a370578b6da86" CACHE STRING "Git commit/tag/branch of AL-common" )
 
 include(FetchContent)
 
@@ -19,10 +19,15 @@ if( ${AL_DOWNLOAD_DEPENDENCIES} )
     GIT_TAG "${AL_COMMON_VERSION}"
   )
 else()
-  # Look in ../al-common for common files
+  # Look in $AL_COMMON_PATH or ../al-common for common files
+  if( DEFINED ENV{AL_COMMON_PATH} )
+    set( AL_COMMON_PATH $ENV{AL_COMMON_PATH} )
+  else()
+    set( AL_COMMON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../al-common" )
+  endif()
   FetchContent_Declare(
     al-common
-    SOURCE_DIR      ${CMAKE_CURRENT_SOURCE_DIR}/../al-common
+    SOURCE_DIR      "${AL_COMMON_PATH}"
   )
 endif()
 FetchContent_MakeAvailable( al-common )
@@ -32,6 +37,7 @@ FetchContent_MakeAvailable( al-common )
 ################################################################################
 
 # Set VERSION and FULL_VERSION from `git describe`:
+set( GIT_ARCHIVE_DESCRIBE [[$Format:%(describe)$]] )
 include( ALDetermineVersion )
 project( al-java
   VERSION ${VERSION}
@@ -63,10 +69,10 @@ endif()
 
 find_package( JNI REQUIRED )
 find_package( Java REQUIRED )
-include(UseJava)
+include( UseJava )
 find_package( SaxonHE )
 # Find LibXslt for the xsltproc program
-find_package( LibXslt )
+find_package( LibXslt QUIET )
 if( NOT LIBXSLT_XSLTPROC_EXECUTABLE )
   message( FATAL_ERROR "Could not find xsltproc" )
 endif()
@@ -165,15 +171,15 @@ file( CREATE_LINK
   SYMBOLIC COPY_ON_ERROR
 )
 set( IDENTIFIER_SRC_DIR ${CMAKE_CURRENT_BINARY_DIR}/identifiers/src/ )
-file( GLOB ID_FILES ${data-dictionary_SOURCE_DIR}/*/*_identifier.xml )
 
 set( IDENTIFIER_SOURCES )
-foreach( ID_FILE IN LISTS ID_FILES )
+foreach( ID_FILE IN LISTS DD_IDENTIFIER_FILES )
   # cmake_path( GET ID_FILE STEM ID_NAME)
   string( REGEX REPLACE "(^.*[/\\]|[.]xml$)" "" ID_NAME ${ID_FILE} )
   set( SOURCE_NAME "${IDENTIFIER_SRC_DIR}/${ID_NAME}.java" )
   add_custom_command(
     OUTPUT ${SOURCE_NAME} ${HEADER_NAME}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${IDENTIFIER_SRC_DIR}
     COMMAND ${LIBXSLT_XSLTPROC_EXECUTABLE}
       --stringparam name ${ID_NAME}
       --stringparam prefix ${IDENTIFIER_SRC_DIR}

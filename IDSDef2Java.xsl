@@ -78,24 +78,13 @@
         System.err.println("IMAS library not set up in the environment. (AL_VERSION missing)");
         System.exit(1);
         }
-        <xsl:choose><xsl:when test="$SYSTEM = 'Linux'">
-            libpath = libpath + "/lib";
-            String imas_library = libpath + "/libal-java-binding.so";
-          </xsl:when><xsl:otherwise>
-            String imas_library = libpath + "/javainterface/lib/libal-java-binding.dll";
-          </xsl:otherwise></xsl:choose>
-        File f = new File(imas_library);
-        if (!f.exists()) {
-        System.err.println("IMAS library not set up in the environment. (libal-java-binding.so missing)");
-        }
-        
         try {
-        System.load(imas_library);
+          System.loadLibrary("al-java-binding");
         } catch (UnsatisfiedLinkError exc) {
-        System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
+          System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
         } catch (Throwable exc) {
-        System.err.println("Cannot link to JNI library: " + exc);
-        System.exit(0);
+          System.err.println("Cannot link to JNI library: " + exc);
+          System.exit(1);
         }
         }
         

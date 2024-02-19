@@ -7,13 +7,11 @@ include(ALExampleUtilities)
 # Sources
 ################################################################################
 
-# The java interface requires the libal-java-binding.so in the folder
-# $IMAS_PREFIX/lib/libal-java-binding.so
-get_target_property( IMAS_PREFIX al-java-binding BINARY_DIR )
 set( TEST_ENVIRONMENT
     "IMAS_VERSION=${DD_VERSION}"
     "AL_VERSION=${AL_VERSION}"
-    "IMAS_PREFIX=${IMAS_PREFIX}"
+    "IMAS_PREFIX=$<TARGET_FILE_DIR:al-java-binding>"
+    "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:al-java-binding>:$ENV{LD_LIBRARY_PATH}"
 )
 
 if( AL_BACKEND_MDSPLUS )
