@@ -2395,10 +2395,10 @@
                 Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, "<xsl:value-of select="$DD_VERSION"/>", "<xsl:value-of select="@lifecycle_status"/>");
               </xsl:when>
               <xsl:when test="@path='ids_properties/version_put/access_layer'">
-                Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, "<xsl:value-of select="$AL_VERSION"/>", "<xsl:value-of select="@lifecycle_status"/>");
+                Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, LowLevel.al_get_version(), "<xsl:value-of select="@lifecycle_status"/>");
               </xsl:when>
               <xsl:when test="@path='ids_properties/version_put/access_layer_language'">
-                Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, "java", "<xsl:value-of select="@lifecycle_status"/>");
+                Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, "java-<xsl:value-of select="$AL_VERSION"/>", "<xsl:value-of select="@lifecycle_status"/>");
               </xsl:when>
               <xsl:otherwise>
                 Wrapper.writeData(ctx, idsFullName, strNodePath, strTimeBasePath, this.<xsl:value-of select="@name"/>, "<xsl:value-of select="@lifecycle_status"/>");
