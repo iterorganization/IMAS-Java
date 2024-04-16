@@ -17,7 +17,7 @@ builddependencies = [
 ]
 
 dependencies = [
-    ('IMAS-AL-Lowlevel', version),
+    ('IMAS-AL-Core', version),
     ('IMAS-AL-MDSplus-models', version, local_dd_suffix),
     ('Java', '11', '', SYSTEM),
 ]
