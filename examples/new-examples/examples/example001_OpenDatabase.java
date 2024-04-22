@@ -124,6 +124,7 @@ public class example001_OpenDatabase {
             Stream<Path> stream = Files.list(Paths.get("./testdb_ascii"));
             stream.forEach(System.out::println);
             // Contents of testdb_ascii:
+
         } catch (Exception e) {
             System.err.println("Failed to open DBEntry with path\n" + e.getMessage());
             throw e;
