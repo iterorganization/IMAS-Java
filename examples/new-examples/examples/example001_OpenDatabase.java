@@ -85,12 +85,8 @@ public class example001_OpenDatabase {
             entry = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.CREATE_PULSE);
             
             // Content of ./testdb_mdsplus directory
-            try (Stream<Path> stream = Files.list(Paths.get("./testdb_mdsplus"))) {
-                stream.forEach(System.out::println);
-            } catch (Exception e) {
-                System.out.println("Error listing directory contents: " + e.getMessage());
-                throw e;
-            }
+            Stream<Path> stream = Files.list(Paths.get("./testdb_mdsplus"));
+            stream.forEach(System.out::println);
     
         } catch (Exception e) {
             System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
@@ -104,12 +100,8 @@ public class example001_OpenDatabase {
             entry = imas.open("imas:hdf5?path=./testdb_hdf5", LowLevel.CREATE_PULSE);
             
             // Content of ./testdb_hdf5 directory
-            try (Stream<Path> stream = Files.list(Paths.get("./testdb_hdf5"))) {
-                stream.forEach(System.out::println);
-            } catch (Exception e) {
-                System.out.println("Error listing directory contents: " + e.getMessage());
-                throw e;
-            }
+            Stream<Path> stream = Files.list(Paths.get("./testdb_hdf5"));
+            stream.forEach(System.out::println);
     
         } catch (Exception e) {
             System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
@@ -123,12 +115,8 @@ public class example001_OpenDatabase {
             entry = imas.open("imas:ascii?path=./testdb_ascii", LowLevel.CREATE_PULSE);
             
             // Content of ./testdb_ascii directory
-            try (Stream<Path> stream = Files.list(Paths.get("./testdb_ascii"))) {
-                stream.forEach(System.out::println);
-            } catch (Exception e) {
-                System.out.println("Error listing directory contents: " + e.getMessage());
-                throw e;
-            }
+            Stream<Path> stream = Files.list(Paths.get("./testdb_ascii"));
+            stream.forEach(System.out::println);
     
         } catch (Exception e) {
             System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
