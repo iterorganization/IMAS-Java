@@ -25,7 +25,7 @@ public class example001_OpenDatabase {
              * You can access IDSes in here - take a look at sample code dealing with IDSes for details
              */
         } catch (Exception e) {
-            System.out.println("Failed to create DBEntry with legacy arguments\n" + e.getMessage());
+            System.err.println("Failed to create DBEntry with legacy arguments\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
@@ -69,7 +69,7 @@ public class example001_OpenDatabase {
             * You can access IDSes in here - take a look at sample code dealing with IDSes for details
             */
         } catch (Exception e) {
-            System.out.println("Failed to open DBEntry with URI\n" + e.getMessage());
+            System.err.println("Failed to open DBEntry with URI\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
@@ -90,7 +90,7 @@ public class example001_OpenDatabase {
             stream.forEach(System.out::println);
     
         } catch (Exception e) {
-            System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
+            System.err.println("Failed to open DBEntry with path\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
@@ -106,7 +106,7 @@ public class example001_OpenDatabase {
             stream.forEach(System.out::println);
     
         } catch (Exception e) {
-            System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
+            System.err.println("Failed to open DBEntry with path\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
@@ -122,20 +122,10 @@ public class example001_OpenDatabase {
             stream.forEach(System.out::println);
     
         } catch (Exception e) {
-            System.out.println("Failed to open DBEntry with path\n" + e.getMessage());
+            System.err.println("Failed to open DBEntry with path\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        try {
-            createDBEntryLegacy();
-            openDBEntryURI();
-            createDBEntryURIwithPath();
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
         }
     }
 }
