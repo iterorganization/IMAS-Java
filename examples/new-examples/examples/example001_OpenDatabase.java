@@ -13,14 +13,14 @@ public class example001_OpenDatabase {
         String user = System.getenv("USER");
         String dbName = "test";
         String ddVersion = "3";
-        int shot = 1;
+        int pulse = 1;
         int run = 10;
         int backendID = LowLevel.HDF5_BACKEND;
 
         int entry = 0;
         try {
             // Create new entry, catch exceptions if failed
-            entry = imas.createEnv(shot, run, user, dbName, ddVersion, backendID);
+            entry = imas.createEnv(pulse, run, user, dbName, ddVersion, backendID);
             /*
              * You can access IDSes in here - take a look at sample code dealing with IDSes for details
              */
@@ -37,7 +37,7 @@ public class example001_OpenDatabase {
         String user = System.getenv("USER");
         String dbName = "test";
         String ddVersion = "3";
-        int shot = 1;
+        int pulse = 1;
         int run = 10;
         String backend = "hdf5";
 
@@ -51,8 +51,8 @@ public class example001_OpenDatabase {
             memory - data is lost after entry is closed
             uda
          */
-        String uri = String.format("imas:%s?user=%s;shot=%s;run=%s;database=%s;version=%s",
-                                    backend,user,shot,run,dbName,ddVersion);
+        String uri = String.format("imas:%s?user=%s;pulse=%s;run=%s;database=%s;version=%s",
+                                    backend,user,pulse,run,dbName,ddVersion);
         int entry = 0;
         try {
             /*
@@ -85,6 +85,7 @@ public class example001_OpenDatabase {
             entry = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.CREATE_PULSE);
             
             // Content of ./testdb_mdsplus directory
+            System.out.println("Contents of testdb_mdsplus:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_mdsplus"));
             stream.forEach(System.out::println);
     
@@ -100,6 +101,7 @@ public class example001_OpenDatabase {
             entry = imas.open("imas:hdf5?path=./testdb_hdf5", LowLevel.CREATE_PULSE);
             
             // Content of ./testdb_hdf5 directory
+            System.out.println("Contents of testdb_hdf5:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_hdf5"));
             stream.forEach(System.out::println);
     
@@ -115,6 +117,7 @@ public class example001_OpenDatabase {
             entry = imas.open("imas:ascii?path=./testdb_ascii", LowLevel.CREATE_PULSE);
             
             // Content of ./testdb_ascii directory
+            System.out.println("Contents of testdb_ascii:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_ascii"));
             stream.forEach(System.out::println);
     
