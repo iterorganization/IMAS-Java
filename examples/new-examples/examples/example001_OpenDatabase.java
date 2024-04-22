@@ -10,12 +10,12 @@ public class example001_OpenDatabase {
 
     // This example focuses on creating DBEntry using legacy mode method
     public static void createDBEntryLegacy() throws Exception {
-        String user = System.getenv("USER");
-        String dbName = "test";
+        String user      = System.getenv("USER");
+        String dbName    = "test";
         String ddVersion = "3";
-        int pulse = 1;
-        int run = 10;
-        int backendID = LowLevel.HDF5_BACKEND;
+        int pulse        = 1;
+        int run          = 10;
+        int backendID    = LowLevel.HDF5_BACKEND;
 
         int entry = 0;
         try {
@@ -34,12 +34,12 @@ public class example001_OpenDatabase {
 
     // This example focuses on opening DBEntry using URI
     public static void openDBEntryURI() throws Exception {
-        String user = System.getenv("USER");
-        String dbName = "test";
+        String user      = System.getenv("USER");
+        String dbName    = "test";
         String ddVersion = "3";
-        int pulse = 1;
-        int run = 10;
-        String backend = "hdf5";
+        int pulse        = 1;
+        int run          = 10;
+        String backend   = "hdf5";
 
         /*
             Format URI with required data.
