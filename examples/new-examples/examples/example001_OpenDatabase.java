@@ -10,17 +10,17 @@ public class example001_OpenDatabase {
 
     // This example focuses on creating DBEntry using legacy mode method
     public static void createDBEntryLegacy() throws Exception {
-        String user      = System.getenv("USER");
-        String dbName    = "test";
-        String ddVersion = "3";
-        int pulse        = 1;
-        int run          = 10;
-        int backendID    = LowLevel.HDF5_BACKEND;
+        String user           = System.getenv("USER");
+        String dbName         = "test";
+        String ddMajorVersion = "3";
+        int pulse             = 1;
+        int run               = 10;
+        int backendID         = LowLevel.HDF5_BACKEND;
 
         int entry = 0;
         try {
             // Create new entry, catch exceptions if failed
-            entry = imas.createEnv(pulse, run, user, dbName, ddVersion, backendID);
+            entry = imas.createEnv(pulse, run, user, dbName, ddMajorVersion, backendID);
             /*
              * You can access IDSes in here - take a look at sample code dealing with IDSes for details
              */
@@ -34,12 +34,12 @@ public class example001_OpenDatabase {
 
     // This example focuses on opening DBEntry using URI
     public static void openDBEntryURI() throws Exception {
-        String user      = System.getenv("USER");
-        String dbName    = "test";
-        String ddVersion = "3";
-        int pulse        = 1;
-        int run          = 10;
-        String backend   = "hdf5";
+        String user           = System.getenv("USER");
+        String dbName         = "test";
+        String ddMajorVersion = "3";
+        int pulse             = 1;
+        int run               = 10;
+        String backend        = "hdf5";
 
         /*
             Format URI with required data.
@@ -52,7 +52,7 @@ public class example001_OpenDatabase {
             uda
          */
         String uri = String.format("imas:%s?user=%s;pulse=%s;run=%s;database=%s;version=%s",
-                                    backend,user,pulse,run,dbName,ddVersion);
+                                    backend,user,pulse,run,dbName,ddMajorVersion);
         int entry = 0;
         try {
             /*
