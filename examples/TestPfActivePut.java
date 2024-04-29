@@ -1,4 +1,5 @@
 import imasjava.*;
+import imasjava.wrapper.LowLevel;
 
 import java.io.*;
 
@@ -18,7 +19,10 @@ class TestPfActivePut {
         // Test the "put" part
         try {
             int number = 10;
-            int idx = imas.createEnv(12, 2, userName, "test", "3");
+            
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db";
+            int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
             System.out.println("idx: " + idx);
 
             imas.pf_active pf_active = new imas.pf_active();

@@ -1,11 +1,13 @@
 import java.io.*;
 
 import imasjava.*;
+import imasjava.wrapper.LowLevel;
 
 class TestCoreProfilesGetSlice {
     public static void main(String args[]) {
         // Get username
         String userName = System.getenv("USER");
+        
         if (userName == null) {
             System.out.println("PANIC: $USER not found! Exiting...");
             System.exit(1);
@@ -19,7 +21,9 @@ class TestCoreProfilesGetSlice {
         // Test the "getSlice" part
         imas.core_profiles ids;
         try {
-            int idx = imas.openEnv(13, 2, userName, "test", "3"); // 12 or 20 or 400
+            String currentDir =  System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db";
+            int idx = imas.open(uri, LowLevel.OPEN_PULSE);
             double time = 4.0;
 
             ids = imas.core_profiles.getSlice(idx, "core_profiles", time, 1);

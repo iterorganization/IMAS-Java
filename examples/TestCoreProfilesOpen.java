@@ -23,7 +23,7 @@ class TestCoreProfilesOpen {
         try {
             //Opens a new pulse file in folder 13/1 of the current user directory
 	    String currentDir =  System.getProperty("user.dir");
-	    String uri = "imas:hdf5?path=" +  currentDir + "/13/1"; //URI string
+	    String uri = "imas:hdf5?path=" +  currentDir + "/test_db"; //URI string
 	    int idx = imas.open(uri, LowLevel.OPEN_PULSE); //opening pulse file
 	    System.out.println("idx for get: " + idx); 
             ids = imas.core_profiles.get(idx, "core_profiles");

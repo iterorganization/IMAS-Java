@@ -1,4 +1,5 @@
 import imasjava.*;
+import imasjava.wrapper.LowLevel;
 
 import java.io.*;
 
@@ -18,7 +19,10 @@ class TestPfActiveGetSlice {
         // Test the "getSlice" part
         imas.pf_active pf_active;
         try {
-            int idx = imas.openEnv(22, 1, userName, "test", "3");
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db";
+            int idx = imas.open(uri, LowLevel.OPEN_PULSE);
+
             System.out.println("idx for getslice: " + idx);
 
             double time = 4.2;
