@@ -20,7 +20,7 @@ class TestPfActiveGetSlice {
         imas.pf_active pf_active;
         try {
             String currentDir = System.getProperty("user.dir");
-            String uri = "imas:mdsplus?path=" + currentDir + "/test_db";
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestPfActive";
             int idx = imas.open(uri, LowLevel.OPEN_PULSE);
 
             System.out.println("idx for getslice: " + idx);

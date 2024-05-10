@@ -22,8 +22,8 @@ class TestCoreProfilesGet {
         imas.core_profiles ids;
         try {
             String currentDir =  System.getProperty("user.dir");
-            String uri = "imas:mdsplus?path=" + currentDir + "/test_db";
-            int idx = imas.open(uri, LowLevel.OPEN_PULSE)
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            int idx = imas.open(uri, LowLevel.OPEN_PULSE);
             System.out.println("idx for get: " + idx);
 
             ids = imas.core_profiles.get(idx, "core_profiles");

@@ -20,7 +20,7 @@ class TestPfActivePutSlice {
         try {
             int number = 1;
             String currentDir = System.getProperty("user.dir");
-            String uri = "imas:mdsplus?path=" + currentDir + "/test_db";
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestPfActive";
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
             System.out.println("idx: " + idx);
 

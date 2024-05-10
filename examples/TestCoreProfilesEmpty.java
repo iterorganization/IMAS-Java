@@ -19,7 +19,7 @@ class TestCoreProfilesEmpty {
         // Get empty IDS
         try {
             String currentDir =  System.getProperty("user.dir");
-            String uri = "imas:mdsplus?path=" + currentDir + "/test_db";
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
 
             imas.core_profiles ids = imas.core_profiles.get(idx, "core_profiles");
@@ -34,7 +34,7 @@ class TestCoreProfilesEmpty {
         // whether it is empty
         try {
             String currentDir =  System.getProperty("user.dir");
-            String uri = "imas:mdsplus?path=" + currentDir + "/test_db";
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
             
             imas.core_profiles ids = new imas.core_profiles();
