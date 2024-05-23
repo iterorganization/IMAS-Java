@@ -63,21 +63,6 @@
         
         public class imas {
         static {
-        String libpath = System.getenv("IMAS_PREFIX");
-        String imasversion = System.getenv("IMAS_VERSION");
-        String alversion = System.getenv("AL_VERSION");
-        if (libpath == null) {
-        System.err.println("IMAS library not set up in the environment. (IMAS_PREFIX missing)");
-        System.exit(1);
-        }
-        if (imasversion == null) {
-        System.err.println("IMAS library not set up in the environment. (IMAS_VERSION missing)");
-        System.exit(1);
-        }
-        if (alversion == null) {
-        System.err.println("IMAS library not set up in the environment. (AL_VERSION missing)");
-        System.exit(1);
-        }
         try {
           System.loadLibrary("al-java-binding");
         } catch (UnsatisfiedLinkError exc) {
