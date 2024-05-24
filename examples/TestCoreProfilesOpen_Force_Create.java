@@ -25,8 +25,9 @@ class TestCoreProfilesOpen_Force_Create {
         try {
 	    //Creates a new pulse file in folder 13/1 of the current user directory 
             String currentDir =  System.getProperty("user.dir");
-            String uri = "imas:hdf5?path=" +  currentDir + "/13/1"; //URI string
+            String uri = "imas:hdf5?path=" +  currentDir + "/test_db_TestCoreProfiles"; //URI string
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE); //pulse file creation
+            
             System.out.println("idx: " + idx);
 
             // allocate the ids fields

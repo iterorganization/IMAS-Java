@@ -1,6 +1,7 @@
 import java.lang.*;
 
 import imasjava.*;
+import imasjava.wrapper.LowLevel;
 
 class TestCoreProfilesPut {
     public static void main(String args[]) {
@@ -22,7 +23,9 @@ class TestCoreProfilesPut {
 
         // Test the "put" part
         try {
-            int idx = imas.createEnv(13, 1, userName, "test", "3");
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
             System.out.println("idx: " + idx);
 
             // allocate the ids fields

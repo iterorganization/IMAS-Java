@@ -1,6 +1,7 @@
 import java.lang.*;
 
 import imasjava.*;
+import imasjava.wrapper.LowLevel;
 
 class TestCoreProfilesPutSlice {
     public static void main(String args[]) {
@@ -21,7 +22,9 @@ class TestCoreProfilesPutSlice {
 
         // Test the "putSlice" part
         try {
-            int idx = imas.createEnv(13, 2, userName, "test", "3");
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
             System.out.println("idx: " + idx);
 
             // allocate the core_profiles fields

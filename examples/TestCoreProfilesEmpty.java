@@ -1,6 +1,7 @@
 import java.io.*;
 
 import imasjava.*;
+import imasjava.wrapper.LowLevel;
 
 class TestCoreProfilesEmpty {
     public static void main(String args[]) {
@@ -9,6 +10,7 @@ class TestCoreProfilesEmpty {
 
         // Get username
         String userName = System.getenv("USER");
+
         if (userName == null) {
             System.out.println("PANIC: $USER not found! Exiting...");
             System.exit(1);
@@ -16,7 +18,9 @@ class TestCoreProfilesEmpty {
 
         // Get empty IDS
         try {
-            int idx = imas.createEnv(13, 1, userName, "test", "3");
+            String currentDir =  System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
 
             imas.core_profiles ids = imas.core_profiles.get(idx, "core_profiles");
             System.out.println("Is defined: " + ids.isDefined());
@@ -29,7 +33,9 @@ class TestCoreProfilesEmpty {
         // Store IDS with a basic data, get it from the pulse file, and check
         // whether it is empty
         try {
-            int idx = imas.createEnv(13, 1, userName, "test", "3");
+            String currentDir =  System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
             
             imas.core_profiles ids = new imas.core_profiles();
             
@@ -40,7 +46,7 @@ class TestCoreProfilesEmpty {
             ids.put(idx, "core_profiles", ids);
             imas.close(idx);
 
-            idx = imas.openEnv(13, 1, userName, "test", "3");
+            idx = imas.open(uri, LowLevel.OPEN_PULSE);
             ids = imas.core_profiles.get(idx, "core_profiles");
             System.out.println("Is defined: " + ids.isDefined());
             

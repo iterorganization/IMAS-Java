@@ -1,11 +1,13 @@
 import java.io.*;
 
 import imasjava.*;
+import imasjava.wrapper.LowLevel;
 
 class TestCoreProfilesGet {
     public static void main(String args[]) {
         // Get username
         String userName = System.getenv("USER");
+        
         if (userName == null) {
             System.out.println("PANIC: $USER not found! Exiting...");
             System.exit(1);
@@ -19,7 +21,9 @@ class TestCoreProfilesGet {
         // Test the "get" part
         imas.core_profiles ids;
         try {
-            int idx = imas.openEnv(13, 1, userName, "test", "3");
+            String currentDir =  System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            int idx = imas.open(uri, LowLevel.OPEN_PULSE);
             System.out.println("idx for get: " + idx);
 
             ids = imas.core_profiles.get(idx, "core_profiles");

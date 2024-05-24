@@ -24,7 +24,9 @@ class TestCoreProfilesSerialize {
 
         // Test the "serialize" part
         try {
-            int idx = imas.createEnv(13, 1, userName, "test", "3");
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
 
             // allocate the ids fields
             imas.core_profiles ids1 = new imas.core_profiles();
