@@ -2894,18 +2894,47 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
     <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE">
     <xsl:param name="currpath"/>
     <xsl:param name="dimension"/>
-    <!-- target field coordinate we want to check (specific and relative coordinate) -->
+    <xsl:variable name="coord_same_as">
+    <xsl:apply-templates select="." mode="get_coordinate_string">
+      <xsl:with-param name="dimension" select="$dimension"/>
+      <xsl:with-param name="same_as" select="'yes'"/>
+    </xsl:apply-templates>
+    </xsl:variable>
+
+    <xsl:if test="not($coord_same_as='1...N')">
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE_CHECKS">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="$dimension"/>
+        <xsl:with-param name="coord" select="$coord_same_as"/>
+        <xsl:with-param name="targetdim" select="$dimension"/>
+      </xsl:apply-templates>
+    </xsl:if>
+
+
     <xsl:variable name="coord">
-    <xsl:apply-templates select="." mode="get_coordinate">
+    <xsl:apply-templates select="." mode="get_coordinate_string">
       <xsl:with-param name="dimension" select="$dimension"/>
+      <xsl:with-param name="same_as" select="'no'"/>
     </xsl:apply-templates>
-    </xsl:variable >
-    <!-- target field dimension we want to check -->
-    <xsl:variable name="targetdim">
-    <xsl:apply-templates select="." mode="get_targetdim">
-      <xsl:with-param name="dimension" select="$dimension"/>
-    </xsl:apply-templates>
-    </xsl:variable >
+    </xsl:variable>
+
+    <xsl:if test="not($coord='1...N')">
+      <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE_CHECKS">
+        <xsl:with-param name="currpath" select="$currpath"/>
+        <xsl:with-param name="dimension" select="$dimension"/>
+        <xsl:with-param name="coord" select="$coord"/>
+        <xsl:with-param name="targetdim" select="'0'"/>
+      </xsl:apply-templates>
+    </xsl:if>
+    </xsl:template> 
+
+
+
+    <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_CHECKS">
+    <xsl:param name="currpath"/>
+    <xsl:param name="dimension"/>
+    <xsl:param name="coord"/>
+    <xsl:param name="targetdim"/>
     <!-- variable to check if the specified coordinate is present or not. 
     this variable is a safeguard that prevents wrong code generation-->
     <xsl:variable name="ispresent">
@@ -3022,126 +3051,58 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
         <xsl:value-of select="'yes'"/>
       </xsl:if >
     </xsl:template> 
-    <!-- get the target coordinate (if 'as_parent' or not) -->
-    <xsl:template match="field" mode="get_coordinate">
-    <xsl:param name="dimension"/>
-    <xsl:variable name="string_coord">
-    <xsl:apply-templates select="." mode="get_coordinate_string">
-    <xsl:with-param name="dimension" select="$dimension"/>
-    </xsl:apply-templates>
-    </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="not($string_coord='1...N')">
-          <xsl:value-of select="$string_coord"/>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:template>
 
 
     <xsl:template match="field" mode="get_coordinate_string">
     <xsl:param name="dimension"/>
+    <xsl:param name="same_as"/>
       <xsl:choose>
         <xsl:when test="$dimension='0'">
-          <xsl:if test="@coordinate1='1...N' and @coordinate1_same_as">
+          <xsl:if test="$same_as='yes'">
           <xsl:value-of select="@coordinate1_same_as"/>
           </xsl:if>
-          <xsl:if test="not(@coordinate1_same_as)">
+          <xsl:if test="not($same_as='yes')">
           <xsl:value-of select="@coordinate1"/>
           </xsl:if>
         </xsl:when>
         <xsl:when test="$dimension='1'">
-          <xsl:if test="@coordinate2='1...N' and @coordinate2_same_as">
+          <xsl:if test="$same_as='yes'">
           <xsl:value-of select="@coordinate2_same_as"/>
           </xsl:if>
-          <xsl:if test="not(@coordinate2_same_as)">
+          <xsl:if test="not($same_as='yes')">
           <xsl:value-of select="@coordinate2"/>
           </xsl:if>
         </xsl:when>
         <xsl:when test="$dimension='2'">
-          <xsl:if test="@coordinate3='1...N' and @coordinate3_same_as">
+          <xsl:if test="$same_as='yes'">
           <xsl:value-of select="@coordinate3_same_as"/>
           </xsl:if>
-          <xsl:if test="not(@coordinate3_same_as)">
+          <xsl:if test="not($same_as='yes')">
           <xsl:value-of select="@coordinate3"/>
           </xsl:if>
         </xsl:when>
         <xsl:when test="$dimension='3'">
-          <xsl:if test="@coordinate4='1...N' and @coordinate4_same_as">
+          <xsl:if test="$same_as='yes'">
           <xsl:value-of select="@coordinate4_same_as"/>
           </xsl:if>
-          <xsl:if test="not(@coordinate4_same_as)">
+          <xsl:if test="not($same_as='yes')">
           <xsl:value-of select="@coordinate4"/>
           </xsl:if>
         </xsl:when>
         <xsl:when test="$dimension='4'">
-          <xsl:if test="@coordinate5='1...N' and @coordinate5_same_as">
+          <xsl:if test="$same_as='yes'">
           <xsl:value-of select="@coordinate5_same_as"/>
           </xsl:if>
-          <xsl:if test="not(@coordinate5_same_as)">
+          <xsl:if test="not($same_as='yes')">
           <xsl:value-of select="@coordinate5"/>
           </xsl:if>
         </xsl:when>
         <xsl:when test="$dimension='5'">
-          <xsl:if test="@coordinate6='1...N' and @coordinate6_same_as">
+          <xsl:if test="$same_as='yes'">
           <xsl:value-of select="@coordinate6_same_as"/>
           </xsl:if>
-          <xsl:if test="not(@coordinate6_same_as)">
+          <xsl:if test="not($same_as='yes')">
           <xsl:value-of select="@coordinate6"/>
-          </xsl:if>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:template>
-
-    <!-- get the target coordinate dimension-->
-    <xsl:template match="field" mode="get_targetdim">
-    <xsl:param name="dimension"/>
-      <xsl:choose>
-        <xsl:when test="$dimension='0'">
-          <xsl:if test="@coordinate1='1...N' and @coordinate1_same_as">
-          <xsl:value-of select="'0'"/>
-          </xsl:if>
-          <xsl:if test="not(@coordinate1='1...N') and not(@coordinate1_same_as)">
-          <xsl:value-of select="'0'"/>
-          </xsl:if>
-        </xsl:when>
-        <xsl:when test="$dimension='1'">
-          <xsl:if test="@coordinate2='1...N' and @coordinate2_same_as">
-          <xsl:value-of select="'1'"/>
-          </xsl:if>
-          <xsl:if test="not(@coordinate2='1...N') and not(@coordinate2_same_as)">
-          <xsl:value-of select="'0'"/>
-          </xsl:if>
-        </xsl:when>
-        <xsl:when test="$dimension='2'">
-          <xsl:if test="@coordinate3='1...N' and @coordinate3_same_as">
-          <xsl:value-of select="'2'"/>
-          </xsl:if>
-          <xsl:if test="not(@coordinate3='1...N') and not(@coordinate3_same_as)">
-          <xsl:value-of select="'0'"/>
-          </xsl:if>
-        </xsl:when>
-        <xsl:when test="$dimension='3'">
-          <xsl:if test="@coordinate4='1...N' and @coordinate4_same_as">
-          <xsl:value-of select="'3'"/>
-          </xsl:if>
-          <xsl:if test="not(@coordinate4='1...N') and not(@coordinate4_same_as)">
-          <xsl:value-of select="'0'"/>
-          </xsl:if>
-        </xsl:when>
-        <xsl:when test="$dimension='4'">
-          <xsl:if test="@coordinate5='1...N' and @coordinate5_same_as">
-          <xsl:value-of select="'4'"/>
-          </xsl:if>
-          <xsl:if test="not(@coordinate5='1...N') and not(@coordinate5_same_as)">
-          <xsl:value-of select="'0'"/>
-          </xsl:if>
-        </xsl:when>
-        <xsl:when test="$dimension='5'">
-          <xsl:if test="@coordinate6='1...N' and @coordinate6_same_as">
-          <xsl:value-of select="'5'"/>
-          </xsl:if>
-          <xsl:if test="not(@coordinate6='1...N') and not(@coordinate6_same_as)">
-          <xsl:value-of select="'0'"/>
           </xsl:if>
         </xsl:when>
       </xsl:choose>
