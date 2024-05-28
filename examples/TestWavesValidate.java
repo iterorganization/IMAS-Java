@@ -12,22 +12,22 @@ class TestWavesValidate {
 
         System.out.println("### Testing simplest case...");
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
 
         ids.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
-        
+
         System.out.println("### Testing HOMOGENEOUS time array...");
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
@@ -47,10 +47,10 @@ class TestWavesValidate {
             }
         }
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
@@ -64,10 +64,12 @@ class TestWavesValidate {
             }
         }
         try {
-        ids.validate();}
-        catch (Exception e) {
-        System.out.println("Error: unexpected ValidationException: "+e.getMessage());
-        };
+            ids.validate();
+        } catch (Exception e) {
+            System.out.println("Error: unexpected ValidationException: " + e.getMessage());
+            System.exit(1);
+        }
+        ;
         System.out.println("");
 
         System.out.println("### Testing HOMOGENEOUS alternative/fixed coordinates issue fixed v2");
@@ -81,10 +83,12 @@ class TestWavesValidate {
             }
         }
         try {
-        ids.validate();}
-        catch (Exception e) {
-        System.out.println("Error: unexpected ValidationException: "+e.getMessage());
-        };
+            ids.validate();
+        } catch (Exception e) {
+            System.out.println("Error: unexpected ValidationException: " + e.getMessage());
+            System.exit(1);
+        }
+        ;
         System.out.println("");
     }
 }

@@ -23,11 +23,11 @@ class TestCoreProfilesOpen_Force_Create {
 
         // Test the "put" part
         try {
-	    //Creates a new pulse file in folder 13/1 of the current user directory 
-            String currentDir =  System.getProperty("user.dir");
-            String uri = "imas:hdf5?path=" +  currentDir + "/test_db_TestCoreProfiles"; //URI string
+            //Creates a new pulse file in folder 13/1 of the current user directory
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:hdf5?path=" + currentDir + "/test_db_TestCoreProfiles"; //URI string
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE); //pulse file creation
-            
+
             System.out.println("idx: " + idx);
 
             // allocate the ids fields
@@ -66,6 +66,7 @@ class TestCoreProfilesOpen_Force_Create {
             System.out.println("End putting the code_profiles IDS");
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
     }
 }

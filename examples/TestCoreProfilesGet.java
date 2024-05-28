@@ -7,7 +7,7 @@ class TestCoreProfilesGet {
     public static void main(String args[]) {
         // Get username
         String userName = System.getenv("USER");
-        
+
         if (userName == null) {
             System.out.println("PANIC: $USER not found! Exiting...");
             System.exit(1);
@@ -21,7 +21,7 @@ class TestCoreProfilesGet {
         // Test the "get" part
         imas.core_profiles ids;
         try {
-            String currentDir =  System.getProperty("user.dir");
+            String currentDir = System.getProperty("user.dir");
             String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
             int idx = imas.open(uri, LowLevel.OPEN_PULSE);
             System.out.println("idx for get: " + idx);
@@ -45,6 +45,7 @@ class TestCoreProfilesGet {
             imas.close(idx);
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
     }
 }

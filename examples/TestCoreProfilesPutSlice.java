@@ -49,6 +49,7 @@ class TestCoreProfilesPutSlice {
             imas.close(idx);
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
     }
 }

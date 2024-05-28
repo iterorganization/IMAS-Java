@@ -64,6 +64,7 @@ class TestCoreProfilesPut {
             System.out.println("End putting the code_profiles IDS");
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
     }
 }

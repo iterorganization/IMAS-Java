@@ -18,7 +18,7 @@ class TestCoreProfilesEmpty {
 
         // Get empty IDS
         try {
-            String currentDir =  System.getProperty("user.dir");
+            String currentDir = System.getProperty("user.dir");
             String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
 
@@ -28,17 +28,18 @@ class TestCoreProfilesEmpty {
             imas.close(idx);
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
 
         // Store IDS with a basic data, get it from the pulse file, and check
         // whether it is empty
         try {
-            String currentDir =  System.getProperty("user.dir");
+            String currentDir = System.getProperty("user.dir");
             String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
-            
+
             imas.core_profiles ids = new imas.core_profiles();
-            
+
             ids.ids_properties.homogeneous_time = 1;
             ids.ids_properties.comment = "This is a test ids. User: " + userName;
             ids.time = new Vect1DDouble(time);
@@ -49,14 +50,15 @@ class TestCoreProfilesEmpty {
             idx = imas.open(uri, LowLevel.OPEN_PULSE);
             ids = imas.core_profiles.get(idx, "core_profiles");
             System.out.println("Is defined: " + ids.isDefined());
-            
-            imas.close(idx); 
+
+            imas.close(idx);
 
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
 
-	
+
     }
 }
 

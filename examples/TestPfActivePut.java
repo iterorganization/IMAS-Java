@@ -19,7 +19,7 @@ class TestPfActivePut {
         // Test the "put" part
         try {
             int number = 10;
-            
+
             String currentDir = System.getProperty("user.dir");
             String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestPfActive";
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
@@ -62,6 +62,7 @@ class TestPfActivePut {
             imas.close(idx);
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
     }
 }
