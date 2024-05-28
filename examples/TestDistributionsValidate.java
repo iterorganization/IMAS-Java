@@ -17,6 +17,7 @@ class TestDistributionsValidate {
         try {
             ids.validate();
             System.out.println("Error, expected ValidationException.");
+            System.exit(1);
         } catch (Exception e) {
         }
         System.out.println("");
