@@ -69,7 +69,6 @@ class TestWavesValidate {
             System.out.println("Error: unexpected ValidationException: " + e.getMessage());
             System.exit(1);
         }
-        ;
         System.out.println("");
 
         System.out.println("### Testing HOMOGENEOUS alternative/fixed coordinates issue fixed v2");
@@ -88,7 +87,6 @@ class TestWavesValidate {
             System.out.println("Error: unexpected ValidationException: " + e.getMessage());
             System.exit(1);
         }
-        ;
         System.out.println("");
     }
 }
