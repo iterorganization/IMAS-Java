@@ -1,4 +1,4 @@
-package examples;
+package imasjava.examples;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;

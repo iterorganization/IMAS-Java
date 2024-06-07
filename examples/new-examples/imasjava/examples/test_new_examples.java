@@ -1,6 +1,7 @@
-import examples.example001_OpenDatabase;
+package imasjava.examples;
+import example001_OpenDatabase;
 
-public class test_new_examples {
+public class TestNewExamples {
     public static void main(String[] args) throws Exception {
         try {
             System.out.println("Running OpenDatabase example case");
