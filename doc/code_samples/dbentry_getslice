@@ -6,7 +6,7 @@ public class load_ids_slice {
     public static void main(String[] args) throws Exception {
         // Open the database entry by providing an IMAS URI
         int data_entry = imas.open(
-            "imas:mdsplus?user=public;pulse=131024;run=41;database=ITER?version=3",
+            "imas:mdsplus?user=public;pulse=131024;run=41;database=ITER;version=3",
             LowLevel.OPEN_PULSE);
 
         // Retrieve the time slice just before t=370 of the core_profiles IDS
