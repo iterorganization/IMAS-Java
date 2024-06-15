@@ -22,10 +22,10 @@ class TestCoreProfilesOpen {
         imas.core_profiles ids;
         try {
             //Opens a new pulse file in folder 13/1 of the current user directory
-	    String currentDir =  System.getProperty("user.dir");
-	    String uri = "imas:hdf5?path=" +  currentDir + "/13/1"; //URI string
-	    int idx = imas.open(uri, LowLevel.OPEN_PULSE); //opening pulse file
-	    System.out.println("idx for get: " + idx); 
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:hdf5?path=" + currentDir + "/test_db_TestCoreProfiles"; //URI string
+            int idx = imas.open(uri, LowLevel.OPEN_PULSE); //opening pulse file
+            System.out.println("idx for get: " + idx);
             ids = imas.core_profiles.get(idx, "core_profiles");
             System.out.println("ids_properties.homogeneous: " + ids.ids_properties.homogeneous_time);
             System.out.println("ids_properties.comment: " + ids.ids_properties.comment);
@@ -45,6 +45,7 @@ class TestCoreProfilesOpen {
             imas.close(idx);
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
     }
 }

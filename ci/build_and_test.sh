@@ -118,7 +118,7 @@ CMAKE_ARGS=(
     -D AL_BACKEND_UDA=ON
     # Build MDSplus models
     -D AL_BUILD_MDSPLUS_MODELS=ON
-    # "Download" dependencies from repos checked out by Bamboo in the repos/ folder:
+    # Download dependencies from HTTPS (using an access token):
     -D AL_DOWNLOAD_DEPENDENCIES=ON
     -D AL_COMMON_GIT_REPOSITORY=https://git.iter.org/scm/imas/al-common.git
     -D AL_CORE_GIT_REPOSITORY=https://git.iter.org/scm/imas/al-core.git

@@ -1,4 +1,5 @@
 import imasjava.*;
+import imasjava.wrapper.LowLevel;
 
 import java.io.*;
 
@@ -18,7 +19,9 @@ class TestPfActiveGet {
         // Test the "get" part
         imas.pf_active pf_actives;
         try {
-            int idx = imas.openEnv(12, 2, userName, "test", "3");
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestPfActive";
+            int idx = imas.open(uri, LowLevel.OPEN_PULSE);
             System.out.println("idx for get: " + idx);
 
             pf_actives = imas.pf_active.get(idx, "pf_active");
@@ -34,6 +37,7 @@ class TestPfActiveGet {
             imas.close(idx);
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
 
     }

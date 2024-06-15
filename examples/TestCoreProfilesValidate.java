@@ -10,10 +10,10 @@ class TestCoreProfilesValidate {
         ids.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
         System.out.println("### Testing simplest case...");
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
@@ -24,21 +24,22 @@ class TestCoreProfilesValidate {
         }
         System.out.println("### Testing HETEROGENEOUS scalar time coordinate issue");
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
         System.out.println("### Testing HETEROGENEOUS scalar time coordinate issue fixed");
         for (int i = 0; i < 5; i++) {
-            ids.profiles_1d[i].time = 0.1*i;
+            ids.profiles_1d[i].time = 0.1 * i;
         }
         try {
-        ids.validate();}
-        catch (Exception e) {
-        System.out.println("Error: unexpected ValidationException: "+e.getMessage());
+            ids.validate();
+        } catch (Exception e) {
+            System.out.println("Error: unexpected ValidationException: " + e.getMessage());
+            System.exit(1);
         }
         System.out.println("");
     }
