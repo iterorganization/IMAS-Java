@@ -24,7 +24,6 @@ public class example002_fillingDataInIDS {
             // IDS_TIME_MODE_INDEPENDENT: The IDS stores no time-dependent data.
             emptyCoreProfiles.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
             
-            
             // it is also recommended to provide basic information regarding data source
             // even though this information is not required to store IDS, it is highly recommended
             // to fill these fields.
@@ -111,15 +110,10 @@ public class example002_fillingDataInIDS {
             System.out.println(emptyEdgeProfiles.grid_ggd[1].identifier.name);
             System.out.println(emptyEdgeProfiles.grid_ggd[2].identifier.name);
 
-//            System.out.println("\nDefault value for 'INT'     data  (edge_profiles/midplane/index)                               : " + emptyEdgeProfiles.midplane.index);
-//            System.out.println("Default value for 'FLOAT'   data  (edge_profiles/vacuum_toroidal_field/vacuum_toroidal_field/r0) : " + emptyEdgeProfiles.vacuum_toroidal_field.r0);
-//            System.out.println("Default value for 1+ dimensional data                                                            : " + emptyEdgeProfiles.vacuum_toroidal_field.b0);
-        
-        }   catch (Exception e) {
-                System.err.println("Fallowig exception occured\n" + e.getMessage());
-                throw e;
-        }
-        
+        } catch (Exception e) {
+            System.err.println("Fallowing exception occured\n" + e.getMessage());
+            throw e;
+        }   
     }
 
 }
