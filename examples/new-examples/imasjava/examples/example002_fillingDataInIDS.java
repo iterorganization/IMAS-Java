@@ -62,44 +62,58 @@ public class example002_fillingDataInIDS {
             imas.edge_profiles emptyEdgeProfiles = new imas.edge_profiles();
             emptyEdgeProfiles.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
             
-            int size_of_grid = 3;
+            emptyEdgeProfiles.grid_ggd = new imas.edge_profiles.grid_ggdClass[1];
+            emptyEdgeProfiles.grid_ggd[0] = new imas.edge_profiles.grid_ggdClass();
+            emptyEdgeProfiles.grid_ggd[0].identifier.name = "Sctructure before resize";
+
+            System.out.println("\nSize of grid_ggd before resize: " + emptyEdgeProfiles.grid_ggd.length);
+            System.out.println("Message in IDS before resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
+
+
+            int size_of_grid = 2;
 
             // Resize field of Array of Structures to specified size
-            // Resizing will destroy the data previously stored in following ids.
+            // Resizing this way will destroy stored data
             emptyEdgeProfiles.grid_ggd = new imas.edge_profiles.grid_ggdClass[size_of_grid];
-
-            for (int i = 0; i < size_of_grid; i++){
+            for (int i = 0; i < size_of_grid; i++) {
                 emptyEdgeProfiles.grid_ggd[i] = new imas.edge_profiles.grid_ggdClass();
             }
-            
+
+            System.out.println("\nSize of grid_ggd after resize: " + emptyEdgeProfiles.grid_ggd.length);
+            System.out.println("Message in IDS after resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
+
             emptyEdgeProfiles.grid_ggd[0].identifier.name = "First test struct";
             emptyEdgeProfiles.grid_ggd[1].identifier.name = "Second test struct";
-
-            // Add new AoS Elements to existing data
+            
+            // Now we want to resize grid_ggd to 3 and keep previously existing data
+            // In order to do that we have to use temporary variable to keep existing data
+            size_of_grid++;
             imas.edge_profiles.grid_ggdClass[] tmp_grid = new imas.edge_profiles.grid_ggdClass[size_of_grid];
             for (int i = 0; i < emptyEdgeProfiles.grid_ggd.length; i++) {
                 tmp_grid[i] = emptyEdgeProfiles.grid_ggd[i];
             }
             emptyEdgeProfiles.grid_ggd = tmp_grid;
             
-            // System.out.println("tutututut " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
+            System.out.println("\nSize of grid_ggd after resize to 3: " + emptyEdgeProfiles.grid_ggd.length);
+            System.out.println("Message in IDS after resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
 
+            // Now we'll create another IDS which will be saved inside previously created object.
             imas.edge_profiles emptyEdgeProfiles2 = new imas.edge_profiles();
+            emptyEdgeProfiles2.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
             emptyEdgeProfiles2.grid_ggd = new imas.edge_profiles.grid_ggdClass[1];
             emptyEdgeProfiles2.grid_ggd[0] = new imas.edge_profiles.grid_ggdClass();
             emptyEdgeProfiles2.grid_ggd[0].identifier.name = "Third test struct";
 
             emptyEdgeProfiles.grid_ggd[2] = emptyEdgeProfiles2.grid_ggd[0];
 
+            System.out.println("\nAll messages saved in grid_ggd: ");
             System.out.println(emptyEdgeProfiles.grid_ggd[0].identifier.name);
             System.out.println(emptyEdgeProfiles.grid_ggd[1].identifier.name);
             System.out.println(emptyEdgeProfiles.grid_ggd[2].identifier.name);
-            
 
-            System.out.println("Default value for 'INT'     data  (edge_profiles/midplane/index)                                 : " + emptyEdgeProfiles.midplane.index);
-            System.out.println("Default value for 'FLOAT'   data  (edge_profiles/vacuum_toroidal_field/vacuum_toroidal_field/r0) : " + emptyEdgeProfiles.vacuum_toroidal_field.r0);
-            // System.out.println("Default value for 'COMPLEX' data                                                                 : " + imas.imasdef.EMPTY_COMPLEX);
-            System.out.println("Default value for 1+ dimensional data                                                            : " + emptyEdgeProfiles.vacuum_toroidal_field.b0);
+//            System.out.println("\nDefault value for 'INT'     data  (edge_profiles/midplane/index)                               : " + emptyEdgeProfiles.midplane.index);
+//            System.out.println("Default value for 'FLOAT'   data  (edge_profiles/vacuum_toroidal_field/vacuum_toroidal_field/r0) : " + emptyEdgeProfiles.vacuum_toroidal_field.r0);
+//            System.out.println("Default value for 1+ dimensional data                                                            : " + emptyEdgeProfiles.vacuum_toroidal_field.b0);
         
         }   catch (Exception e) {
                 System.err.println("Fallowig exception occured\n" + e.getMessage());
