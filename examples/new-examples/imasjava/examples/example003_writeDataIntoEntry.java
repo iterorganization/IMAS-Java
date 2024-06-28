@@ -26,8 +26,8 @@ public class example003_writeDataIntoEntry {
             emptyEquilibrium.time = new Vect1DDouble(timeArray);
 
             // intentional error when entering data. equilibrium/vacuum_toroidal_field/b0 should have the same size as equilibrium/time
-            double[] incorrectSize = {1.0};
-            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(incorrectSize);
+            double[] incorrectVacuumToroidalField_b0 = {1.0};
+            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(incorrectVacuumToroidalField_b0);
 
             // NOTE: putting ids into entry will trigger validate function.
             // IDS fields types and dimensions will be checked
@@ -38,8 +38,8 @@ public class example003_writeDataIntoEntry {
             }
 
             // to fix it we need to set proper size of that field in IDS
-            double[] correctSize = {1.0, 2.0, 3.0};
-            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(correctSize);
+            double[] correctVacuumToroidalField_b0 = {1.0, 2.0, 3.0};
+            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(correctVacuumToroidalField_b0);
             emptyEquilibrium.put(dataEntry, "equilibrium", emptyEquilibrium);
 
             imas.close(dataEntry);
@@ -48,7 +48,7 @@ public class example003_writeDataIntoEntry {
             // - <ids>/ids_properties/version_put/access_layer
             // - <ids>/ids_properties/version_put/access_layer_language
 
-            // IDSs can be printed using dump() method. Empty fields are not printed unless print_empty flag is set to True
+            // IDSs can be printed this way
             try {
                 int dataEntry1 = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.OPEN_PULSE);
                 imas.equilibrium savedEquilibrium = imas.equilibrium.get(dataEntry1, "equilibrium");
@@ -80,12 +80,11 @@ public class example003_writeDataIntoEntry {
             emptySummary.heating_current_drive.nbi = new imas.summary.heating_current_driveClass.nbiClass[arraySize];
             emptySummary.heating_current_drive.nbi[0] = new imas.summary.heating_current_driveClass.nbiClass();
 
-
             emptySummary.stationary_phase_flag.value = new Vect1DInt(arraySize);
             emptySummary.time = new Vect1DDouble(arraySize);
             emptySummary.heating_current_drive.nbi[0].beam_current_fraction.value = new Vect2DDouble(3,1);
 
-            for (double timeSlice = 0.0; timeSlice < 5.0; timeSlice++) {
+            for (int timeSlice = 0; timeSlice < 5; timeSlice++) {
                 
                 // NOTE: time-independent data is being put only if it is empty in entry
                 // in this case summary/stationary_phase_flag/source will be put only at first iteration.
@@ -93,26 +92,29 @@ public class example003_writeDataIntoEntry {
                 emptySummary.stationary_phase_flag.source = "Name saved by example code iteration: " + timeSlice;
 
                 // fill example data
-                int timeSliceInt = (int) timeSlice;
-                emptySummary.stationary_phase_flag.value.setElementAt(0, 10*timeSliceInt);
+                emptySummary.stationary_phase_flag.value.setElementAt(0, 10*timeSlice);
 
                 // fill 2D data
+                double timeSliceDouble = (double) timeSlice;             
                 double[][] value2DArray = new double[3][1];
                 for (int i = 0; i<3; i++){
-                    value2DArray[i][0] = 100 * timeSlice;
+                    value2DArray[i][0] = 100 * timeSliceDouble;
                 }
 
                 emptySummary.heating_current_drive.nbi[0].beam_current_fraction.value.set(value2DArray);
 
                 // NOTE: it is user's responsibility to organize <ids>/time field in ascending manner
                 // breaking this rule will make get_slice() command to fail
-                // slice time is being appended to <ids>/time stored in entry                
-                emptySummary.time.setElementAt(0, timeSlice);
+                // slice time is being appended to <ids>/time stored in entry   
+                emptySummary.time.setElementAt(0, timeSliceDouble);
                 emptySummary.putSlice(dataEntry, "summary", emptySummary);
             }
+
+            // multiple slices can be put into entry as well
             emptySummary.stationary_phase_flag.value = new Vect1DInt(3);
             emptySummary.time = new Vect1DDouble(3);
 
+            // preparing data
             double[] valueArray = {11.0, 12.0, 13.0};
             Vect1DDouble vectValueArray = new Vect1DDouble(valueArray);
             for (int i = 0; i < 3; i++){
@@ -129,7 +131,7 @@ public class example003_writeDataIntoEntry {
             
             double[] timeArray = {50.0, 60.0, 70.0};
             Vect1DDouble vectTimeArray = new Vect1DDouble(timeArray);
-            for (int i =0; i < 3; i++) {
+            for (int i = 0; i < 3; i++) {
                 emptySummary.time.setElementAt(i, vectTimeArray.getElementAt(i));
             }
             
@@ -221,6 +223,9 @@ public class example003_writeDataIntoEntry {
                 // listAllOccurrences accepts as its 3rd parameter string containing nodePath
                 occurrences = imas.listAllOccurrences(dataEntry2, "equilibrium", "");
                 System.out.println("\nequilibrium occurrences without nodePath\n" + occurrences);
+
+                occurrences = imas.listAllOccurrences(dataEntry2, "equilibrium", "");
+                System.out.println("\nequilibrium occurrences with '/vacuum_toroidal_field/b0' nodePath\n" + occurrences);
 
                 imas.close(dataEntry2);
             } catch (Exception e) { 
