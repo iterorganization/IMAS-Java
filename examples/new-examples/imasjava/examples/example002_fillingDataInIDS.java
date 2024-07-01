@@ -113,6 +113,12 @@ public class example002_fillingDataInIDS {
             System.out.println(emptyEdgeProfiles.grid_ggd[1].identifier.name);
             System.out.println(emptyEdgeProfiles.grid_ggd[2].identifier.name);
 
+        // IDS fields have default values different for every data type
+            System.out.println("Default value for 'INT'     data  (edge_profiles/midplane/index)                                 : " + emptyEdgeProfiles.midplane.index); 
+            System.out.println("Default value for 'FLOAT'   data  (edge_profiles/vacuum_toroidal_field/vacuum_toroidal_field/r0) : " + emptyEdgeProfiles.vacuum_toroidal_field.r0);
+            System.out.println("Default value for 'COMPLEX' data                                                                 : " + LowLevel.EMPTY_COMPLEX);
+            System.out.println("Default value for 1+ dimensional data                                                            : " + emptyEdgeProfiles.vacuum_toroidal_field.b0);
+
         } catch (Exception e) {
             System.err.println("Fallowing exception occured\n" + e.getMessage());
             throw e;
