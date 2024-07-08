@@ -1,4 +1,4 @@
-package imasjava.examples;
+// package imasjava.examples;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
@@ -7,7 +7,7 @@ import java.io.*;
 import imasjava.*;
 import imasjava.wrapper.LowLevel;
 
-public class example002_fillingDataInIDS {
+public class Example002_fillingDataInIDS {
 
     // This example focuses on creating empty IDS and allocating arrays inside IDS structure
     public static void creatingCompletlyNewIDS() throws Exception {
@@ -48,7 +48,7 @@ public class example002_fillingDataInIDS {
             // AL adds some information behind your back. This is particularly important
             // in case you want later on find out what particular version of AL was used when data were stored.
             // examples of this type of fields are <ids>/ids_properties/version_put and <ids>/ids_properties/plugins
-            // in Java we don't have to delete objects. Java garbage collector will do that for us.
+            // in Java we don't have to delate objects. Java garbage collector will do that for us.
 
         } catch (Exception e) {
             System.err.println("Fallowing exception occured\n" + e.getMessage());
@@ -80,7 +80,7 @@ public class example002_fillingDataInIDS {
             for (int i = 0; i < size_of_grid; i++) {
                 emptyEdgeProfiles.grid_ggd[i] = new imas.edge_profiles.grid_ggdClass();
             }
-
+ 
             System.out.println("\nSize of grid_ggd after resize: " + emptyEdgeProfiles.grid_ggd.length);
             System.out.println("Message in IDS after resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
 
@@ -113,11 +113,11 @@ public class example002_fillingDataInIDS {
             System.out.println(emptyEdgeProfiles.grid_ggd[1].identifier.name);
             System.out.println(emptyEdgeProfiles.grid_ggd[2].identifier.name);
 
-        // IDS fields have default values different for every data type
-            System.out.println("Default value for 'INT'     data  (edge_profiles/midplane/index)                                 : " + emptyEdgeProfiles.midplane.index); 
-            System.out.println("Default value for 'FLOAT'   data  (edge_profiles/vacuum_toroidal_field/vacuum_toroidal_field/r0) : " + emptyEdgeProfiles.vacuum_toroidal_field.r0);
-            System.out.println("Default value for 'COMPLEX' data                                                                 : " + LowLevel.EMPTY_COMPLEX);
-            System.out.println("Default value for 1+ dimensional data                                                            : " + emptyEdgeProfiles.vacuum_toroidal_field.b0);
+            // IDS fields have default values different for every data type
+            System.out.println(String.format("\nDefault value for 'INT' data  (edge_profiles/midplane/index) %35s ",":") + emptyEdgeProfiles.midplane.index); 
+            System.out.println(String.format("Default value for 'FLOAT' data  (edge_profiles/vacuum_toroidal_field/vacuum_toroidal_field/r0) : " + emptyEdgeProfiles.vacuum_toroidal_field.r0));
+            System.out.println(String.format("Default value for 'COMPLEX' data %63s ", ":") + LowLevel.EMPTY_COMPLEX);
+            System.out.println(String.format("Default value for 1+ dimensional data %58s ", ":") + emptyEdgeProfiles.vacuum_toroidal_field.b0);
 
         } catch (Exception e) {
             System.err.println("Fallowing exception occured\n" + e.getMessage());
