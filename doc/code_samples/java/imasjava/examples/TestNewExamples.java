@@ -1,5 +1,5 @@
 package imasjava.examples;
-import example001_OpenDatabase;
+import Example001_OpenDatabase;
 
 public class TestNewExamples {
     public static void main(String[] args) throws Exception {

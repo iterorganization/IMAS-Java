@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import imasjava.*;
 import imasjava.wrapper.LowLevel;
 
-public class example001_OpenDatabase {
+public class Example001_OpenDatabase {
 
     // This example focuses on creating DBEntry using legacy mode method
     public static void createDBEntryLegacy() throws Exception {
@@ -25,7 +25,7 @@ public class example001_OpenDatabase {
              * You can access IDSes in here - take a look at sample code dealing with IDSes for details
              */
         } catch (Exception e) {
-            System.err.println("Failed to create DBEntry with legacy arguments\n" + e.getMessage());
+            System.err.println("\nFailed to create DBEntry with legacy arguments\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
@@ -69,7 +69,7 @@ public class example001_OpenDatabase {
             * You can access IDSes in here - take a look at sample code dealing with IDSes for details
             */
         } catch (Exception e) {
-            System.err.println("Failed to open DBEntry with URI\n" + e.getMessage());
+            System.err.println("\nFailed to open DBEntry with URI\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
@@ -82,9 +82,9 @@ public class example001_OpenDatabase {
 
         // example usage of uri with 'path' keyword pointing to relative location
         try {
-            entry = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.CREATE_PULSE);
+            entry = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.FORCE_CREATE_PULSE);
             
-            System.out.println("Contents of testdb_mdsplus:");
+            System.out.println("\nContents of testdb_mdsplus:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_mdsplus"));
             stream.forEach(System.out::println);
             // Contents of testdb_mdsplus:
@@ -93,7 +93,7 @@ public class example001_OpenDatabase {
             // ./testdb_mdsplus/ids_001.datafile
 
         } catch (Exception e) {
-            System.err.println("Failed to open DBEntry with path\n" + e.getMessage());
+            System.err.println("\nFailed to open DBEntry with path\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
@@ -101,16 +101,16 @@ public class example001_OpenDatabase {
 
         // example usage of uri with 'path' keyword pointing to relative location
         try {
-            entry = imas.open("imas:hdf5?path=./testdb_hdf5", LowLevel.CREATE_PULSE);
+            entry = imas.open("imas:hdf5?path=./testdb_hdf5", LowLevel.FORCE_CREATE_PULSE);
             
-            System.out.println("Contents of testdb_hdf5:");
+            System.out.println("\nContents of testdb_hdf5:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_hdf5"));
             stream.forEach(System.out::println);
             // Contents of testdb_hdf5:
             // ./testdb_hdf5/master.h5
 
         } catch (Exception e) {
-            System.err.println("Failed to open DBEntry with path\n" + e.getMessage());
+            System.err.println("\nFailed to open DBEntry with path\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
@@ -118,7 +118,7 @@ public class example001_OpenDatabase {
 
         // example usage of uri with 'path' keyword pointing to relative location
         try {
-            entry = imas.open("imas:ascii?path=./testdb_ascii", LowLevel.CREATE_PULSE);
+            entry = imas.open("imas:ascii?path=./testdb_ascii", LowLevel.FORCE_CREATE_PULSE);
             
             System.out.println("Contents of testdb_ascii:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_ascii"));
@@ -133,4 +133,3 @@ public class example001_OpenDatabase {
         }
     }
 }
-
