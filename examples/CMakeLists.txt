@@ -8,9 +8,6 @@ include(ALExampleUtilities)
 ################################################################################
 
 set( TEST_ENVIRONMENT
-    "IMAS_VERSION=${DD_VERSION}"
-    "AL_VERSION=${AL_VERSION}"
-    "IMAS_PREFIX=$<TARGET_FILE_DIR:al-java-binding>"
     "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:al-java-binding>:$ENV{LD_LIBRARY_PATH}"
 )
 

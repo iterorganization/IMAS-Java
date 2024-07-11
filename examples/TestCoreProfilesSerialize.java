@@ -7,7 +7,7 @@ import imasjava.wrapper.*;
 class TestCoreProfilesSerialize {
     public static void main(String args[]) {
         // Define a generic vector and its time base
-        double[] time = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0 };
+        double[] time = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
         Vect1DDouble vect1DDouble_1 = new Vect1DDouble(time);
 
         // Get username
@@ -24,7 +24,9 @@ class TestCoreProfilesSerialize {
 
         // Test the "serialize" part
         try {
-            int idx = imas.createEnv(13, 1, userName, "test", "3");
+            String currentDir = System.getProperty("user.dir");
+            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
 
             // allocate the ids fields
             imas.core_profiles ids1 = new imas.core_profiles();
@@ -78,6 +80,7 @@ class TestCoreProfilesSerialize {
             imas.close(idx);
         } catch (Exception exc) {
             System.out.println("Error: " + exc);
+            System.exit(1);
         }
     }
 }

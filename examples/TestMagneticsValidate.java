@@ -10,38 +10,38 @@ class TestMagneticsValidate {
 
         System.out.println("### Testing simplest case...");
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
 
         ids.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
-        
+
         System.out.println("### Testing HOMOGENEOUS time array...");
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
         System.out.println("### Testing HOMOGENEOUS flux_loop.indices_differential (fixed size)...");
-        ids.time= new Vect1DDouble(20);
+        ids.time = new Vect1DDouble(20);
         ids.time.setArray(time, 20);
-        ids.flux_loop= new imas.magnetics.flux_loopClass[20];
+        ids.flux_loop = new imas.magnetics.flux_loopClass[20];
         for (int i = 0; i < time.length; i++) {
             ids.flux_loop[i] = new imas.magnetics.flux_loopClass();
             ids.flux_loop[i].indices_differential = new Vect1DInt(3);
         }
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
@@ -52,20 +52,20 @@ class TestMagneticsValidate {
             ids.flux_loop[i].flux.data = new Vect1DDouble(15);
         }
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
         System.out.println("### Testing HETEROGENEOUS with missing time coordinate...");
         ids.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HETEROGENEOUS;
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
 
@@ -74,9 +74,10 @@ class TestMagneticsValidate {
             ids.flux_loop[i].flux.time = new Vect1DDouble(15);
         }
         try {
-        ids.validate();}
-        catch (Exception e) {
-        System.out.println("Error: unexpected ValidationException: "+e.getMessage());
+            ids.validate();
+        } catch (Exception e) {
+            System.out.println("Error: unexpected ValidationException: " + e.getMessage());
+            System.exit(1);
         }
         System.out.println("");
 
@@ -100,10 +101,10 @@ class TestMagneticsValidate {
             ids.b_field_pol_probe[i].field.time = new Vect1DDouble(9);
         }
         try {
-        ids.validate();
-        }
-        catch (Exception e) {
-        System.out.println("Error: unexpected ValidationException: "+e.getMessage());
+            ids.validate();
+        } catch (Exception e) {
+            System.out.println("Error: unexpected ValidationException: " + e.getMessage());
+            System.exit(1);
         }
         System.out.println("");
 
@@ -113,10 +114,10 @@ class TestMagneticsValidate {
             ids.b_field_pol_probe[i].non_linear_response.b_field_non_linear = new Vect1DDouble(4);
         }
         try {
-        ids.validate();
-        System.out.println("Error, expected ValidationException.");
-        }
-        catch (Exception e) {
+            ids.validate();
+            System.out.println("Error, expected ValidationException.");
+            System.exit(1);
+        } catch (Exception e) {
         }
         System.out.println("");
     }
