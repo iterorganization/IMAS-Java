@@ -1,8 +1,4 @@
-// package imasjava.examples;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.util.stream.Stream;
+package imasjava.examples;
 import java.io.*;
 import imasjava.*;
 import imasjava.wrapper.LowLevel;
@@ -51,7 +47,7 @@ public class Example002_fillingDataInIDS {
             // in Java we don't have to delate objects. Java garbage collector will do that for us.
 
         } catch (Exception e) {
-            System.err.println("Fallowing exception occured\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
             throw e;
         }
     }
@@ -120,7 +116,7 @@ public class Example002_fillingDataInIDS {
             System.out.println(String.format("Default value for 1+ dimensional data %58s ", ":") + emptyEdgeProfiles.vacuum_toroidal_field.b0);
 
         } catch (Exception e) {
-            System.err.println("Fallowing exception occured\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
             throw e;
         }   
     }
@@ -192,7 +188,7 @@ public class Example002_fillingDataInIDS {
             System.out.println("Copied value: \n" + emptyGyrokineticsLocalCopy.linear.wavevector[0].eigenmode[0].fields.phi_potential_perturbed_norm);
 
         } catch (Exception e) {
-            System.err.println("Fallowing exception occured\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
             throw e;       
         }
     }

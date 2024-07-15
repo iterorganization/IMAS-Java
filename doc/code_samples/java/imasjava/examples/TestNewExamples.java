@@ -1,7 +1,7 @@
 package imasjava.examples;
-import Example002_fillingDataInIDS;
+import imasjava.examples.Example002_fillingDataInIDS;
 
-public class testNewExamples {
+public class TestNewExamples {
     public static void main(String[] args) throws Exception {
         try {
             
