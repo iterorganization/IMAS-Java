@@ -84,10 +84,10 @@ public class Example001_OpenDatabase {
         try {
             entry = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.FORCE_CREATE_PULSE);
             
-            System.out.println("\nContents of testdb_mdsplus:");
+            System.out.println("\nContent of testdb_mdsplus:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_mdsplus"));
             stream.forEach(System.out::println);
-            // Contents of testdb_mdsplus:
+            // Content of testdb_mdsplus:
             // ./testdb_mdsplus/ids_001.tree
             // ./testdb_mdsplus/ids_001.characteristics
             // ./testdb_mdsplus/ids_001.datafile
@@ -103,10 +103,10 @@ public class Example001_OpenDatabase {
         try {
             entry = imas.open("imas:hdf5?path=./testdb_hdf5", LowLevel.FORCE_CREATE_PULSE);
             
-            System.out.println("\nContents of testdb_hdf5:");
+            System.out.println("\nContent of testdb_hdf5:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_hdf5"));
             stream.forEach(System.out::println);
-            // Contents of testdb_hdf5:
+            // Content of testdb_hdf5:
             // ./testdb_hdf5/master.h5
 
         } catch (Exception e) {
@@ -120,10 +120,10 @@ public class Example001_OpenDatabase {
         try {
             entry = imas.open("imas:ascii?path=./testdb_ascii", LowLevel.FORCE_CREATE_PULSE);
             
-            System.out.println("Contents of testdb_ascii:");
+            System.out.println("Content of testdb_ascii:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_ascii"));
             stream.forEach(System.out::println);
-            // Contents of testdb_ascii:
+            // Content of testdb_ascii:
 
         } catch (Exception e) {
             System.err.println("Failed to open DBEntry with path\n" + e.getMessage());
