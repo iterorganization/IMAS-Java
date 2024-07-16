@@ -1,13 +1,9 @@
 package imasjava.examples;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.util.stream.Stream;
 import java.io.*;
 import imasjava.*;
 import imasjava.wrapper.LowLevel;
 
-public class example004_readDataFromEntry{
+public class Example004_readDataFromEntry{
 
     // This example focuses on reading whole IDS from entry.
     // We are storing and reading back an IDS - equilibrium. Data are stored inside MDS+ file.
@@ -38,11 +34,11 @@ public class example004_readDataFromEntry{
             //  etc.
 
             // one may check if IDS was filled with data using <ids>.isDefined() method
-            System.out.println("is equilibrium defined?: " +  savedEquilibrium.isDefined());
+            System.out.println("\nis equilibrium defined?: " +  savedEquilibrium.isDefined());
             imas.close(dataEntry1);
 
         } catch (Exception e) {
-            System.out.println("Following error occured:\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
             throw e;
         }
     
@@ -61,7 +57,7 @@ public class example004_readDataFromEntry{
             imas.summary emptySummary = new imas.summary();
             emptySummary.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
             
-            double[] ipValueArray = {10.0, 20.0, 30.0};
+            double[] ipValueArray = {10.0, 11.0, 12.0};
             emptySummary.global_quantities.ip.value = new Vect1DDouble(ipValueArray);
 
             emptySummary.heating_current_drive.nbi = new imas.summary.heating_current_driveClass.nbiClass[1];
@@ -81,6 +77,9 @@ public class example004_readDataFromEntry{
 
             double[] timeArray = {1.0, 2.0, 3.0};
             emptySummary.time = new Vect1DDouble(timeArray);
+
+            System.out.println("\n/heating_current_drive/nbi[0]/beam_current_fraction/value: \n");
+            System.out.println(emptySummary.heating_current_drive.nbi[0].beam_current_fraction.value);
 
             emptySummary.put(dataEntry, "summary", emptySummary);
             imas.close(dataEntry);
@@ -104,7 +103,7 @@ public class example004_readDataFromEntry{
             imas.summary savedSummaryClosestInterp = imas.summary.getSlice(dataEntry1, "summary", 1.75 , LowLevel.CLOSEST_INTERP);        
             // closest time value to 1.75 is 2.0
             // value for summary/global_quantities/ip/value and time=2 is 11.0
-            System.out.println("summary/global_quantities/ip/value for CLOSEST_INTERP and time=1: " + savedSummaryClosestInterp.global_quantities.ip.value);
+            System.out.println("summary/global_quantities/ip/value for CLOSEST_INTERP and time=2: " + savedSummaryClosestInterp.global_quantities.ip.value);
 
             // this part of code presents LINEAR_INTERP. It is interpolation method that returns a linear interpolation between the existing slices before and after the requested time.
             // NOTE: The linear interpolation will be successful only if, between the two time slices of an interpolated dynamic array of structure,
@@ -119,18 +118,7 @@ public class example004_readDataFromEntry{
             imas.close(dataEntry1);
 
         } catch (Exception e) {
-            System.out.println("Following error occured:\n" + e.getMessage());
-            throw e;
-        }
-
-    }
-
-    public static void pratialGet() throws Exception {
-
-        try {
-            System.out.println("\nThe Java interface does not support partial_get");
-        } catch (Exception e) {
-            System.out.println("Following error occured:\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
             throw e;
         }
 
