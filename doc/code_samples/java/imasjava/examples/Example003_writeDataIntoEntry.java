@@ -1,5 +1,4 @@
 package imasjava.examples;
-import java.io.*;
 import imasjava.*;
 import java.util.*;
 import imasjava.wrapper.LowLevel;
@@ -208,8 +207,6 @@ public class Example003_writeDataIntoEntry {
                 // nodePath in Java HLI works with STR_0D (Sting) fields
                 int dataEntry2 = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.OPEN_PULSE);
                 
-                String nodeContentList[] = new String[] {};
-                int occurrenceList[] = new int[] {};
                 HashMap<Integer, String> occurrences;
                 
                 // listAllOccurrences accepts as its 3rd parameter string containing nodePath
