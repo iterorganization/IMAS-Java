@@ -1,6 +1,7 @@
 package imasjava.examples;
 import imasjava.examples.Example001_OpenDatabase;
 import imasjava.examples.Example002_fillingDataInIDS;
+import imasjava.examples.Example003_writeDataIntoEntry;
 
 public class TestNewExamples {
     public static void main(String[] args) throws Exception {
@@ -14,6 +15,11 @@ public class TestNewExamples {
             Example002_fillingDataInIDS.creatingCompletlyNewIDS();
             Example002_fillingDataInIDS.defaultValuesAndAosOperations();
             Example002_fillingDataInIDS.copyingAndValidatingIDS();
+
+            System.out.println("Running example case");
+            Example003_writeDataIntoEntry.putEntireIDS();
+            Example003_writeDataIntoEntry.putSlice();
+            Example003_writeDataIntoEntry.putIntoNonDefaultOccurrence();
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }

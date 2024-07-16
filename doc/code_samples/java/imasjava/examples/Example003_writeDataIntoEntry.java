@@ -1,14 +1,10 @@
 package imasjava.examples;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.util.stream.Stream;
 import java.io.*;
 import imasjava.*;
 import java.util.*;
 import imasjava.wrapper.LowLevel;
 
-public class example003_writeDataIntoEntry {
+public class Example003_writeDataIntoEntry {
 
     // This example focuses on putting IDS into entry and passing IDS validation
     public static void putEntireIDS() throws Exception {
@@ -26,8 +22,8 @@ public class example003_writeDataIntoEntry {
             emptyEquilibrium.time = new Vect1DDouble(timeArray);
 
             // intentional error when entering data. equilibrium/vacuum_toroidal_field/b0 should have the same size as equilibrium/time
-            double[] incorrectVacuumToroidalField_b0 = {1.0};
-            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(incorrectVacuumToroidalField_b0);
+            double[] incorrectVacuumToroidalField_b0Size = {1.0};
+            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(incorrectVacuumToroidalField_b0Size);
 
             // NOTE: putting ids into entry will trigger validate function.
             // IDS fields types and dimensions will be checked
@@ -38,8 +34,8 @@ public class example003_writeDataIntoEntry {
             }
 
             // to fix it we need to set proper size of that field in IDS
-            double[] correctVacuumToroidalField_b0 = {1.0, 2.0, 3.0};
-            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(correctVacuumToroidalField_b0);
+            double[] correctVacuumToroidalField_b0Size = {1.0, 2.0, 3.0};
+            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(correctVacuumToroidalField_b0Size);
             emptyEquilibrium.put(dataEntry, "equilibrium", emptyEquilibrium);
 
             imas.close(dataEntry);
@@ -60,7 +56,7 @@ public class example003_writeDataIntoEntry {
             }
 
         } catch (Exception e) {
-            System.out.println("Following error occured:\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
             throw e;
         }
     } 
@@ -131,7 +127,7 @@ public class example003_writeDataIntoEntry {
             
             double[] timeArray = {50.0, 60.0, 70.0};
             Vect1DDouble vectTimeArray = new Vect1DDouble(timeArray);
-            for (int i = 0; i < 3; i++) {
+            for (int i =0; i < 3; i++) {
                 emptySummary.time.setElementAt(i, vectTimeArray.getElementAt(i));
             }
             
@@ -152,7 +148,7 @@ public class example003_writeDataIntoEntry {
                 throw e;
             }               
         } catch (Exception e) {
-            System.out.println("Following error occured:\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
             throw e;
         }
     }
@@ -175,48 +171,44 @@ public class example003_writeDataIntoEntry {
             double[] timeArray = {1.0, 2.0, 3.0};
             emptyEquilibrium.time = new Vect1DDouble(timeArray);
 
-            // fill fields with some data
-            emptyEquilibrium.vacuum_toroidal_field.r0 = 2.5;
+            // in order to print properly all occurrences with content of a given node, we need to put empty IDS to default occurrence
+            emptyEquilibrium.put(dataEntry, "equilibrium", emptyEquilibrium);
 
-            double[] b0Array = {10.0, 20.0, 30.0};
-            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(b0Array);
+            // add some comment to IDS
+            emptyEquilibrium.ids_properties.comment = "comment from 1st occurrence";
 
             // put IDS into occurrence 1
             emptyEquilibrium.put(dataEntry, "equilibrium/1", emptyEquilibrium);
         
-            // modify data, so differences between occurrences can be spotted
-            emptyEquilibrium.vacuum_toroidal_field.r0 = 25.5;
-
-            double[] b0Array1 = {11.0, 22.0, 33.0};
-            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(b0Array1);
+            // modify comment, so differences between occurrences can be spotted
+            emptyEquilibrium.ids_properties.comment = "comment from 2nd occurrence";
 
             // put IDS into occurrence 2
             emptyEquilibrium.put(dataEntry, "equilibrium/2", emptyEquilibrium);
             imas.close(dataEntry);
 
             try {
-                // NOTE: there is ids_properties/occurrence_type structure
-                // it stores additional information about specific occurrence
-                // we can access these values
+                // now we can print saved comments
                 int dataEntry1 = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.OPEN_PULSE);
                 imas.equilibrium savedEquilibriumOccurrence1 = imas.equilibrium.get(dataEntry1, "equilibrium/1");
                 imas.equilibrium savedEquilibriumOccurrence2 = imas.equilibrium.get(dataEntry1, "equilibrium/2");
                 
-                System.out.println("\nSaved equilibrium/vacuum_toroidal_field/b0 field: (occurrence 1)\n" + savedEquilibriumOccurrence1.vacuum_toroidal_field.b0);
-                System.out.println("Saved equilibrium/vacuum_toroidal_field/b0 field: (occurrence 2)\n" + savedEquilibriumOccurrence2.vacuum_toroidal_field.b0);
+                System.out.println("\nSaved equilibrium/ids_properties/comment field: (occurrence 1)\n" + savedEquilibriumOccurrence1.ids_properties.comment);
+                System.out.println("\nSaved equilibrium/ids_properties/comment field: (occurrence 2)\n" + savedEquilibriumOccurrence2.ids_properties.comment);
                 imas.close(dataEntry1);
 
             } catch (Exception e) {
-                System.out.println("Following error occured:\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
                 throw e; 
             }
             
             try {
                 // occurrences can be listed with listAllOccurrences() function
-                // list_all_occurrences also returns content of IDS pointed by node_path argument    
+                // listAllOccurrences also returns content of IDS field pointed by nodePath argument    
+                // nodePath in Java HLI works with STR_0D (Sting) fields
                 int dataEntry2 = imas.open("imas:mdsplus?path=./testdb_mdsplus", LowLevel.OPEN_PULSE);
                 
-                String nodeContentist[] = new String[] {};
+                String nodeContentList[] = new String[] {};
                 int occurrenceList[] = new int[] {};
                 HashMap<Integer, String> occurrences;
                 
@@ -224,18 +216,17 @@ public class example003_writeDataIntoEntry {
                 occurrences = imas.listAllOccurrences(dataEntry2, "equilibrium", "");
                 System.out.println("\nequilibrium occurrences without nodePath\n" + occurrences);
 
-                occurrences = imas.listAllOccurrences(dataEntry2, "equilibrium", "");
-                System.out.println("\nequilibrium occurrences with '/vacuum_toroidal_field/b0' nodePath\n" + occurrences);
+                occurrences = imas.listAllOccurrences(dataEntry2, "equilibrium", "ids_properties/comment");
+                System.out.println("\nequilibrium occurrences with 'ids_properties/comment' nodePath\n" + occurrences);
 
                 imas.close(dataEntry2);
             } catch (Exception e) { 
-                System.out.println("Following error occured:\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
                 throw e; 
             }
         } catch (Exception e) {
-            System.out.println("Following error occured:\n" + e.getMessage());
+            System.err.println("Following exception occurred\n" + e.getMessage());
             throw e;
         }
     }
-
 }
