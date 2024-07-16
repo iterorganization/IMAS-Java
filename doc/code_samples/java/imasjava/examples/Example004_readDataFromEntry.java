@@ -1,5 +1,4 @@
 package imasjava.examples;
-import java.io.*;
 import imasjava.*;
 import imasjava.wrapper.LowLevel;
 
@@ -19,7 +18,7 @@ public class Example004_readDataFromEntry{
             double[] timeArray = {1.0, 2.0, 3.0};
             double[] b0Array = {1.0, 2.0, 3.0};
             emptyEquilibrium.time = new Vect1DDouble(timeArray);
-            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(timeArray);
+            emptyEquilibrium.vacuum_toroidal_field.b0 = new Vect1DDouble(b0Array);
 
             emptyEquilibrium.put(dataEntry, "equilibrium", emptyEquilibrium);
             imas.close(dataEntry);
@@ -78,8 +77,10 @@ public class Example004_readDataFromEntry{
             double[] timeArray = {1.0, 2.0, 3.0};
             emptySummary.time = new Vect1DDouble(timeArray);
 
-            System.out.println("\n/heating_current_drive/nbi[0]/beam_current_fraction/value: \n");
+            System.out.println("\nsummary/heating_current_drive/nbi[0]/beam_current_fraction/value: ");
             System.out.println(emptySummary.heating_current_drive.nbi[0].beam_current_fraction.value);
+            System.out.println("\nsummary/global_quantities/ip/value: ");
+            System.out.println(emptySummary.global_quantities.ip.value);
 
             emptySummary.put(dataEntry, "summary", emptySummary);
             imas.close(dataEntry);
