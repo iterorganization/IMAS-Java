@@ -1,5 +1,4 @@
 package imasjava.examples;
-import java.io.*;
 import imasjava.*;
 import imasjava.wrapper.LowLevel;
 
