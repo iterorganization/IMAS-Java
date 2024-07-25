@@ -120,13 +120,13 @@ public class Example001_OpenDatabase {
         try {
             entry = imas.open("imas:ascii?path=./testdb_ascii", LowLevel.FORCE_CREATE_PULSE);
             
-            System.out.println("Content of testdb_ascii:");
+            System.out.println("\nContent of testdb_ascii:");
             Stream<Path> stream = Files.list(Paths.get("./testdb_ascii"));
             stream.forEach(System.out::println);
             // Content of testdb_ascii:
 
         } catch (Exception e) {
-            System.err.println("Failed to open DBEntry with path\n" + e.getMessage());
+            System.err.println("\nFailed to open DBEntry with path\n" + e.getMessage());
             throw e;
         } finally {
             imas.close(entry);
