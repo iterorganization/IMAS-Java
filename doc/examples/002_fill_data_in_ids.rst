@@ -118,7 +118,7 @@ This example focuses on creating multi-dimensional arrays, using copmlex type an
 .. literalinclude:: ../code_samples/java/imasjava/examples/Example002_fillingDataInIDS.java
     :start-after:      // This example focuses on creating multi-dimensional arrays, using copmlex type and copying IDS structures
     :language: java
-    :dedent: 4
+
 
 
 .. output::
