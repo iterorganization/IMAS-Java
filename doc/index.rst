@@ -44,14 +44,13 @@ language.
    plugins
 
 .. toctree::
-    :maxdepth: 2
     :caption: Examples
 
-    doc/examples/index.rst
-    doc/examples/001_open_database
-    doc/examples/002_fill_data_in_ids
-    doc/examples/003_write_data_into_entry
-    doc/examples/004_read_data_from_entry
+    examples/000_how_to_run_examples
+    examples/001_open_database
+    examples/002_fill_data_in_ids
+    examples/003_write_data_into_entry
+    examples/004_read_data_from_entry
 
 .. toctree::
    :maxdepth: 3
