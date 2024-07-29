@@ -89,6 +89,7 @@ html_theme_options = {
         "toc.sticky",
         # "content.tabs.link",
         "announce.dismiss",
+        "globaltoc_collapse",
     ],
     # "toc_title_is_page_title": True,
     # "globaltoc_collapse": True,
