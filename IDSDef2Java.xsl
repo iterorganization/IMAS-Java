@@ -961,14 +961,10 @@
                         } catch (Exception exc) {
                                 throw new ALException("Can not read bytes");
                         }
-                        String protocolInString = String.valueOf(LowLevel.ASCII_SERIALIZER_PROTOCOL);  
-                        byte[] prependBytes = protocolInString.getBytes();  
-                        output = new byte[prependBytes.length + data.length];
-                        for(int i=0; i &lt; prependBytes.length; i++)
-                        {
-                            output[i] = prependBytes[i];
-                        }
-                        int j= prependBytes.length ;
+                        output = new byte[1 + data.length];
+			// prepend serializer proto encoded as one byte ascii code
+			output[0] = (byte)((char)LowLevel.ASCII_SERIALIZER_PROTOCOL);
+                        int j=1;
                         for(int i=0;i &lt; data.length; i++){
                         output[j] = data[i];
                         j++;
@@ -997,12 +993,7 @@
     {
         if (data.length ==0)
                 throw new ALException("No data provided");
-        byte[] protocolBytes = new byte[2];
-        for (int i = 0; i &lt; 2; i++) {
-                protocolBytes[i] = data[i];
-        }
-        String protocolString = new String(protocolBytes);
-        int protocol = Integer.parseInt(protocolString);
+        int protocol = (int)data[0];
 
         if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
                 File tmpdir;
@@ -1024,7 +1015,7 @@
                 }
                 try{
                         OutputStream outputStream = new FileOutputStream(tmpfile);
-                        outputStream.write(Arrays.copyOfRange(data, 2, data.length));
+                        outputStream.write(Arrays.copyOfRange(data, 1, data.length));
                         outputStream.close();
                 }catch(Exception exc) 
                 {
