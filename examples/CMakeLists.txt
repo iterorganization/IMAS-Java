@@ -34,6 +34,7 @@ set( TESTS
     TestCoreProfilesPutSlice
     TestCoreProfilesSerialize
     TestCoreProfilesValidate
+    TestCoreProfilesSampleGet
     TestDistributionsValidate
     TestMagneticsValidate
     TestPfActiveGet

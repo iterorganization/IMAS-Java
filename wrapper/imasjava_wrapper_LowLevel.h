@@ -137,6 +137,14 @@ JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_al_1begin_1global_1action
 
 /*
  * Class:     imasjava_wrapper_LowLevel
+ * Method:    al_begin_timerange_action
+ * Signature: (ILjava/lang/String;DD[DIII)I
+ */
+JNIEXPORT jint JNICALL Java_imasjava_wrapper_LowLevel_al_1begin_1timerange_1action
+  (JNIEnv *, jclass, jint, jstring, jint, jdouble, jdouble, jdoubleArray, jint, jint);
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
  * Method:    al_begin_slice_action
  * Signature: (ILjava/lang/String;IDI)I
  */

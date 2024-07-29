@@ -302,6 +302,34 @@ extern "C" {
 }
 /*
  * Class:     imasjava_wrapper_LowLevel
+ * Method:    al_begin_timerange_action
+ * Signature: (ILjava/lang/String;DD[DIII)I
+ */
+jint JNICALL Java_imasjava_wrapper_LowLevel_al_1begin_1timerange_1action
+  (JNIEnv *env, jclass jWrapperClass, jint jCtx, jstring jDataObjectName, jint jRWMode, jdouble jTmin, jdouble jTmax, jdoubleArray jdTime, jint jCsize, jint jInterpMode)
+  {
+    al_status_t al_status;
+    int ctx = -1; 
+    const char *dataObjectName = env->GetStringUTFChars(jDataObjectName, 0);
+
+    const double *dTime = env->GetDoubleArrayElements(jdTime,0);
+    int csize = jCsize;
+
+    // - - - - - - - - - - AL LowLevel method call - - - - - - - - - - - -
+    al_status = al_begin_timerange_action((int)jCtx, dataObjectName, (int)jRWMode, (double)jTmin, (double)jTmax, dTime, &csize, (int)jInterpMode, &ctx);
+    // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
+
+    env->ReleaseStringUTFChars(jDataObjectName, dataObjectName);
+    env->ReleaseDoubleArrayElements(jdTime, (jdouble*)dTime, csize);
+
+    if (al_status.code < 0)
+        raiseLowLevelException( env, al_status);
+
+    return ctx;
+  }
+
+/*
+ * Class:     imasjava_wrapper_LowLevel
  * Method:    al_begin_slice_action
  * Signature: (ILjava/lang/String;IDI)I
  */

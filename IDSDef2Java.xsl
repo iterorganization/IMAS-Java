@@ -1284,6 +1284,74 @@
             ids.get(iOccurrence);
             return ids;
             }
+
+            public static imas.<xsl:value-of select="@name"/>  getSample(int expIdx, String idsFullName, double tmin, double tmax, double[] dtime, int interpolMode)  throws ALException
+            {
+            imas.<xsl:value-of select="@name"/> ids = new imas.<xsl:value-of select="@name"/> ();
+            int iOccurrence = 0;
+            
+            if(!<xsl:value-of select="@name"/>_IDSBase.IDS_NAME.equals(idsFullName))
+            {
+            String tokens[] = idsFullName.split("/");
+            iOccurrence = Integer.parseInt(tokens[1]);          
+            }
+            ids.setPulseCtx(expIdx);
+            ids.getSample(iOccurrence, tmin, tmax, dtime, interpolMode);
+            return ids;
+            }
+
+            public void getSample(int iOccurrence, double tmin, double tmax, double[] dtime, int interpolMode)  throws ALException
+            {
+            String strNodePath = "";
+            int pulseCtx = this.pulseCtx;
+            int ctx = -1;
+            String idsFullName = <xsl:value-of select="@name"/>_IDSBase.IDS_NAME;
+            
+            
+            int idsTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
+
+            if (tmax &lt; tmin) {
+              System.err.println("Error in getSample:\n"
+              + "error, tmax should be greater or equals to tmin\n");
+              return;
+            }
+
+            if ((interpolMode != 0) &amp;&amp; (dtime.length == 0)) {
+              System.err.println("Error in getSample:\n"
+              + "error, interpolation mode should be 0 with no resampling (dtime.length == 0)\n");
+              return;
+            }
+
+            if ((interpolMode == 0) &amp;&amp; (dtime.length &gt;= 1)) {
+              System.err.println("Error in getSample:\n"
+              + "error, interpolation mode should be specified (non zero) with resampling (dtime.length &gt;= 1)\n");
+              return;
+            }
+            
+            if(iOccurrence > 0)
+            idsFullName = idsFullName + "/" + iOccurrence;
+
+            idsTimeMode = imas.readIdsTimeMode(pulseCtx, idsFullName);
+
+            if(idsTimeMode &lt; 0) {
+              System.err.println("Error in getSample:\n"
+              + "error reading homogeneous time for <xsl:value-of select="@name"/> IDS\n");
+              return;
+            }
+            
+            this.reset();
+            try{
+            // Open get context
+            ctx = LowLevel.al_begin_timerange_action(pulseCtx, idsFullName, LowLevel.READ_OP, tmin, tmax, dtime, dtime.length, interpolMode);
+            LowLevel.al_bind_readback_plugins(ctx);
+            this.getRootFields(ctx, idsTimeMode);
+            LowLevel.al_unbind_readback_plugins(ctx);
+            }
+            finally {
+            if(ctx >= 0)
+            LowLevel.al_end_action(ctx);
+            }
+            }
             
             
             public void get(int iOccurrence)  throws ALException

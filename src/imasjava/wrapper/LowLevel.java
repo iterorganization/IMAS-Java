@@ -177,6 +177,30 @@ public class LowLevel {
 			      final String dataobjectname,
 			      int rwmode) throws ALException;
   /**
+     Starts an I/O action on a DATAOBJECT time range.
+     This function gives a new operation context for the duration of an action on a time range.  
+     @param[in] ctx pulse context (from al_begin_uri_action())
+     @param[in] dataobjectname name of the DATAOBJECT
+     @param[in] rwmode mode for this operation:
+     - READ_OP: read operation
+     - WRITE_OP: write operation
+     - REPLACE_OP: replace operation
+     @param[in] tmin min time of the time range
+     @param[in] tmax max time of the time range
+     @param[in] data array of explicit time base
+     @param[in] dim size of time base
+     @param[in] interpmode mode for interpolation:
+     - CLOSEST_INTERP take the slice at the closest time
+     - PREVIOUS_INTERP take the slice at the previous time
+     - LINEAR_INTERP interpolate the slice between the values of the previous and next slice
+     - UNDEFINED_INTERP if not relevant (for write operations)
+     @result operation context id [_or error status if < 0_]
+   */
+   public static native int al_begin_timerange_action(int ctx,
+			      final String dataobjectname,
+			      int rwmode, double tmin, double tmax, 
+               double[] data, int dim,int interpmode) throws ALException;
+  /**
      Starts an I/O action on a DATAOBJECT slice.
      This function gives a new operation context for the duration of an action on a slice.  
      @param[in] ctx pulse context (from al_begin_uri_action())
