@@ -70,7 +70,7 @@ public class Example003_writeDataIntoEntry {
             // set mandatory field
             emptySummary.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
 
-            // summary/heating_current_drive/nbi is array of structures thus we need to resize it do use it.
+            // summary/heating_current_drive/nbi is an array of structures, so we need to resize it to use it.
             int arraySize = 1;
             emptySummary.heating_current_drive.nbi = new imas.summary.heating_current_driveClass.nbiClass[arraySize];
             emptySummary.heating_current_drive.nbi[0] = new imas.summary.heating_current_driveClass.nbiClass();
@@ -107,9 +107,6 @@ public class Example003_writeDataIntoEntry {
 
             // multiple slices can be put into entry as well
             emptySummary.stationary_phase_flag.value = new Vect1DInt(3);
-            emptySummary.time = new Vect1DDouble(3);
-
-            // preparing data
             double[] valueArray = {11.0, 12.0, 13.0};
             Vect1DDouble vectValueArray = new Vect1DDouble(valueArray);
             for (int i = 0; i < 3; i++){
@@ -123,7 +120,10 @@ public class Example003_writeDataIntoEntry {
                 value2DArray[i] = new double[]{1000.0, 2000.0, 3000.0};
             }
             emptySummary.heating_current_drive.nbi[0].beam_current_fraction.value.set(value2DArray);
-            
+
+
+
+            emptySummary.time = new Vect1DDouble(3);
             double[] timeArray = {50.0, 60.0, 70.0};
             Vect1DDouble vectTimeArray = new Vect1DDouble(timeArray);
             for (int i =0; i < 3; i++) {
