@@ -70,7 +70,7 @@ public class Example003_writeDataIntoEntry {
             // set mandatory field
             emptySummary.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
 
-            // summary/heating_current_drive/nbi is array of structures thus we need to resize it do use it.
+            // summary/heating_current_drive/nbi is an array of structures, so we need to resize it to use it.
             int arraySize = 1;
             emptySummary.heating_current_drive.nbi = new imas.summary.heating_current_driveClass.nbiClass[arraySize];
             emptySummary.heating_current_drive.nbi[0] = new imas.summary.heating_current_driveClass.nbiClass();

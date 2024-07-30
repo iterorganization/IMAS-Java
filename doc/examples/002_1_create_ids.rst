@@ -2,7 +2,11 @@
 Create IDS with Arrays of Structures (AoS)
 =========================================================================================================
 
-This example focuses on creating empty IDS and allocating arrays inside IDS structure
+This example focuses on creating empty IDS and allocating arrays inside IDS structure.
+
+.. seealso::
+
+    API documentation for :java:ref:`Vect1DDouble`
 
 .. literalinclude:: ../code_samples/java/imasjava/examples/Example002_fillingDataInIDS.java
     :start-after:      // This example focuses on creating empty IDS and allocating arrays inside IDS structure
@@ -20,8 +24,3 @@ This example focuses on creating empty IDS and allocating arrays inside IDS stru
         [1.0,2.0,3.0]
         ip:
         [1.0,2.0,3.0]
-
-
-.. seealso::
-
-    API documentation for :java:ref:`Vect1DDouble`

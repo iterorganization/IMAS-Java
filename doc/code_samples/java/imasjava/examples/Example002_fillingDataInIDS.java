@@ -94,7 +94,6 @@ public class Example002_fillingDataInIDS {
             System.out.println("\nSize of grid_ggd after resize to 3: " + emptyEdgeProfiles.grid_ggd.length);
             System.out.println("Message in 'emptyEdgeProfiles.grid_ggd[0]' after resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
             System.out.println("Message in 'emptyEdgeProfiles.grid_ggd[1]' after resize: " + emptyEdgeProfiles.grid_ggd[1].identifier.name);
-            System.out.println("Message in 'emptyEdgeProfiles.grid_ggd[2]' after resize: " + emptyEdgeProfiles.grid_ggd[2].identifier.name);
 
             // now we'll create another IDS which will be saved inside previously created object.
             imas.edge_profiles emptyEdgeProfiles2 = new imas.edge_profiles();

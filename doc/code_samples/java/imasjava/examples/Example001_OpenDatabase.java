@@ -66,7 +66,7 @@ public class Example001_OpenDatabase {
             */
             entry = imas.open(uri, LowLevel.OPEN_PULSE);
             /*
-            * You can access IDSes in here - take a look at sample code dealing with IDSes for details
+            * You can access IDSs in here - take a look at sample code dealing with IDSs for details
             */
         } catch (Exception e) {
             System.err.println("\nFailed to open DBEntry with URI\n" + e.getMessage());
