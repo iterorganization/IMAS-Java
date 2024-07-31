@@ -70,8 +70,26 @@ class TestCoreProfilesSampleGet {
 
             double[] dtime = {};
 
-            ids.getSample(idx, "core_profiles", 3.0, 8.0, dtime, 0);
-            System.out.println("ids.time :" + ids.time.getDim());
+            double tmin = 3.0;
+            double tmax = 8.0;
+
+            ids = imas.core_profiles.getSample(idx, "core_profiles", tmin, tmax, dtime, 0);
+            if (ids.time.getDim() != (tmax-tmin) + 1)
+                System.out.println("Error, expected size of ids.time (" + ids.time.getDim() + "):" + (tmax-tmin) + 1);
+
+            tmin = 5.0;
+            tmax = 9.0;
+
+            ids.getSample(0, tmin, tmax, dtime, 0);
+            if (ids.time.getDim() != (tmax-tmin) + 1)
+                System.out.println("Error, expected size of ids.time (" + ids.time.getDim() + "):" + (tmax-tmin) + 1);
+
+            double[]  dtime_interp = {0.5};
+            int expected_size = (int)Math.round((tmax-tmin)/dtime_interp[0]) + 1;
+
+            ids.getSample(0, tmin, tmax, dtime_interp, 1);
+            if (ids.time.getDim() != expected_size)
+                System.out.println("Error, expected size of ids.time (" + ids.time.getDim() + "):" + expected_size);
 
             imas.close(idx);
 
