@@ -27,6 +27,45 @@ IDS API
         :return: The loaded IDS
         :example: .. literalinclude:: code_samples/dbentry_get
 
+    .. java:method:: public static ids_type getSample(int expIdx, String idsFullName, double tmin, double tmax, double[] dtime, int interpolMode)
+
+        Read the contents in a specific time range of the an IDS into memory.
+
+        This method fetches the IDS with all the time slice in time range between tmin and tmax. 
+        1. In case of no interpolation in the time range interpolMode must be set to 0 and dtime = {}.
+        2. The method can interpolate time slices in the time range, if interpolMode = 1 and dtime = {step} (double array of size equals 1). 
+           The 'step' is the regular time step. 
+
+        3. Interpolation of dynamic data on an explicit time base. This method is selected
+            when dtime and interpolMode are provided.
+            dtime must be a double[] of size larger than 1.
+
+            This mode will generate an IDS with a homogeneous time vector equal to
+            dtime. tmin and tmax are ignored in this mode.
+
+        Empty fields within the IDS in the Data Entry are returned with the
+        default values indicated in :ref:`Default values`.
+
+        :param int expIdx: Data entry context created with
+            :java:ref:`imas.open`, :java:ref:`imas.openEnv` or
+            :java:ref:`imas.createEnv`
+        :param String idsFullName: name of the ids with optional occurrence
+            number, e.g. ``"core_profiles"`` (for occurrence 0),
+            ``"core_profiles/1"`` (for occurrence 1)
+        :param double tmin: Lower bound of the requested time range
+        :param double tmax:  Upper bound of the requested time range, must be larger than or
+                equal to :param:`tmin`
+        :param double[] dtime: Interval to use when interpolating, must be a std::vector<double>
+                containing an explicit time base to interpolate.
+        :param interpolMode: Interpolation method to use. Available options:
+
+            - :const: CLOSEST_INTERP
+            - :const: PREVIOUS_INTERP
+            - :const: LINEAR_INTERP
+
+            :returns: The loaded IDS.
+        :example: .. literalinclude:: code_samples/dbentry_getSample
+
     .. java:method:: public boolean isDefined()
         
         Checks whether IDS was initialized or not.

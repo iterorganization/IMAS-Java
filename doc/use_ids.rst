@@ -39,4 +39,5 @@
 .. |tm_independent| replace:: :java:ref:`IDS_TIME_MODE_INDEPENDENT`
 
 .. |ids_validate| replace:: :java:ref:`ids_validate`
+.. |ids_getSample| replace:: :java:ref:`ids_getSample`
 .. |validate_error| replace:: throws an error
