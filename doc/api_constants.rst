@@ -53,6 +53,12 @@ IMAS constants
 
         Identifier for the ASCII serialization protocol.
 
+    .. java:field:: public final static int FLEXBUFFERS_SERIALIZER_PROTOCOL = 61
+        
+        Identifier for the Flexbuffers serialization protocol. This protocol is more
+        performant and results in a smaller buffer size than the
+        :java:ref:`ASCII_SERIALIZER_PROTOCOL`.
+
     .. java:field:: public final static int DEFAULT_SERIALIZER_PROTOCOL
 
         Identifier for the default serialization protocol.
