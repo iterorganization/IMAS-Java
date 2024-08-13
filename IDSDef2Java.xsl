@@ -979,7 +979,7 @@
         else if (protocol == LowLevel.FLEXBUFFERS_SERIALIZER_PROTOCOL) {
                 int _pulseCtx = -1;
                 try{    
-                        _pulseCtx = Wrapper.alBeginDataEntryAction("imas:serialize?path=/", LowLevel.CREATE_PULSE);
+                        _pulseCtx = Wrapper.alBeginDataEntryAction("imas:flexbuffers?path=/", LowLevel.CREATE_PULSE);
                 } catch(Exception exc) 
                 {
                         LowLevel.al_end_action(_pulseCtx);
@@ -1087,7 +1087,7 @@
         else if (protocol == LowLevel.FLEXBUFFERS_SERIALIZER_PROTOCOL) {
                 int _pulseCtx = -1;
                 try{
-                        _pulseCtx = Wrapper.alBeginDataEntryAction("imas:serialize?path=/", LowLevel.OPEN_PULSE);
+                        _pulseCtx = Wrapper.alBeginDataEntryAction("imas:flexbuffers?path=/", LowLevel.OPEN_PULSE);
                 } catch(Exception exc)
                 {
                         LowLevel.al_end_action(_pulseCtx);
