@@ -976,6 +976,35 @@
                 return output;
 
         }
+        else if (protocol == LowLevel.FLEXBUFFERS_SERIALIZER_PROTOCOL) {
+                int _pulseCtx = -1;
+                try{    
+                        _pulseCtx = Wrapper.alBeginDataEntryAction("imas:flexbuffers?path=/", LowLevel.CREATE_PULSE);
+                } catch(Exception exc) 
+                {
+                        LowLevel.al_end_action(_pulseCtx);
+                        throw new ALException("Error calling alBeginDataEntryAction() in serialize");
+                }
+                // store state and overwrite so we use the Serialize backend in this->put
+                int _pulseCtx_stored = this.pulseCtx;
+                this.pulseCtx = _pulseCtx;
+                this.put();
+                // restore state
+                this.pulseCtx = _pulseCtx_stored;
+
+                // Read buffer from the backend
+                int[] size = {0};
+                byte[] data = LowLevel.al_read_data_char(_pulseCtx, "&lt;buffer&gt;", "", 1, size);
+
+                // cleanup
+                try{
+                        LowLevel.al_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
+                } finally {
+                        if(_pulseCtx >= 0)
+                                LowLevel.al_end_action(_pulseCtx);
+                }
+                return data;
+        }
         else {
                 throw new ALException(String.format("Unrecognized serialization protocol: %s", protocol));
         }
@@ -1054,6 +1083,34 @@
                         LowLevel.al_end_action(_pulseCtx);
                 }
                 tmpfile.delete();
+        }
+        else if (protocol == LowLevel.FLEXBUFFERS_SERIALIZER_PROTOCOL) {
+                int _pulseCtx = -1;
+                try{
+                        _pulseCtx = Wrapper.alBeginDataEntryAction("imas:flexbuffers?path=/", LowLevel.OPEN_PULSE);
+                } catch(Exception exc)
+                {
+                        LowLevel.al_end_action(_pulseCtx);
+                        throw new ALException("Error calling alBeginDataEntryAction() in deserialize");
+                }
+
+                // Write buffer to backend
+                int[] size = {data.length};
+                LowLevel.al_write_data_char(_pulseCtx, "&lt;buffer&gt;", "", data, 1, size);
+
+                // store state and overwrite so we use the Serialize backend in this->get
+                int _pulseCtx_stored = this.pulseCtx;
+                this.pulseCtx = _pulseCtx;
+                this.get(0);
+                // restore state
+                this.pulseCtx = _pulseCtx_stored;
+
+                try{
+                    LowLevel.al_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
+                } finally {
+                    if(_pulseCtx >= 0)
+                        LowLevel.al_end_action(_pulseCtx);
+                }
         }
         else {
                 throw new ALException(String.format("Unrecognized serialization protocol: %s", protocol));
