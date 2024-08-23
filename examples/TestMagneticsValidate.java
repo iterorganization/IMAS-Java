@@ -90,12 +90,12 @@ class TestMagneticsValidate {
         for (int i = 0; i < 7; i++) {
             ids.diamagnetic_flux[i] = new imas.magnetics.diamagnetic_fluxClass();
         }
-        ids.b_field_tor_probe = new imas.magnetics.b_field_tor_probeClass[13];
+        ids.b_field_phi_probe = new imas.magnetics.b_field_phi_probeClass[13];
         ids.b_field_pol_probe = new imas.magnetics.b_field_pol_probeClass[13];
         for (int i = 0; i < 13; i++) {
-            ids.b_field_tor_probe[i] = new imas.magnetics.b_field_tor_probeClass();
-            ids.b_field_tor_probe[i].field.data = new Vect1DDouble(9);
-            ids.b_field_tor_probe[i].field.time = new Vect1DDouble(9);
+            ids.b_field_phi_probe[i] = new imas.magnetics.b_field_phi_probeClass();
+            ids.b_field_phi_probe[i].field.data = new Vect1DDouble(9);
+            ids.b_field_phi_probe[i].field.time = new Vect1DDouble(9);
             ids.b_field_pol_probe[i] = new imas.magnetics.b_field_pol_probeClass();
             ids.b_field_pol_probe[i].field.data = new Vect1DDouble(9);
             ids.b_field_pol_probe[i].field.time = new Vect1DDouble(9);

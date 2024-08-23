@@ -1,7 +1,7 @@
 import java.lang.*;
 
 import imasjava.*;
-import imasjava.ids.magnetics_IDSBase.b_field_tor_probeClass;
+import imasjava.ids.magnetics_IDSBase.b_field_phi_probeClass;
 import imasjava.ids.magnetics_IDSBase.flux_loopClass;
 import imasjava.wrapper.LowLevel;
 
@@ -34,33 +34,33 @@ class TestResizeArray {
 
         System.out.println("");
 
-        System.out.println("### Testing b_field_tor_probe resize...");
-        ids.b_field_tor_probe = new imas.magnetics.b_field_tor_probeClass[13];
+        System.out.println("### Testing b_field_phi_probe resize...");
+        ids.b_field_phi_probe = new imas.magnetics.b_field_phi_probeClass[13];
         ids.b_field_pol_probe = new imas.magnetics.b_field_pol_probeClass[13];
-        System.out.println("### Testing b_field_tor_probe size: " + ids.b_field_tor_probe.length);
+        System.out.println("### Testing b_field_phi_probe size: " + ids.b_field_phi_probe.length);
         for (int i = 0; i < 13; i++) {
-            ids.b_field_tor_probe[i] = new imas.magnetics.b_field_tor_probeClass();
-            ids.b_field_tor_probe[i].field.data = new Vect1DDouble(9);
-            ids.b_field_tor_probe[i].field.time = new Vect1DDouble(9);
+            ids.b_field_phi_probe[i] = new imas.magnetics.b_field_phi_probeClass();
+            ids.b_field_phi_probe[i].field.data = new Vect1DDouble(9);
+            ids.b_field_phi_probe[i].field.time = new Vect1DDouble(9);
             ids.b_field_pol_probe[i] = new imas.magnetics.b_field_pol_probeClass();
             ids.b_field_pol_probe[i].field.data = new Vect1DDouble(9);
             ids.b_field_pol_probe[i].field.time = new Vect1DDouble(9);
         }
-        System.out.println("### Before resize ids.b_field_tor_probe[0]: " + ids.b_field_tor_probe[0]);
+        System.out.println("### Before resize ids.b_field_phi_probe[0]: " + ids.b_field_phi_probe[0]);
 
-        ids.b_field_tor_probe = (b_field_tor_probeClass[]) imasjava.utilities.ImasReflection.getResizedClassObject(ids.b_field_tor_probe, 20);
-        ids.b_field_pol_probe = new imas.magnetics.b_field_pol_probeClass[ids.b_field_tor_probe.length];
-        for (int i = 13; i < ids.b_field_tor_probe.length; i++) {
-            ids.b_field_tor_probe[i] = new imas.magnetics.b_field_tor_probeClass();
-            ids.b_field_tor_probe[i].field.data = new Vect1DDouble(9);
-            ids.b_field_tor_probe[i].field.time = new Vect1DDouble(9);
+        ids.b_field_phi_probe = (b_field_phi_probeClass[]) imasjava.utilities.ImasReflection.getResizedClassObject(ids.b_field_phi_probe, 20);
+        ids.b_field_pol_probe = new imas.magnetics.b_field_pol_probeClass[ids.b_field_phi_probe.length];
+        for (int i = 13; i < ids.b_field_phi_probe.length; i++) {
+            ids.b_field_phi_probe[i] = new imas.magnetics.b_field_phi_probeClass();
+            ids.b_field_phi_probe[i].field.data = new Vect1DDouble(9);
+            ids.b_field_phi_probe[i].field.time = new Vect1DDouble(9);
             ids.b_field_pol_probe[i] = new imas.magnetics.b_field_pol_probeClass();
             ids.b_field_pol_probe[i].field.data = new Vect1DDouble(9);
             ids.b_field_pol_probe[i].field.time = new Vect1DDouble(9);
         }
-        System.out.println("### Testing b_field_tor_probe resize: " + ids.b_field_tor_probe.length);
-        System.out.println("### After resize ids.b_field_tor_probe[0]: " + ids.b_field_tor_probe[0]);
-        System.out.println("### After resize ids.b_field_tor_probe[19]: " + ids.b_field_tor_probe[19]);
+        System.out.println("### Testing b_field_phi_probe resize: " + ids.b_field_phi_probe.length);
+        System.out.println("### After resize ids.b_field_phi_probe[0]: " + ids.b_field_phi_probe[0]);
+        System.out.println("### After resize ids.b_field_phi_probe[19]: " + ids.b_field_phi_probe[19]);
 
         System.out.println("");
     }

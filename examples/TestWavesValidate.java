@@ -42,7 +42,7 @@ class TestWavesValidate {
                 ids.coherent_wave[i].beam_tracing[j].beam = new imas.waves.coherent_waveClass.beam_tracingClass.beamClass[max3];
                 for (int k = 0; k < max3; k++) {
                     ids.coherent_wave[i].beam_tracing[j].beam[k] = new imas.waves.coherent_waveClass.beam_tracingClass.beamClass();
-                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_tor = new Vect1DInt(5);
+                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_phi = new Vect1DInt(5);
                 }
             }
         }
@@ -58,8 +58,8 @@ class TestWavesValidate {
         for (int i = 0; i < max1; i++) {
             for (int j = 0; j < max2; j++) {
                 for (int k = 0; k < max3; k++) {
-                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_tor = null;
-                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_tor = new Vect1DInt(1);
+                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_phi = null;
+                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_phi = new Vect1DInt(1);
                 }
             }
         }
@@ -75,8 +75,8 @@ class TestWavesValidate {
         for (int i = 0; i < max1; i++) {
             for (int j = 0; j < max2; j++) {
                 for (int k = 0; k < max3; k++) {
-                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_tor = null;
-                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_tor = new Vect1DInt(5);
+                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_phi = null;
+                    ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_phi = new Vect1DInt(5);
                     ids.coherent_wave[i].beam_tracing[j].beam[k].length = new Vect1DDouble(5);
                 }
             }
