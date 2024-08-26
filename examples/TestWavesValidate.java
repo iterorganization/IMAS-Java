@@ -60,7 +60,7 @@ class TestWavesValidate {
                 for (int k = 0; k < max3; k++) {
                     ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_parallel = null;
                     ids.coherent_wave[i].beam_tracing[j].beam[k].wave_vector.n_parallel = new Vect1DDouble(1);
-		    ids.coherent_wave[i].beam_tracing[j].beam[k].length = new Vect1DDouble(1);
+                    ids.coherent_wave[i].beam_tracing[j].beam[k].length = new Vect1DDouble(1);
                 }
             }
         }
