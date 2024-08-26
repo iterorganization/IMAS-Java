@@ -23,7 +23,7 @@ public class example_getSample_ids {
 
         imas.core_profiles cp1 = imas.core_profiles.getSample(data_entry, "core_profiles", tmin, tmax, dtime1, 1);
 
-        System.out.println("Size of ime range:" + cp1.time.getDim());
+        System.out.println("Size of time range:" + cp1.time.getDim());
 
         double[] dtime2 = {2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0};
 
