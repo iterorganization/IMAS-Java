@@ -29,7 +29,7 @@ IDS API
 
     .. java:method:: public static ids_type getSample(int expIdx, String idsFullName, double tmin, double tmax, double[] dtime, int interpolMode)
 
-        Read the contents in a specific time range of the an IDS into memory.
+        Read the contents of an IDS over a specific time range into memory.
 
         This method fetches an IDS with all time slices in a time range between tmin and tmax. 
         1. In case of no interpolation in the time range, interpolMode must be set to 0 and dtime = {}.
