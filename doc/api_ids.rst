@@ -31,7 +31,7 @@ IDS API
 
         Read the contents in a specific time range of the an IDS into memory.
 
-        This method fetches the IDS with all the time slice in time range between tmin and tmax. 
+        This method fetches an IDS with all time slices in a time range between tmin and tmax. 
         1. In case of no interpolation in the time range, interpolMode must be set to 0 and dtime = {}.
         2. The method can interpolate time slices in the time range, if interpolMode = 1 and dtime = {step} (double array of size equals 1). 
            The 'step' is the regular time step. 
