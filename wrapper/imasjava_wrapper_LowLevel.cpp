@@ -312,7 +312,7 @@ jint JNICALL Java_imasjava_wrapper_LowLevel_al_1begin_1timerange_1action
     int ctx = -1; 
     const char *dataObjectName = env->GetStringUTFChars(jDataObjectName, 0);
 
-    const double *dTime = env->GetDoubleArrayElements(jdTime,0);
+    jdouble *dTime = env->GetDoubleArrayElements(jdTime,0);
     int csize = jCsize;
 
     // - - - - - - - - - - AL LowLevel method call - - - - - - - - - - - -
@@ -320,7 +320,7 @@ jint JNICALL Java_imasjava_wrapper_LowLevel_al_1begin_1timerange_1action
     // - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - -
 
     env->ReleaseStringUTFChars(jDataObjectName, dataObjectName);
-    env->ReleaseDoubleArrayElements(jdTime, (jdouble*)dTime, csize);
+    env->ReleaseDoubleArrayElements(jdTime, (jdouble*)dTime, JNI_ABORT);
 
     if (al_status.code < 0)
         raiseLowLevelException( env, al_status);
