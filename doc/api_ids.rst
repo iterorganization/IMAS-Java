@@ -33,12 +33,10 @@ IDS API
 
         This method fetches an IDS with all time slices in a time range between tmin and tmax. 
         1. In case of no interpolation in the time range, interpolMode must be set to 0 and dtime = {}.
-        2. The method can interpolate time slices in the time range, if interpolMode = 1 and dtime = {step} (double array of size equals 1). 
-        The 'step' is the regular time step. 
 
-        3. Interpolation of dynamic data on an explicit time base. This method is selected
-        when dtime and interpolMode are provided.
-        dtime must be a double[] of size larger than 1.
+        2. The method can interpolate time slices in the time range, if interpolMode is not set to 0 and dtime = {step} (double array of size equals 1) where 'step' is the constant time between two slices. 
+
+        3. Interpolation of dynamic data on an explicit time base. This method is selected when dtime and interpolMode are provided. dtime must be a double[] of size larger than 1.
 
         This mode will generate an IDS with a homogeneous time vector equal to
         dtime. tmin and tmax are ignored in this mode.
