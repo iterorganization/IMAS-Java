@@ -34,12 +34,18 @@ IDS API
         This method fetches an IDS with all time slices in a time range between tmin and tmax. 
         1. In case of no interpolation in the time range, interpolMode must be set to 0 and dtime = {}.
 
+           This mode returns an IDS object with all constant/static data filled. The dynamic data is retrieved for the provided time range [tmin, tmax].
+
         2. The method can interpolate time slices in the time range, if interpolMode is not set to 0 and dtime = {step} (double array of size equals 1) where 'step' is the constant time between two slices. 
+
+            This mode will generate an IDS with a homogeneous time vector ``[tmin, tmin + dtime, tmin + 2*dtime, ...`` up to ``tmax``. The chosen interpolation method will have no effect on the time vector, but may have an impact on the
+            other dynamic values. The returned IDS always has ``ids_properties.homogeneous_time = 1``.
 
         3. Interpolation of dynamic data on an explicit time base. This method is selected when dtime and interpolMode are provided. dtime must be a double[] of size larger than 1.
 
-        This mode will generate an IDS with a homogeneous time vector equal to
-        dtime. tmin and tmax are ignored in this mode.
+            This mode will generate an IDS with a homogeneous time vector equal to ``dtime``. ``tmin`` and ``tmax`` are ignored in this mode.
+            The chosen interpolation method will have no effect on the time vector, but may have an impact on the other dynamic values. 
+            The returned IDS always has ``ids_properties.homogeneous_time = 1``.
 
         Empty fields within the IDS in the Data Entry are returned with the
         default values indicated in :ref:`Default values`.
