@@ -961,14 +961,10 @@
                         } catch (Exception exc) {
                                 throw new ALException("Can not read bytes");
                         }
-                        String protocolInString = String.valueOf(LowLevel.ASCII_SERIALIZER_PROTOCOL);  
-                        byte[] prependBytes = protocolInString.getBytes();  
-                        output = new byte[prependBytes.length + data.length];
-                        for(int i=0; i &lt; prependBytes.length; i++)
-                        {
-                            output[i] = prependBytes[i];
-                        }
-                        int j= prependBytes.length ;
+                        output = new byte[1 + data.length];
+			// prepend serializer proto encoded as one byte ascii code
+			output[0] = (byte)((char)LowLevel.ASCII_SERIALIZER_PROTOCOL);
+                        int j=1;
                         for(int i=0;i &lt; data.length; i++){
                         output[j] = data[i];
                         j++;
@@ -979,6 +975,35 @@
                 }
                 return output;
 
+        }
+        else if (protocol == LowLevel.FLEXBUFFERS_SERIALIZER_PROTOCOL) {
+                int _pulseCtx = -1;
+                try{    
+                        _pulseCtx = Wrapper.alBeginDataEntryAction("imas:flexbuffers?path=/", LowLevel.CREATE_PULSE);
+                } catch(Exception exc) 
+                {
+                        LowLevel.al_end_action(_pulseCtx);
+                        throw new ALException("Error calling alBeginDataEntryAction() in serialize");
+                }
+                // store state and overwrite so we use the Serialize backend in this->put
+                int _pulseCtx_stored = this.pulseCtx;
+                this.pulseCtx = _pulseCtx;
+                this.put();
+                // restore state
+                this.pulseCtx = _pulseCtx_stored;
+
+                // Read buffer from the backend
+                int[] size = {0};
+                byte[] data = LowLevel.al_read_data_char(_pulseCtx, "&lt;buffer&gt;", "", 1, size);
+
+                // cleanup
+                try{
+                        LowLevel.al_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
+                } finally {
+                        if(_pulseCtx >= 0)
+                                LowLevel.al_end_action(_pulseCtx);
+                }
+                return data;
         }
         else {
                 throw new ALException(String.format("Unrecognized serialization protocol: %s", protocol));
@@ -997,12 +1022,7 @@
     {
         if (data.length ==0)
                 throw new ALException("No data provided");
-        byte[] protocolBytes = new byte[2];
-        for (int i = 0; i &lt; 2; i++) {
-                protocolBytes[i] = data[i];
-        }
-        String protocolString = new String(protocolBytes);
-        int protocol = Integer.parseInt(protocolString);
+        int protocol = (int)data[0];
 
         if (protocol == LowLevel.ASCII_SERIALIZER_PROTOCOL) {
                 File tmpdir;
@@ -1024,7 +1044,7 @@
                 }
                 try{
                         OutputStream outputStream = new FileOutputStream(tmpfile);
-                        outputStream.write(Arrays.copyOfRange(data, 2, data.length));
+                        outputStream.write(Arrays.copyOfRange(data, 1, data.length));
                         outputStream.close();
                 }catch(Exception exc) 
                 {
@@ -1063,6 +1083,34 @@
                         LowLevel.al_end_action(_pulseCtx);
                 }
                 tmpfile.delete();
+        }
+        else if (protocol == LowLevel.FLEXBUFFERS_SERIALIZER_PROTOCOL) {
+                int _pulseCtx = -1;
+                try{
+                        _pulseCtx = Wrapper.alBeginDataEntryAction("imas:flexbuffers?path=/", LowLevel.OPEN_PULSE);
+                } catch(Exception exc)
+                {
+                        LowLevel.al_end_action(_pulseCtx);
+                        throw new ALException("Error calling alBeginDataEntryAction() in deserialize");
+                }
+
+                // Write buffer to backend
+                int[] size = {data.length};
+                LowLevel.al_write_data_char(_pulseCtx, "&lt;buffer&gt;", "", data, 1, size);
+
+                // store state and overwrite so we use the Serialize backend in this->get
+                int _pulseCtx_stored = this.pulseCtx;
+                this.pulseCtx = _pulseCtx;
+                this.get(0);
+                // restore state
+                this.pulseCtx = _pulseCtx_stored;
+
+                try{
+                    LowLevel.al_close_pulse(_pulseCtx, LowLevel.CLOSE_PULSE);
+                } finally {
+                    if(_pulseCtx >= 0)
+                        LowLevel.al_end_action(_pulseCtx);
+                }
         }
         else {
                 throw new ALException(String.format("Unrecognized serialization protocol: %s", protocol));

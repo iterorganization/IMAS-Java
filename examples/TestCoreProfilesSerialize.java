@@ -25,7 +25,7 @@ class TestCoreProfilesSerialize {
         // Test the "serialize" part
         try {
             String currentDir = System.getProperty("user.dir");
-            String uri = "imas:mdsplus?path=" + currentDir + "/test_db_TestCoreProfiles";
+            String uri = "imas:ascii?path=" + currentDir + "/test_db_TestCoreProfiles";
             int idx = imas.open(uri, LowLevel.FORCE_CREATE_PULSE);
 
             // allocate the ids fields
@@ -59,7 +59,8 @@ class TestCoreProfilesSerialize {
             ids1.ids_properties.comment = "This is a test ids. User: " + userName;
             ids1.time = new Vect1DDouble(time);
 
-            byte[] data = ids1.serialize(LowLevel.ASCII_SERIALIZER_PROTOCOL);
+            byte[] data = ids1.serialize();
+            System.out.println("Serialized size " + data.length + ", first byte " + data[0]);
             ids2.deserialize(data);
             boolean commentCompare = ids1.ids_properties.comment.equals(ids2.ids_properties.comment);
             boolean homogeneous_timeCompare = ids1.ids_properties.homogeneous_time == ids2.ids_properties.homogeneous_time;

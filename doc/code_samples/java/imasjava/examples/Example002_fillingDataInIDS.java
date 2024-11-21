@@ -26,7 +26,7 @@ public class Example002_fillingDataInIDS {
             //  <ids>/ids_properties/provider
             //  <ids>/ids_properties/creation_date
 
-            // when ids_properties.homogeneous_time is set to IDS_TIME_MODE_HOMOGENEOUS, 
+            // when ids_properties.homogeneous_time is set to IDS_TIME_MODE_HOMOGENEOUS,
             // all time-dependent fields values correspond to <ids>.time vector.
             double[] timeArray = {1.0, 2.0, 3.0};
             emptyCoreProfiles.time = new Vect1DDouble(timeArray);
@@ -34,7 +34,7 @@ public class Example002_fillingDataInIDS {
             // size of time dependent variables must be equal to the size of time vector
             emptyCoreProfiles.global_quantities.ip = new Vect1DDouble(timeArray);
 
-            // IDSs fields can be printed. 
+            // IDSs fields can be printed.
             System.out.println("\nSaved values of emptyCoreProfiles from creatingCompletlyNewIDS() function");
             System.out.println("time: \n" + emptyCoreProfiles.time);
             System.out.println("ip: \n" + emptyCoreProfiles.global_quantities.ip);
@@ -65,7 +65,7 @@ public class Example002_fillingDataInIDS {
             emptyEdgeProfiles.grid_ggd[0].identifier.name = "Structure before resize";
 
             System.out.println("\nSize of grid_ggd before resize: " + emptyEdgeProfiles.grid_ggd.length);
-            System.out.println("Message in IDS before resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
+            System.out.println("Message in 'emptyEdgeProfiles.grid_ggd[0]' before resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
 
             int size_of_grid = 2;
 
@@ -77,7 +77,7 @@ public class Example002_fillingDataInIDS {
             }
  
             System.out.println("\nSize of grid_ggd after resize: " + emptyEdgeProfiles.grid_ggd.length);
-            System.out.println("Message in IDS after resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
+            System.out.println("Message in 'emptyEdgeProfiles.grid_ggd[0]' after resize(data destroyed): " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
 
             emptyEdgeProfiles.grid_ggd[0].identifier.name = "First test struct";
             emptyEdgeProfiles.grid_ggd[1].identifier.name = "Second test struct";
@@ -92,7 +92,8 @@ public class Example002_fillingDataInIDS {
             emptyEdgeProfiles.grid_ggd = tmp_grid;
             
             System.out.println("\nSize of grid_ggd after resize to 3: " + emptyEdgeProfiles.grid_ggd.length);
-            System.out.println("Message in IDS after resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
+            System.out.println("Message in 'emptyEdgeProfiles.grid_ggd[0]' after resize: " + emptyEdgeProfiles.grid_ggd[0].identifier.name);
+            System.out.println("Message in 'emptyEdgeProfiles.grid_ggd[1]' after resize: " + emptyEdgeProfiles.grid_ggd[1].identifier.name);
 
             // now we'll create another IDS which will be saved inside previously created object.
             imas.edge_profiles emptyEdgeProfiles2 = new imas.edge_profiles();

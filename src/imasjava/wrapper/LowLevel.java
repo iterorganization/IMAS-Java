@@ -26,7 +26,8 @@ public class LowLevel {
       public final static int NON_TIMED = 0;
 
       public final static int ASCII_SERIALIZER_PROTOCOL = SERIALIZER_PROTOCOL_0;
-      public final static int DEFAULT_SERIALIZER_PROTOCOL = ASCII_SERIALIZER_PROTOCOL;
+      public final static int FLEXBUFFERS_SERIALIZER_PROTOCOL = SERIALIZER_PROTOCOL_0+1;
+      public final static int DEFAULT_SERIALIZER_PROTOCOL = FLEXBUFFERS_SERIALIZER_PROTOCOL;
 
       public final static int GLOBAL_OP = OP_RANGE_0;
       public final static int SLICE_OP = OP_RANGE_0 + 1;
