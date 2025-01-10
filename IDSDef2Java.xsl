@@ -3209,157 +3209,201 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
       </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="field" mode="VALIDATE_PATH_SINGLE">
-      <xsl:param name="newpath"/>
-      <xsl:param name="root"/>
-      <xsl:param name="string"/>
-      <xsl:param name="dimension"/>
-      <xsl:param name="coord"/>
-      <xsl:param name="targetdim"/>
-      <xsl:if test="contains($newpath,'/')">
-      <xsl:choose>
-        <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='structure'">
-          <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name" />
-          <xsl:apply-templates select="." mode="VALIDATE_PATH_SINGLE">
-          <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
-          <xsl:with-param name="root" select="$root"/>
-          <xsl:with-param name="string" select="concat($string,$act_struct,'.')"/>
-          <xsl:with-param name="dimension" select="$dimension"/>
-          <xsl:with-param name="coord" select="$coord"/>
-          <xsl:with-param name="targetdim" select="$targetdim"/>
-          </xsl:apply-templates>
-        </xsl:when>
-        <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='struct_array'">
-        <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name" />
-        <xsl:variable name="act_index">
-                <xsl:if test="contains(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,'/')">
-                  <xsl:value-of select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat('/',$act_struct,'(')),')')"/>
-                </xsl:if>
-                <xsl:if test="not(contains(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,'/'))">
-                  <xsl:value-of select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat($act_struct,'(')),')')"/>
-                </xsl:if>
-                </xsl:variable>
-          <xsl:apply-templates select="." mode="VALIDATE_PATH_SINGLE">
-          <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
-          <xsl:with-param name="root" select="$root"/>
-          <xsl:with-param name="string" select="concat($string,$act_struct,'[',$act_index,'].')"/>
-          <xsl:with-param name="dimension" select="$dimension"/>
-          <xsl:with-param name="coord" select="$coord"/>
-          <xsl:with-param name="targetdim" select="$targetdim"/>
-        </xsl:apply-templates>
-        </xsl:when>
-      </xsl:choose>
-      </xsl:if>
+    <xsl:template name="validatePathSingle">
+  <xsl:param name="newpath"/>
+  <xsl:param name="root"/>
+  <xsl:param name="string"/>
+  <xsl:param name="dimension"/>
+  <xsl:param name="coord"/>
+  <xsl:param name="targetdim"/>
 
-      <xsl:variable name="istimeslice">
-      <xsl:if test="contains($coord,' OR')">
-      <xsl:if test="not($root='/')">
-        <xsl:if test="contains(substring-before(substring-after($coord,$root),' OR'),'(itime)')">
-          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
-            <xsl:value-of select="'yes'"/>
-          </xsl:if>
-        </xsl:if>
-      </xsl:if>
-      <xsl:if test="$root='/'">
-        <xsl:if test="contains(substring-before($coord,' OR'),'(itime)')">
-          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
-            <xsl:value-of select="'yes'"/>
-          </xsl:if>
-        </xsl:if>
-      </xsl:if>
-      </xsl:if>
-      <xsl:if test="not($root='/')">
-      <xsl:if test="not(contains($coord,' OR'))">
-        <xsl:if test="contains(substring-after($coord,$root),'(itime)')">
-          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
-            <xsl:value-of select="'yes'"/>
-          </xsl:if>
-        </xsl:if>
-      </xsl:if>
-      </xsl:if>
-      <xsl:if test="$root='/'">
-      <xsl:if test="not(contains($coord,' OR'))">
-        <xsl:if test="contains($coord,'(itime)')">
-          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
-            <xsl:value-of select="'yes'"/>
-          </xsl:if>
-        </xsl:if>
-      </xsl:if>
-      </xsl:if>
-      </xsl:variable>
-      <xsl:if test="not(contains($newpath,'/')) and not($istimeslice='yes')"> <!-- and ( (contains($string,'(itime)') and contains($coord,'(itime)')) or  (not(contains($string,'(itime)')) and not(contains($coord,'(itime)'))) )-->
+  <xsl:choose>
+    <xsl:when test="contains($newpath,'/')">
+      <xsl:call-template name="processNewPath">
+        <xsl:with-param name="newpath" select="$newpath"/>
+        <xsl:with-param name="root" select="$root"/>
+        <xsl:with-param name="string" select="$string"/>
+        <xsl:with-param name="dimension" select="$dimension"/>
+        <xsl:with-param name="coord" select="$coord"/>
+        <xsl:with-param name="targetdim" select="$targetdim"/>
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="validateCoordinate">
+        <xsl:with-param name="root" select="$root"/>
+        <xsl:with-param name="string" select="$string"/>
+        <xsl:with-param name="dimension" select="$dimension"/>
+        <xsl:with-param name="coord" select="$coord"/>
+        <xsl:with-param name="targetdim" select="$targetdim"/>
+      </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="processNewPath">
+  <xsl:param name="newpath"/>
+  <xsl:param name="root"/>
+  <xsl:param name="string"/>
+  <xsl:param name="dimension"/>
+  <xsl:param name="coord"/>
+  <xsl:param name="targetdim"/>
+
+  <xsl:choose>
+    <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='structure'">
+      <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name"/>
+      <xsl:call-template name="validatePathSingle">
+        <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
+        <xsl:with-param name="root" select="$root"/>
+        <xsl:with-param name="string" select="concat($string,$act_struct,'.')"/>
+        <xsl:with-param name="dimension" select="$dimension"/>
+        <xsl:with-param name="coord" select="$coord"/>
+        <xsl:with-param name="targetdim" select="$targetdim"/>
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='struct_array'">
+      <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name"/>
+      <xsl:variable name="act_index">
         <xsl:choose>
-        <xsl:when test="@data_type='struct_array'">
-       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-        int[] shape =  {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
-        </xsl:when>
-        <xsl:otherwise>
-       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-        int[] shape =  this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
-        </xsl:otherwise>
+          <xsl:when test="contains(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,'/')">
+            <xsl:value-of select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat('/',$act_struct,'(')),')')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat($act_struct,'(')),')')"/>
+          </xsl:otherwise>
         </xsl:choose>
-        if (shape[<xsl:value-of select="number($dimension)"/>] > 0) {
-        <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
-        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
-        </xsl:if>
-        <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
-          imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
-                                  <xsl:value-of select="number($dimension)"/>, "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
-                                  <xsl:value-of select="number($targetdim)"/>, "<xsl:value-of select="$coord"/>"
-                                  <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
-                                  <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>);
-      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
-        }
-        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
-          if(shape[<xsl:value-of select="number($dimension)"/>] != idsTimeSize) {
-            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
-            throw new ValidationException(errMsg);
-          }
-        }
-        if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT ) {
-          if(shape[<xsl:value-of select="number($dimension)"/>] != 0) {
-            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, 0, "time");
-            throw new ValidationException(errMsg);
-          }
-        }
-        </xsl:if>
-	}
-	}
-      </xsl:if> 
-      <xsl:if test="not(contains($newpath,'/')) and $istimeslice='yes'">
-      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
-      <xsl:choose>
+      </xsl:variable>
+      <xsl:call-template name="validatePathSingle">
+        <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
+        <xsl:with-param name="root" select="$root"/>
+        <xsl:with-param name="string" select="concat($string,$act_struct,'[',$act_index,'].')"/>
+        <xsl:with-param name="dimension" select="$dimension"/>
+        <xsl:with-param name="coord" select="$coord"/>
+        <xsl:with-param name="targetdim" select="$targetdim"/>
+      </xsl:call-template>
+    </xsl:when>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="validateCoordinate">
+  <xsl:param name="root"/>
+  <xsl:param name="string"/>
+  <xsl:param name="dimension"/>
+  <xsl:param name="coord"/>
+  <xsl:param name="targetdim"/>
+
+  <xsl:variable name="istimeslice">
+    <xsl:choose>
+      <xsl:when test="contains($coord,' OR') and not($root='/') and contains(substring-before(substring-after($coord,$root),' OR'),'(itime)') and not(contains(concat($string,@name),'(itime)'))">
+        <xsl:value-of select="'yes'"/>
+      </xsl:when>
+      <xsl:when test="contains($coord,' OR') and $root='/' and contains(substring-before($coord,' OR'),'(itime)') and not(contains(concat($string,@name),'(itime)'))">
+        <xsl:value-of select="'yes'"/>
+      </xsl:when>
+      <xsl:when test="not(contains($coord,' OR')) and not($root='/') and contains(substring-after($coord,$root),'(itime)') and not(contains(concat($string,@name),'(itime)'))">
+        <xsl:value-of select="'yes'"/>
+      </xsl:when>
+      <xsl:when test="not(contains($coord,' OR')) and $root='/' and contains($coord,'(itime)') and not(contains(concat($string,@name),'(itime)'))">
+        <xsl:value-of select="'yes'"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:if test="not($istimeslice='yes')">
+    <xsl:choose>
       <xsl:when test="@data_type='struct_array'">
-      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-      int[] shape = {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
-      int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
+        if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+          int[] shape = {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
       </xsl:when>
       <xsl:otherwise>
-      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-      int[] shape = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
-      int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+        if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+          int[] shape = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
       </xsl:otherwise>
-      </xsl:choose>
-      if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
-        if(arraySize != idsTimeSize) {
-          String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
-          throw new ValidationException(errMsg);
+    </xsl:choose>
+    if (shape[<xsl:value-of select="number($dimension)"/>] > 0) {
+      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS) {
+      </xsl:if>
+      <xsl:apply-templates select="." mode="check-target-indices">
+        <xsl:with-param name="coord" select="$coord"/>
+        <xsl:with-param name="relativepathdoc" select="$root"/>
+      </xsl:apply-templates>
+      imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
+        <xsl:value-of select="number($dimension)"/>, "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
+        <xsl:value-of select="number($targetdim)"/>, "<xsl:value-of select="$coord"/>"
+        <xsl:apply-templates select="." mode="check-specific-coordinates">
+          <xsl:with-param name="coord" select="$coord"/>
+          <xsl:with-param name="relativepathdoc" select="$root"/>
+          <xsl:with-param name="dimension" select="$dimension"/>
+          <xsl:with-param name="self" select="concat($string,@name)"/>
+        </xsl:apply-templates>
+        <xsl:apply-templates select="." mode="possible-coordinates">
+          <xsl:with-param name="coord" select="$coord"/>
+          <xsl:with-param name="relativepathdoc" select="$root"/>
+          <xsl:with-param name="self" select="concat($string,@name)"/>
+        </xsl:apply-templates>);
+      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
         }
-      }
-      if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
-        for (int itime = 1; itime&lt;arraySize;itime++) {
-            if (this.<xsl:value-of select="@name"/>[itime] != null) {
-              if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
-                throw new ValidationException("Time coordinate of '<xsl:value-of select="@name"/>' (<xsl:value-of select="@name"/>["+Integer.toString(itime)+"]/time)' has empty values");
-              }
-            }
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) {
+          if (shape[<xsl:value-of select="number($dimension)"/>] != idsTimeSize) {
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message("<xsl:value-of select="fn:getpathdoc(@path_doc)"/>", coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
+            throw new ValidationException(errMsg);
           }
         }
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT) {
+          if (shape[<xsl:value-of select="number($dimension)"/>] != 0) {
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message("<xsl:value-of select="fn:getpathdoc(@path_doc)"/>", coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, 0, "time");
+            throw new ValidationException(errMsg);
+          }
+        }
+      </xsl:if>
+    }
+  </xsl:if>
+  <xsl:if test="$istimeslice='yes'">
+    <xsl:call-template name="validateTimeSlice">
+      <xsl:with-param name="string" select="$string"/>
+      <xsl:with-param name="name" select="@name"/>
+      <xsl:with-param name="dimension" select="$dimension"/>
+      <xsl:with-param name="coord" select="$coord"/>
+      <xsl:with-param name="path_doc" select="@path_doc"/>
+    </xsl:call-template>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template name="validateTimeSlice">
+  <xsl:param name="string"/>
+  <xsl:param name="name"/>
+  <xsl:param name="dimension"/>
+  <xsl:param name="coord"/>
+  <xsl:param name="path_doc"/>
+
+  <xsl:choose>
+    <xsl:when test="@data_type='struct_array'">
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/> != null) {
+        int[] shape = {this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/>.length};
+        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/>.length;
+    </xsl:when>
+    <xsl:otherwise>
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/> != null) {
+        int[] shape = this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/>.getDims();
+        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
+    </xsl:otherwise>
+  </xsl:choose>
+  if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) {
+    if (arraySize != idsTimeSize) {
+      String errMsg = CoordinateValidation.coordinate_incorrect_size_message("<xsl:value-of select="fn:getpathdoc($path_doc)"/>", coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
+      throw new ValidationException(errMsg);
+    }
+  }
+  if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS) {
+    for (int itime = 1; itime &lt; arraySize; itime++) {
+      if (this.<xsl:value-of select="$name"/>[itime] != null) {
+        if (!(this.<xsl:value-of select="$name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) {
+          throw new ValidationException("Time coordinate of '<xsl:value-of select="$name"/>' (<xsl:value-of select="$name"/>[" + Integer.toString(itime) + "]/time)' has empty values");
+        }
       }
-	
-      </xsl:if>
-      </xsl:if>
-      </xsl:template> 
+    }
+  }
+</xsl:template>
 
       <xsl:template match='field' mode="possible-coordinates">
       <xsl:param name="coord"/>
@@ -3732,4 +3776,3 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
     
     
   </xsl:stylesheet>
-
