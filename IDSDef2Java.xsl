@@ -50,292 +50,360 @@
     <!--=================================================-->
     
     <xsl:template match = "/IDSs">
-      <xsl:result-document href="src/imasjava/imas.java" method="text">
-        package imasjava;
-        import java.io.File;
-        import java.lang.reflect.*;
-        import java.util.*;
-        
-        import imasjava.utilities.ImasReflection;
-        import imasjava.ids.*;
-        import imasjava.wrapper.LowLevel;
-        import imasjava.wrapper.Wrapper;
-        
-        public class imas {
-        static {
+    <xsl:result-document href="src/imasjava/imas.java" method="text">
+package imasjava;
+import java.io.File;
+import java.lang.reflect.*;
+import java.util.*;
+
+import imasjava.utilities.ImasReflection;
+import imasjava.ids.*;
+import imasjava.wrapper.LowLevel;
+import imasjava.wrapper.Wrapper;
+	
+public class imas {
+    static {
         try {
-          System.loadLibrary("al-java-binding");
+        	System.loadLibrary("al-java-binding");
         } catch (UnsatisfiedLinkError exc) {
-          System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
+          	System.err.println("(imas.java) Caught UnsatisfiedLinkError: " + exc);
         } catch (Throwable exc) {
-          System.err.println("Cannot link to JNI library: " + exc);
-          System.exit(1);
+          	System.err.println("Cannot link to JNI library: " + exc);
+          	System.exit(1);
         }
-        }
-        
-        
-        public static final int INTERPOLATION = 3, CLOSEST_SAMPLE = 1, PREVIOUS_SAMPLE = 2;
-        
-        public static final String al_java_version = "<xsl:value-of select="$AL_VERSION"/>";
-        public static final int al_java_major_version = <xsl:value-of select="$HLI_MAJOR"/>;
-        public static final int al_java_minor_version = <xsl:value-of select="$HLI_MINOR"/>;
-        public static final int al_java_patch_version = <xsl:value-of select="$HLI_PATCH"/>;
+    }
+    
+    
+    public static final int INTERPOLATION = 3, CLOSEST_SAMPLE = 1, PREVIOUS_SAMPLE = 2;
+    
+    public static final String al_java_version = "<xsl:value-of select="$AL_VERSION"/>";
+    public static final int al_java_major_version = <xsl:value-of select="$HLI_MAJOR"/>;
+    public static final int al_java_minor_version = <xsl:value-of select="$HLI_MINOR"/>;
+    public static final int al_java_patch_version = <xsl:value-of select="$HLI_PATCH"/>;
 
-        public static final String al_dd_version = "<xsl:value-of select="$DD_VERSION"/>";
-        public static final int al_dd_major_version = <xsl:value-of select="$DD_MAJOR"/>;
-        public static final int al_dd_minor_version = <xsl:value-of select="$DD_MINOR"/>;
-        public static final int al_dd_patch_version = <xsl:value-of select="$DD_PATCH"/>;
+    public static final String al_dd_version = "<xsl:value-of select="$DD_VERSION"/>";
+    public static final int al_dd_major_version = <xsl:value-of select="$DD_MAJOR"/>;
+    public static final int al_dd_minor_version = <xsl:value-of select="$DD_MINOR"/>;
+    public static final int al_dd_patch_version = <xsl:value-of select="$DD_PATCH"/>;
 
-        public static String get_al_version() {
-            return LowLevel.al_get_version();
-        }
-        
-        
-        public static int pulseCtx = -1;
-        
-        public static String user;
-        public static String tokamak;
-        public static String version;
-        public static int pulse; 
+    public static String get_al_version() {
+        return LowLevel.al_get_version();
+    }
+    
+    
+    public static int pulseCtx = -1;
+    
+    public static String user;
+    public static String tokamak;
+    public static String version;
+    public static int pulse; 
 	public static int run;
 
-          /**
-          * Methods returning the size along the input dimension
-          *
-          * @param dim The dimension that is checked.
-          * @param objs Object input.
-          * @return the size
-          */
-  public static int get_possible_coordinate(int dim, Object obj) {
-      java.lang.reflect.Method method;
+    /**
+    * Methods returning the size along the input dimension
+    *
+    * @param dim The dimension that is checked.
+    * @param objs Object input.
+    * @return the size
+    */
+	public static int get_possible_coordinate(int dim, Object obj) {
+  		java.lang.reflect.Method method;
 
-          if (obj != null) {
+      	if (obj != null) {
             try {
-            method = obj.getClass().getMethod("getDim",int.class);
-            } catch (SecurityException e) { return 0; }
-              catch (NoSuchMethodException e) {method=null;}
+            	method = obj.getClass().getMethod("getDim",int.class);
+            } 
+            catch (SecurityException e) { return 0; }
+            catch (NoSuchMethodException e) {method=null;}
             if (method != null) {
-            int size;
-            try {
-            size = (int) method.invoke(obj,dim);
-            } catch (IllegalArgumentException e) { return 0; }
-              catch (IllegalAccessException e) { return 0; }
-              catch (InvocationTargetException e) { return 0; }
-            return size;
+            	int size;
+            	try {
+            	size = (int) method.invoke(obj,dim);
+            	} 
+            	catch (IllegalArgumentException e) { return 0; }
+              	catch (IllegalAccessException e) { return 0; }
+              	catch (InvocationTargetException e) { return 0; }
+            	return size;
             } else {
-            return ((Object[])obj).length;
+            	return ((Object[])obj).length;
             }
-          }
-    
-      return 0;
-}
+      	}    
+  		return 0;
+	}
 
-  /**
-  * Methods returning true if the object obj is allocated and of size different to 0. False otherwise.
-  *
-  * @param dim The dimension that is checked.
-  * @param obj Object of the possible coordinates.
-  * @return False if the size is validated.
-  */
+  	/**
+  	* Methods returning true if the object obj is allocated and of size different to 0. False otherwise.
+  	*
+  	* @param dim The dimension that is checked.
+  	* @param obj Object of the possible coordinates.
+  	* @return False if the size is validated.
+  	*/
 	public static boolean check_possible_coordinate(int dim, Object obj) {
-          boolean check = false;
-          java.lang.reflect.Method method;
-          if (obj == null) return false;
-          else {
+    	boolean check = false;
+      	java.lang.reflect.Method method;
+      	if (obj == null) return false;
+      	else {
             try {
-            method = obj.getClass().getMethod("getDim",int.class);
-            } catch (SecurityException e) { return true; }
-              catch (NoSuchMethodException e) {method=null;}
+            	method = obj.getClass().getMethod("getDim",int.class);
+            } 
+            catch (SecurityException e) { return true; }
+            catch (NoSuchMethodException e) {method=null;}
             if (method != null) {
-            try {
-	    	  int size = (int) method.invoke(obj,dim);
-                  if (size != 0) check = true;
-            } catch (IllegalArgumentException e) { return true; }
-              catch (IllegalAccessException e) { return true; }
-              catch (InvocationTargetException e) { return true; }
+	            try {
+		    	  int size = (int) method.invoke(obj,dim);
+	                  if (size != 0) check = true;
+	            }
+	            catch (IllegalArgumentException e) { return true; }
+	            catch (IllegalAccessException e) { return true; }
+	            catch (InvocationTargetException e) { return true; }
             } else {
-            if (((Object[])obj).length != 0) check = true;
+        	    if (((Object[])obj).length != 0) check = true;
             }
-          }
-          return check;
-          }
+        }
+    	return check;
+	}
 
 	/**
-        * Coordinate validation method.
-        *
-        * @param arraySize Size of the dimension to check.
-        * @param dim The dimension that is checked.
-        * @param name The name of the object that we want to check the dim dimension size.
-        * @param objdim The target dimension of the coordinate.
-        * @param coordinates The targets names
-        * @param fixedcoord True if a fixed size is allowed. False if not
-        * @param fixeddim Eventual allowed fixed size. set to 0 if fixedcoord = false.
-        * @param objs Object list of the possible coordinates.
-        * @return void
-        * @exception ValidationException is thrown if the coordinate is wrong.
-        */
-        public static void validate_coordinate(int arraySize, int[] shape, String[] coordNames, int[] coordValues, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
-        {
+    * Coordinate validation method.
+    *
+    * @param arraySize Size of the dimension to check.
+    * @param dim The dimension that is checked.
+    * @param name The name of the object that we want to check the dim dimension size.
+    * @param objdim The target dimension of the coordinate.
+    * @param coordinates The targets names
+    * @param fixedcoord True if a fixed size is allowed. False if not
+    * @param fixeddim Eventual allowed fixed size. set to 0 if fixedcoord = false.
+    * @param objs Object list of the possible coordinates.
+    * @return void
+    * @exception ValidationException is thrown if the coordinate is wrong.
+    */
+    public static void validate_coordinate(int arraySize, int[] shape, String[] coordNames, int[] coordValues, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
+    {
+		boolean check = true;
+	  	boolean error = true;
+	  	int i = 0;
+	
+	  	// We check all the possible coordinates allocation		
+	  	for (Object s : objs) {
+			if (check_possible_coordinate( objdim, s))  i = i + 1;
+		}
+	
+	  	if (i!=1) { 
+	    	check = false;
+	  	} 
+	
+	  	// If more of one alternatives coordinates is allocated we raise an exception		
+	  	if (i&gt;1) { 
+	    	String[] coordinateslist = {coordinates};
+	    	String errMsg = CoordinateValidation.coordinate_not_filled_message(name, coordNames, coordValues, shape, dim+1, coordinateslist);
+	    	throw new ValidationException(errMsg);
+	  	}
+	
+	  	// We check all the possible coordinates (one is allocated)
+		if(check) {
+	    	String[] coordinateslist = coordinates.split(" OR ");
+	    	int crd = 0;
+	    	for (Object s : objs) {
+	    		int objSize = imas.get_possible_coordinate(objdim, s);
+	    		if (objSize != 0) {
+	      			if (objSize == arraySize) {
+	        		error = false;
+	      			} else {
+	        			if (!fixedcoord) {
+	          				String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, objSize, coordinateslist[crd]);
+	          				throw new ValidationException(errMsg);
+	        			}
+	      			}
+	    		}
+	    		crd = crd + 1;
+	    	}
+	  	}
+	
+	  	// Last chance: possible alternative fixed size?
+	
+	  	if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
+	    	error = false; 
+	  	}
+	
+	  	// The size of the target dimension not validated - we raise an error		    
+	  	if (error) { 
+	    	String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, 0, coordinates);
+	    	throw new ValidationException(errMsg);
+	    }
+   	}
+    
+    /**
+     * Coordinate validation method.
+     * @param shape array of the sizes of the dimensions
+     * @param coordNames array of the names of the coordinates 
+     * @param coordValues array of the values of the coordinates
+     * @param objdim The target dimension of the coordinate.
+     * @param name The name of objects that we want to check the dim dimension size.	
+     * @param coordinates array of the names of the objects	 		
+     * @param fixedcoord True if a fixed size is allowed. False if not	
+     * @param fixeddim Eventual allowed fixed size. set to 0 if fixedcoord = false.
+     * @param arrayobjs array of objects that we want to check the dim dimension size.
+     * @throws ValidationException 	is thrown if the coordinate is wrong.
+     */
+    public static void validate_coordinate(int[] shape, String[] coordNames, int[] coordValues, int objdim, String name, String[] coordinates, boolean fixedcoord, int fixeddim ,Object[] arrayobjs) throws ValidationException
+    {
 
-          boolean check = true;
-          boolean error = true;
-          int i = 0;
+		boolean check = true;
+		boolean error = true;
+		int i = 0;
 
-          // We check all the possible coordinates allocation
+		// We check all the possible coordinates allocation
+		for (int index = 0; index &lt; arrayobjs.length; index++) {
+			for (Object obj : (Object[]) arrayobjs[index]) {
+				if (check_possible_coordinate(objdim, obj)) {
+					i++;
+				}
+			}
 
-          for (Object s : objs) {
-	  if (check_possible_coordinate( objdim, s))  i = i + 1;
-	  }
+			int dim = index;
+			if (i != 1) // why not i &lt; 1? 
+				check = false;
+			
+			// If more than one alternative coordinate is allocated, we raise an exception
+			if (i > 1) // what about if i = 1? 
+			{
+				String[] coordinateslist = { coordinates[index] };
+				String errMsg = CoordinateValidation.coordinate_not_filled_message(name, coordNames,
+						coordValues, shape, dim + 1, coordinateslist);
+				throw new ValidationException(errMsg);
+			}
 
-          if (i!=1) { 
-            check = false;
-          } 
+			int arraySize = shape[index];
+			// We check all the possible coordinates (one is allocated)				
+			if (check) {
+				String[] coordinateslist = coordinates[index].split(" OR "); // Why this split is required?
+				int crd = 0;
+				for (Object obj : (Object[]) arrayobjs[index]) {
+					int objSize = imas.get_possible_coordinate(objdim, obj);
+					if (objSize != 0) {
+						if (objSize == arraySize) {
+							error = false;
+						} else {
+							if (!fixedcoord) {
+								String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name,
+										coordNames, coordValues, shape, dim + 1, objSize, coordinateslist[crd]);
+								throw new ValidationException(errMsg);
+							}
+						}
+					}
+					crd++;
+				}
+			}
 
-          // If more of one alternatives coordinates is allocated we raise an exception
+			// Last chance: possible alternative fixed size?
+			if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {
+				error = false;
+			}
 
-          if (i&gt;1) { 
-            String[] coordinateslist = {coordinates};
-            String errMsg = CoordinateValidation.coordinate_not_filled_message(name, coordNames, coordValues, shape, dim+1, coordinateslist);
-            throw new ValidationException(errMsg);
-          }
-
-          // We check all the possible coordinates (one is allocated)
-
-
-          if(check) {
-            String[] coordinateslist = coordinates.split(" OR ");
-            int crd = 0;
-            for (Object s : objs) {
-            int objSize = imas.get_possible_coordinate(objdim, s);
-            if (objSize != 0) {
-              if (objSize == arraySize) {
-                error = false;
-              } else {
-                if (!fixedcoord) {
-                  String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, objSize, coordinateslist[crd]);
-                  throw new ValidationException(errMsg);
-                }
-              }
-            }
-            crd = crd + 1;
-            }
-          }
-
-          // Last chance: possible alternative fixed size?
-
-          if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
-            error = false; 
-          }
-
-          // The size of the target dimension not validated - we raise an error
-            
-          if (error) { 
-            String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, 0, coordinates);
-            throw new ValidationException(errMsg);
-	        }
-
-        }
-        
-        public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException {
+			// The size of the target dimension not validated - we raise an error
+			if (error) {
+				String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames,
+						coordValues, shape, dim + 1, 0, coordinates[index]);
+				throw new ValidationException(errMsg);
+			}
+		}
+    }
+    
+    public static boolean isIDSClassTimeDependent(String idsName) throws java.lang.ClassNotFoundException {
         Class ids = ImasReflection.getIdsClass(idsName);
         return imas.isIDSClassTimeDependent(ids);
-        }
-        
-        
-        public static boolean isIDSClassTimeDependent(Class idsClass) {
+    }
+                
+    public static boolean isIDSClassTimeDependent(Class idsClass) {
         Field[] fields = idsClass.getFields();
         boolean timedIds = false;
         
         for (Field field: fields) {
-        if (field.getName().equals("time")) {
-        timedIds = true;
-        break;
+	        if (field.getName().equals("time")) {
+	        timedIds = true;
+	        break;
+	        }
         }
-        }
-        
-        return timedIds;
-        }
-        
-        
-        
-        public static java.util.ArrayList getAvailableIDSs() throws
-        java.lang.NoSuchMethodException,
-        java.lang.IllegalAccessException,
-        java.lang.reflect.InvocationTargetException {
-        java.util.ArrayList result = new java.util.ArrayList();
-        Class[] classes = imasjava.imas.class.getClasses();
-        
-        for (Class classId: classes) {
-        //  if(CPOInterface.class.isAssignableFrom(classId))
-        {
-        Method method = classId.getMethod("getIdsName");
-        Object retVal = method.invoke(null);
-        result.add((String) retVal);
-        }
-        }
-        return result;
-        }
-        
-        public static int getMaxOccurences(String idsName) throws
-        java.lang.NoSuchMethodException,
-        java.lang.IllegalAccessException,
-        java.lang.reflect.InvocationTargetException {
-        Class[] classes = imasjava.imas.class.getClasses();
-        Class idsClass = null;
-        
-        for (Class classId: classes) {
-        if (classId.getName().contains(idsName)) {
-        Method method = classId.getMethod("getMaxOccurences");
-        Object retVal = method.invoke(null);
-        return ((Integer) retVal).intValue();
-        }
-        }
-        return -1;
-        }
-        
-
+    
+    	return timedIds;
+    }
+    
+    
+    
+    public static java.util.ArrayList getAvailableIDSs() throws
+    java.lang.NoSuchMethodException,
+    java.lang.IllegalAccessException,
+    java.lang.reflect.InvocationTargetException {
+    	java.util.ArrayList result = new java.util.ArrayList();
+    	Class[] classes = imasjava.imas.class.getClasses();
+    
+    	for (Class classId: classes) {
+    		//  if(CPOInterface.class.isAssignableFrom(classId))
+    		{
+    			Method method = classId.getMethod("getIdsName");
+    			Object retVal = method.invoke(null);
+    			result.add((String) retVal);
+    		}
+    	}
+    	return result;
+    }
+    
+    public static int getMaxOccurences(String idsName) throws
+    java.lang.NoSuchMethodException,
+    java.lang.IllegalAccessException,
+    java.lang.reflect.InvocationTargetException {
+    	Class[] classes = imasjava.imas.class.getClasses();
+    	Class idsClass = null;
+    
+    	for (Class classId: classes) {
+    		if (classId.getName().contains(idsName)) {
+    			Method method = classId.getMethod("getMaxOccurences");
+    			Object retVal = method.invoke(null);
+    			return ((Integer) retVal).intValue();
+    		}
+    	}
+    	return -1;
+    }
+    
 	public static int defaultBackend() 
 	{
-  int backend = LowLevel.MDSPLUS_BACKEND;
-  String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
-  if (backend_value != null)
-        backend = Integer.parseInt(backend_value);
-	return backend;
+		int backend = LowLevel.MDSPLUS_BACKEND;
+		String backend_value = System.getenv("IMAS_AL_DEFAULT_BACKEND");
+		if (backend_value != null)
+    	backend = Integer.parseInt(backend_value);
+		return backend;
 	}
 
 	public static int fallbackBackend() 
 	{
-	int backend = LowLevel.NO_BACKEND;
-	String backend_value = System.getenv("IMAS_AL_FALLBACK_BACKEND");
-	if (backend_value != null)
-        backend = Integer.parseInt(backend_value);
-	return backend;
-	}
-
-                
-        
-        static public void setPulseCtx(int pulseCtx)
-        {
-        <xsl:apply-templates select="IDS" mode="SET_PULSE_CTX"/>
-        }
-        
-        
-        
-        /**
-        * Opens database instance.
-        * @param uri, URI of the IMAS Data Entry
-        * @param mode, opening mode {OPEN_PULSE, FORCE_OPEN_PULSE, CREATE_PULSE, FORCE_CREATE_PULSE}
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        public static int open(String uri, int mode) throws ALException
-        {
-        int pulseCtx = -1;
-        
-        try{ 
-        pulseCtx = Wrapper.alBeginDataEntryAction(uri, mode);
-        } catch(Exception exc) {
-        throw new ALException(  "[al_begin_dataentry_action]: Error opening data entry with URI: " + uri + ", using mode:" + mode + ":\n" + exc.getMessage()  );
-        }
+		int backend = LowLevel.NO_BACKEND;
+		String backend_value = System.getenv("IMAS_AL_FALLBACK_BACKEND");
+		if (backend_value != null)
+        	backend = Integer.parseInt(backend_value);
+		return backend;
+	}              
+    
+    static public void setPulseCtx(int pulseCtx)
+    {
+    		<xsl:apply-templates select="IDS" mode="SET_PULSE_CTX"/>
+    }              
+    
+    /**
+    * Opens database instance.
+    * @param uri, URI of the IMAS Data Entry
+    * @param mode, opening mode {OPEN_PULSE, FORCE_OPEN_PULSE, CREATE_PULSE, FORCE_CREATE_PULSE}
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    public static int open(String uri, int mode) throws ALException
+    {
+    	int pulseCtx = -1;
+    
+    	try{ 
+    		pulseCtx = Wrapper.alBeginDataEntryAction(uri, mode);
+    	}
+    	catch(Exception exc) {
+    		throw new ALException(  "[al_begin_dataentry_action]: Error opening data entry with URI: " + uri + ", using mode:" + mode + ":\n" + exc.getMessage()  );
+    	}
 
         /* to be checked 
         imas.pulse = pulse;
@@ -346,95 +414,95 @@
         imas.pulseCtx = pulseCtx;
         imas.setPulseCtx(pulseCtx);
         return pulseCtx;
-        }
-        
-        /**
-        * Opens database instance.
-        *
-        * @param pulse Pulse number.
-        * @param run Run Number.
-        * @param user User name
-        * @param tokamak Machine name
-        * @param version Database version
-        * @return the database index to be used in subsequent get/put calls
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        public static int openEnv(int pulse, int run, String user, String tokamak, String version)
-        throws ALException {
-        return openEnv(pulse, run, user, tokamak, version, defaultBackend(), "");
-        }
-        
-        /**
-        * Opens database instance.
-        *
-        * @param pulse Pulse number.
-        * @param run Run Number.
-        * @param user User name
-        * @param tokamak Machine name
-        * @param version Database version
-        * @param options Options passed down to LowLevel
-        * @return the database index to be used in subsequent get/put calls
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        public static int openEnv(
-        int pulse, int run, String user, String tokamak, String version, String options)
-        throws ALException {
-        return openEnv(pulse, run, user, tokamak, version, defaultBackend(), options);
-        }
-        
-        /**
-        * Opens database instance.
-        *
-        * @param backendType Type of the backend to be used
-        * @param pulse Pulse number.
-        * @param run Run Number.
-        * @param user User name
-        * @param tokamak Name of the machine
-        * @param version Database version
-        * @param backendType Type of the backend to be used
-        * @return the database index to be used in subsequent get/put calls
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        public static int openEnv(
-        int pulse, int run, String user, String tokamak, String version, int backendType)
-        throws ALException {
-        return openEnv(pulse, run, user, tokamak, version, backendType, "");
-        }
-        
-        
-        
-        /**
-        * Opens database instance.
-        * @param backendType Type of the backend to be used
-        * @param pulse Pulse number.
-        * @param run Run Number.
-        * @param user User name
-        * @param tokamak Name of the machine
-        * @param version Database version
-        * @param backendType Type of the backend to be used
-        * @param options Options passed down to LowLevel
-        * @return the database index to be used in subsequent get/put calls
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        public static int openEnv(int pulse, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
-        {
-        int pulseCtx = -1;
-        String uri;
-        try{ 
-        uri = Wrapper.alBuildUriFromLegacyParameters(backendType, pulse, run, user, tokamak, version, options);
-	pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
-        } catch(Exception exc) {
-	int fallback = fallbackBackend();
-	if (fallback != LowLevel.NO_BACKEND) {
-        System.out.println("WARNING: the pulse file is not available with the backend " + Integer.toString(backendType) + ", now attempting to access it with the fallback backend " + Integer.toString(fallback));
-	try {
-        uri = Wrapper.alBuildUriFromLegacyParameters(fallback, pulse, run, user, tokamak, version, options);
-	pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
-	} catch (Exception exc2) {
-        throw new ALException("[al_begin_pulse_action]: Error opening pulse file: " + user + "/" + tokamak + "/" + version + "/" + pulse + "/" + run + "/" + fallback + ":\n" + exc.getMessage());
-	}
-	}		
-	}
+    }
+    
+    /**
+    * Opens database instance.
+    *
+    * @param pulse Pulse number.
+    * @param run Run Number.
+    * @param user User name
+    * @param tokamak Machine name
+    * @param version Database version
+    * @return the database index to be used in subsequent get/put calls
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    public static int openEnv(int pulse, int run, String user, String tokamak, String version)
+    throws ALException {
+    	return openEnv(pulse, run, user, tokamak, version, defaultBackend(), "");
+    }
+    
+    /**
+    * Opens database instance.
+    *
+    * @param pulse Pulse number.
+    * @param run Run Number.
+    * @param user User name
+    * @param tokamak Machine name
+    * @param version Database version
+    * @param options Options passed down to LowLevel
+    * @return the database index to be used in subsequent get/put calls
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    public static int openEnv(
+    int pulse, int run, String user, String tokamak, String version, String options)
+    throws ALException {
+    	return openEnv(pulse, run, user, tokamak, version, defaultBackend(), options);
+    }
+    
+    /**
+    * Opens database instance.
+    *
+    * @param backendType Type of the backend to be used
+    * @param pulse Pulse number.
+    * @param run Run Number.
+    * @param user User name
+    * @param tokamak Name of the machine
+    * @param version Database version
+    * @param backendType Type of the backend to be used
+    * @return the database index to be used in subsequent get/put calls
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    public static int openEnv(
+    int pulse, int run, String user, String tokamak, String version, int backendType)
+    throws ALException {
+    	return openEnv(pulse, run, user, tokamak, version, backendType, "");
+    }
+                  
+    /**
+    * Opens database instance.
+    * @param backendType Type of the backend to be used
+    * @param pulse Pulse number.
+    * @param run Run Number.
+    * @param user User name
+    * @param tokamak Name of the machine
+    * @param version Database version
+    * @param backendType Type of the backend to be used
+    * @param options Options passed down to LowLevel
+    * @return the database index to be used in subsequent get/put calls
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    public static int openEnv(int pulse, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
+    {
+    	int pulseCtx = -1;
+    	String uri;
+    	try{ 
+    		uri = Wrapper.alBuildUriFromLegacyParameters(backendType, pulse, run, user, tokamak, version, options);
+			pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
+    	}
+    	catch(Exception exc) {
+			int fallback = fallbackBackend();
+			if (fallback != LowLevel.NO_BACKEND) {
+    			System.out.println("WARNING: the pulse file is not available with the backend " + Integer.toString(backendType) + ", now attempting to access it with the fallback backend " + Integer.toString(fallback));
+				try {
+    				uri = Wrapper.alBuildUriFromLegacyParameters(fallback, pulse, run, user, tokamak, version, options);
+					pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.OPEN_PULSE);
+				}
+				catch (Exception exc2) {
+    				throw new ALException("[al_begin_pulse_action]: Error opening pulse file: " + user + "/" + tokamak + "/" + version + "/" + pulse + "/" + run + "/" + fallback + ":\n" + exc.getMessage());
+				}
+			}		
+		}
         imas.pulse = pulse;
         imas.run = run;
         imas.user = user;
@@ -443,81 +511,82 @@
         imas.pulseCtx = pulseCtx;
         imas.setPulseCtx(pulseCtx);
         return pulseCtx;
-        }
-        
-        /**
-        * Creates a new database instance.
-        *
-        * @param pulse Pulse number.
-        * @param run Run Number.
-        * @param user User name
-        * @param tokamak Name of the machine
-        * @param version Database version
-        * @return the database index to be used in subsequent get/put calls
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        public static int createEnv(int pulse, int run, String user, String tokamak, String version)
-        throws ALException {
-        return createEnv(pulse, run, user, tokamak, version, defaultBackend(), "");
-        }
-        
-        /**
-        * Creates a new database instance.
-        *
-        * @param pulse Pulse number.
-        * @param run Run Number.
-        * @param user User name
-        * @param tokamak Name of the machine
-        * @param version Database version
-        * @param options Options that are passed down to LowLevel
-        * @return the database index to be used in subsequent get/put calls
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        public static int createEnv(
-        int pulse, int run, String user, String tokamak, String version, String options)
-        throws ALException {
-        return createEnv(pulse, run, user, tokamak, version, defaultBackend(), options);
-        }
-        
-        
-        /**
-        *Creates a new database instance.
-        * @param pulse Pulse number.
-        * @param run Run Number.
-        * @param user User name
-        * @param tokamak Name of the machine
-        * @param version Database version
-        * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
-        * @return the database index to be used in subsequent get/put calls
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        
-        public static int createEnv(int pulse, int run, String user, String tokamak, String version, int backendType) throws ALException
-        {
-        return createEnv(pulse, run, user, tokamak, version, backendType, "");
-        }
-        
-        /**
-        *Creates a new database instance.
-        * @param pulse Pulse number.
-        * @param run Run Number.
-        * @param user User name
-        * @param tokamak Name of the machine
-        * @param version Database version
-        * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
+    }
+    
+    /**
+    * Creates a new database instance.
+    *
+    * @param pulse Pulse number.
+    * @param run Run Number.
+    * @param user User name
+    * @param tokamak Name of the machine
+    * @param version Database version
+    * @return the database index to be used in subsequent get/put calls
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    public static int createEnv(int pulse, int run, String user, String tokamak, String version)
+    throws ALException {
+    	return createEnv(pulse, run, user, tokamak, version, defaultBackend(), "");
+    }
+    
+    /**
+    * Creates a new database instance.
+    *
+    * @param pulse Pulse number.
+    * @param run Run Number.
+    * @param user User name
+    * @param tokamak Name of the machine
+    * @param version Database version
+    * @param options Options that are passed down to LowLevel
+    * @return the database index to be used in subsequent get/put calls
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    public static int createEnv(
+    int pulse, int run, String user, String tokamak, String version, String options)
+    throws ALException {
+    	return createEnv(pulse, run, user, tokamak, version, defaultBackend(), options);
+    }
+    
+    
+    /**
+    *Creates a new database instance.
+    * @param pulse Pulse number.
+    * @param run Run Number.
+    * @param user User name
+    * @param tokamak Name of the machine
+    * @param version Database version
+    * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
+    * @return the database index to be used in subsequent get/put calls
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    
+    public static int createEnv(int pulse, int run, String user, String tokamak, String version, int backendType) throws ALException
+    {
+    	return createEnv(pulse, run, user, tokamak, version, backendType, "");
+    }
+    
+    /**
+    *Creates a new database instance.
+    * @param pulse Pulse number.
+    * @param run Run Number.
+    * @param user User name
+    * @param tokamak Name of the machine
+    * @param version Database version
+    * @param backendType Type of the backend to be use (take a look inside wrapper/LowLevel)
 	* @param options Options passed down to LowLevel
-        * @return the database index to be used in subsequent get/put calls
-        * @exception ALException is thrown if the database cannot be open.
-        */
-        public static int createEnv(int pulse, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
-        {
+    * @return the database index to be used in subsequent get/put calls
+    * @exception ALException is thrown if the database cannot be open.
+    */
+    public static int createEnv(int pulse, int run, String user, String tokamak, String version, int backendType, String options) throws ALException
+    {
         int pulseCtx = -1;
         
         try { 
-        String uri = Wrapper.alBuildUriFromLegacyParameters(backendType, pulse, run, user, tokamak, version, options);
-        pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.FORCE_CREATE_PULSE);
-        } catch(Exception exc){
-        throw new ALException("[al_begin_uri_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ pulse + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
+        	String uri = Wrapper.alBuildUriFromLegacyParameters(backendType, pulse, run, user, tokamak, version, options);
+        	pulseCtx = Wrapper.alBeginDataEntryAction(uri, LowLevel.FORCE_CREATE_PULSE);
+        } 
+        catch(Exception exc){
+        	throw new ALException("[al_begin_uri_action]: Error creating pulse file: " + user + "/" + tokamak + "/" + version + "/"+ pulse + "/" + run + "/" + backendType + ":\n" + exc.getMessage()  );
         }
         
         imas.pulse = pulse;
@@ -529,54 +598,56 @@
         imas.pulseCtx = pulseCtx;
         imas.setPulseCtx(pulseCtx);
         return pulseCtx;
-        }
-        
-        
-        
-        /**
-        *Closes the currently open database.
-        * @param refIdx database index, returned by create or open.
-        **/
-        static public void close() throws ALException
-        {
-        close(imas.pulseCtx);
-        }
-        
-        static public void close(int refIdx, String name, int pulse, int run) throws ALException{
+    }
+    
+    
+    
+    /**
+    *Closes the currently open database.
+    * @param refIdx database index, returned by create or open.
+    **/
+    static public void close() throws ALException
+    {
+    	close(imas.pulseCtx);
+    }
+    
+    static public void close(int refIdx, String name, int pulse, int run) throws ALException{
         System.err.println(  "WARNING:\n"
         + "\"int close(int refIdx, String name, int pulse, int run)\"  is DEPRECATED.\n"
         + "Please use \"close()\" instead");
         close(refIdx);
-        }
-        
-        static public void close(int refIdx) throws ALException
-        {
+    }
+    
+    static public void close(int refIdx) throws ALException
+    {
         try{
-        LowLevel.al_close_pulse(refIdx, LowLevel.CLOSE_PULSE);
-        } catch (Exception exc) {
-        throw new ALException("[al_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.pulse + "/" + imas.run + ":\n" + exc.getMessage()  );
-        } finally {
-        if(refIdx >= 0)
-        LowLevel.al_end_action(refIdx);
+        	LowLevel.al_close_pulse(refIdx, LowLevel.CLOSE_PULSE);
+        } 
+        catch (Exception exc) {
+        	throw new ALException("[al_close_pulse]: Error closing pulse file: " + imas.user + "/" + imas.tokamak + "/" + imas.version + "/"+ imas.pulse + "/" + imas.run + ":\n" + exc.getMessage()  );
+        } 
+        finally {
+        	if(refIdx >= 0)
+        	LowLevel.al_end_action(refIdx);
         }
-        }
-        
-        /**
-        *Get the time base of a ids.
-        * @param idx database index, returned by create or open.
-        * @param path name of the IDS
-        * @return a vector containing the times of all slices
-        * @exception ALException is thrown if the time base cannot be read.
-        **/
-        static public Vect1DDouble getTime(int expIdx, String path) throws ALException {
+    }
+    
+    /**
+    *Get the time base of a ids.
+    * @param idx database index, returned by create or open.
+    * @param path name of the IDS
+    * @return a vector containing the times of all slices
+    * @exception ALException is thrown if the time base cannot be read.
+    **/
+    static public Vect1DDouble getTime(int expIdx, String path) throws ALException {
         ALLowLevel.beginIDSGet(expIdx, path, true);
         Vect1DDouble time = ALLowLevel.getVect1DDouble(expIdx, path, "time");
         ALLowLevel.endIDSGet(expIdx, path);
         return time;
-        }
-        
-        static public int readIdsTimeMode(int pulseCtx, String idsFullName) throws ALException
-        {
+    }
+    
+    static public int readIdsTimeMode(int pulseCtx, String idsFullName) throws ALException
+    {
         int idsTimeMode = LowLevel.IDS_TIME_MODE_UNKNOWN;
         int ctx = -1;
         
@@ -585,79 +656,78 @@
         
         try
         {
-        idsTimeMode = Wrapper.readData(ctx, "ids_properties/homogeneous_time", "", idsTimeMode);
+        	idsTimeMode = Wrapper.readData(ctx, "ids_properties/homogeneous_time", "", idsTimeMode);
         }
         finally
         {
-        LowLevel.al_end_action(ctx);
+        	LowLevel.al_end_action(ctx);
         }
         
         switch(idsTimeMode)
         {
-        case LowLevel.IDS_TIME_MODE_UNKNOWN:     
-        case LowLevel.IDS_TIME_MODE_HETEROGENEOUS: 
-        case LowLevel.IDS_TIME_MODE_HOMOGENEOUS:   
-        case LowLevel.IDS_TIME_MODE_INDEPENDENT:   
-        break;
-        
-        default: 
-        throw new ALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('ids_properties/homogeneous_time') set to unknown value!");
+	        case LowLevel.IDS_TIME_MODE_UNKNOWN:     
+	        case LowLevel.IDS_TIME_MODE_HETEROGENEOUS: 
+	        case LowLevel.IDS_TIME_MODE_HOMOGENEOUS:   
+	        case LowLevel.IDS_TIME_MODE_INDEPENDENT:   
+	        break;
+	        
+	        default: 
+	        	throw new ALException("ERROR! IDS '<xsl:value-of select="@name"/>': time dependency mode ('ids_properties/homogeneous_time') set to unknown value!");
         
         }
         
         return idsTimeMode;
-        }
-        
-        static public String timeModeToString( int idsTimeMode )
-        {
+    }
+    
+    static public String timeModeToString( int idsTimeMode )
+    {
         String strTimeMode;
         
         switch(idsTimeMode)
         {
-        case LowLevel.IDS_TIME_MODE_UNKNOWN:     
-        strTimeMode = "UNKNOWN";
-        break;
-        case LowLevel.IDS_TIME_MODE_HETEROGENEOUS: 
-        strTimeMode = "HETEROGENEOUS";
-        break;
-        case LowLevel.IDS_TIME_MODE_HOMOGENEOUS:   
-        strTimeMode = "HOMOGENEOUS";
-        break;
-        case LowLevel.IDS_TIME_MODE_INDEPENDENT:
-        strTimeMode = "INDEPENDENT";
-        break;
-        default: 
-        strTimeMode = "UNKNOWN";
-        break;
-        
+	        case LowLevel.IDS_TIME_MODE_UNKNOWN:     
+	        	strTimeMode = "UNKNOWN";
+	        break;
+	        case LowLevel.IDS_TIME_MODE_HETEROGENEOUS: 
+	        	strTimeMode = "HETEROGENEOUS";
+	        break;
+	        case LowLevel.IDS_TIME_MODE_HOMOGENEOUS:   
+		        strTimeMode = "HOMOGENEOUS";
+	        break;
+	        case LowLevel.IDS_TIME_MODE_INDEPENDENT:
+	        	strTimeMode = "INDEPENDENT";
+	        break;
+	        default: 
+	        	strTimeMode = "UNKNOWN";
+	        break;		        
         }
         return strTimeMode;
+    }
+
+    static public HashMap&lt;Integer, String&gt; listAllOccurrences(int idx, String idsName, String nodePath)
+    {
+        HashMap&lt;Integer, String&gt; OccurrenceList = new HashMap&lt;Integer, String&gt;();
+        int alOccurrenceList[] =  { };
+        String[] nodeContentist;
+        int[] occurrenceList;
+        int size = 0;
+        try {
+            alOccurrenceList = LowLevel.al_get_occurrences(idx, idsName);
+        } catch (Exception exc) {
+            System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_get_occurrences: " + exc);
         }
 
-        static public HashMap&lt;Integer, String&gt; listAllOccurrences(int idx, String idsName, String nodePath)
-        {
-            HashMap&lt;Integer, String&gt; OccurrenceList = new HashMap&lt;Integer, String&gt;();
-            int alOccurrenceList[] =  { };
-            String[] nodeContentist;
-            int[] occurrenceList;
-            int size = 0;
-            try {
-                alOccurrenceList = LowLevel.al_get_occurrences(idx, idsName);
-            } catch (Exception exc) {
-                System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_get_occurrences: " + exc);
-            }
+        if (alOccurrenceList != null &amp;&amp; !(alOccurrenceList.length == 0)) {
+         	size = alOccurrenceList.length;
+        } else {
+          	size = 0;
+        }
 
-            if (alOccurrenceList != null &amp;&amp; !(alOccurrenceList.length == 0)) {
-              size = alOccurrenceList.length;
-            } else {
-              size = 0;
-            }
+        nodeContentist = new String[size];
 
-            nodeContentist = new String[size];
+        if (nodePath != null &amp;&amp; !nodePath.trim().isEmpty()) {
 
-            if (nodePath != null &amp;&amp; !nodePath.trim().isEmpty()) {
-
-              for (int i = 0; i &lt; size; i++) {
+        	for (int i = 0; i &lt; size; i++) {
                 int ctx = -1;
                 int retSize[] = new int[1];	
                 byte dataArr[] = null;
@@ -665,54 +735,55 @@
                 String occurrenceName = idsName;
                 if (i &gt; 0) occurrenceName += "/"+Integer.toString(i);
                 try {
-                ctx = LowLevel.al_begin_global_action(idx, occurrenceName, LowLevel.READ_OP);
-                } catch (Exception exc) {
-                System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_begin_global_action: " + exc);
-                return null;
+                	ctx = LowLevel.al_begin_global_action(idx, occurrenceName, LowLevel.READ_OP);
+                } 
+                catch (Exception exc) {
+                	System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_begin_global_action: " + exc);
+                	return null;
                 }
 
                 try {
-                dataArr = LowLevel.al_read_data_char(ctx, nodePath, "", 1, retSize);
-                } catch (Exception exc) {
-                System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_read_data_char: " + exc);
-                return null;
+                	dataArr = LowLevel.al_read_data_char(ctx, nodePath, "", 1, retSize);
+                } 
+                catch (Exception exc) {
+                	System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_read_data_char: " + exc);
+                	return null;
                 }
                 
                 str = new String(dataArr);
                 nodeContentist[i] = str.trim();
 
                 try {
-                LowLevel.al_end_action(ctx);
-                } catch (Exception exc) {
-                System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_end_action: " + exc);
-                return null;
-                }
-              }
-
-            }
-            else {
-               for (int i = 0; i &lt; size; i++) nodeContentist[i] = "";
-            }
-
-            for (int i = 0; i &lt; size; i++) {
-              OccurrenceList.put(alOccurrenceList[i],nodeContentist[i]);
-            }
-
-            return OccurrenceList;
-
+                	LowLevel.al_end_action(ctx);
+                } 
+                catch (Exception exc) {
+                	System.out.println("IMAS:list_all_occurrences:Failed. Error calling al_end_action: " + exc);
+                	return null;
+            	}
+          	}
         }
-        
-        <xsl:apply-templates select = "IDS" mode="DEFINE_IDS_MEMBER"/>
+        else {
+           for (int i = 0; i &lt; size; i++) nodeContentist[i] = "";
         }
+
+        for (int i = 0; i &lt; size; i++) {
+        	OccurrenceList.put(alOccurrenceList[i],nodeContentist[i]);
+        }
+
+        return OccurrenceList;
+
+    }
+    <xsl:apply-templates select = "IDS" mode="DEFINE_IDS_MEMBER"/>
+}
       </xsl:result-document>
       
       <xsl:apply-templates select = "IDS" mode="DEFINE_IDS_BASE_CLASS"/>
     </xsl:template>
     
     <xsl:template match = "IDS" mode="DEFINE_IDS_MEMBER">
-      public static class <xsl:value-of select="@name"/> extends <xsl:value-of select="@name"/>_IDSBase
-      {
-      }
+	public static class <xsl:value-of select="@name"/> extends <xsl:value-of select="@name"/>_IDSBase
+	{
+	}
     </xsl:template>
     <!--=========================================================================================================================================================-->
     <!--=========================================================================================================================================================-->
@@ -3209,201 +3280,157 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
       </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="validatePathSingle">
-  <xsl:param name="newpath"/>
-  <xsl:param name="root"/>
-  <xsl:param name="string"/>
-  <xsl:param name="dimension"/>
-  <xsl:param name="coord"/>
-  <xsl:param name="targetdim"/>
+    <xsl:template match="field" mode="VALIDATE_PATH_SINGLE">
+      <xsl:param name="newpath"/>
+      <xsl:param name="root"/>
+      <xsl:param name="string"/>
+      <xsl:param name="dimension"/>
+      <xsl:param name="coord"/>
+      <xsl:param name="targetdim"/>
+      <xsl:if test="contains($newpath,'/')">
+      <xsl:choose>
+        <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='structure'">
+          <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name" />
+          <xsl:apply-templates select="." mode="VALIDATE_PATH_SINGLE">
+          <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
+          <xsl:with-param name="root" select="$root"/>
+          <xsl:with-param name="string" select="concat($string,$act_struct,'.')"/>
+          <xsl:with-param name="dimension" select="$dimension"/>
+          <xsl:with-param name="coord" select="$coord"/>
+          <xsl:with-param name="targetdim" select="$targetdim"/>
+          </xsl:apply-templates>
+        </xsl:when>
+        <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='struct_array'">
+        <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name" />
+        <xsl:variable name="act_index">
+                <xsl:if test="contains(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,'/')">
+                  <xsl:value-of select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat('/',$act_struct,'(')),')')"/>
+                </xsl:if>
+                <xsl:if test="not(contains(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,'/'))">
+                  <xsl:value-of select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat($act_struct,'(')),')')"/>
+                </xsl:if>
+                </xsl:variable>
+          <xsl:apply-templates select="." mode="VALIDATE_PATH_SINGLE">
+          <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
+          <xsl:with-param name="root" select="$root"/>
+          <xsl:with-param name="string" select="concat($string,$act_struct,'[',$act_index,'].')"/>
+          <xsl:with-param name="dimension" select="$dimension"/>
+          <xsl:with-param name="coord" select="$coord"/>
+          <xsl:with-param name="targetdim" select="$targetdim"/>
+        </xsl:apply-templates>
+        </xsl:when>
+      </xsl:choose>
+      </xsl:if>
 
-  <xsl:choose>
-    <xsl:when test="contains($newpath,'/')">
-      <xsl:call-template name="processNewPath">
-        <xsl:with-param name="newpath" select="$newpath"/>
-        <xsl:with-param name="root" select="$root"/>
-        <xsl:with-param name="string" select="$string"/>
-        <xsl:with-param name="dimension" select="$dimension"/>
-        <xsl:with-param name="coord" select="$coord"/>
-        <xsl:with-param name="targetdim" select="$targetdim"/>
-      </xsl:call-template>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:call-template name="validateCoordinate">
-        <xsl:with-param name="root" select="$root"/>
-        <xsl:with-param name="string" select="$string"/>
-        <xsl:with-param name="dimension" select="$dimension"/>
-        <xsl:with-param name="coord" select="$coord"/>
-        <xsl:with-param name="targetdim" select="$targetdim"/>
-      </xsl:call-template>
-    </xsl:otherwise>
-  </xsl:choose>
-</xsl:template>
-
-<xsl:template name="processNewPath">
-  <xsl:param name="newpath"/>
-  <xsl:param name="root"/>
-  <xsl:param name="string"/>
-  <xsl:param name="dimension"/>
-  <xsl:param name="coord"/>
-  <xsl:param name="targetdim"/>
-
-  <xsl:choose>
-    <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='structure'">
-      <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name"/>
-      <xsl:call-template name="validatePathSingle">
-        <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
-        <xsl:with-param name="root" select="$root"/>
-        <xsl:with-param name="string" select="concat($string,$act_struct,'.')"/>
-        <xsl:with-param name="dimension" select="$dimension"/>
-        <xsl:with-param name="coord" select="$coord"/>
-        <xsl:with-param name="targetdim" select="$targetdim"/>
-      </xsl:call-template>
-    </xsl:when>
-    <xsl:when test="ancestor::field[@name = substring-before($newpath,'/')]/@data_type='struct_array'">
-      <xsl:variable name="act_struct" select="ancestor::field[@name = substring-before($newpath,'/')]/@name"/>
-      <xsl:variable name="act_index">
-        <xsl:choose>
-          <xsl:when test="contains(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,'/')">
-            <xsl:value-of select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat('/',$act_struct,'(')),')')"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="substring-before(substring-after(ancestor::field[@name = substring-before($newpath,'/')]/@path_doc,concat($act_struct,'(')),')')"/>
-          </xsl:otherwise>
-        </xsl:choose>
+      <xsl:variable name="istimeslice">
+      <xsl:if test="contains($coord,' OR')">
+      <xsl:if test="not($root='/')">
+        <xsl:if test="contains(substring-before(substring-after($coord,$root),' OR'),'(itime)')">
+          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
+            <xsl:value-of select="'yes'"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      <xsl:if test="$root='/'">
+        <xsl:if test="contains(substring-before($coord,' OR'),'(itime)')">
+          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
+            <xsl:value-of select="'yes'"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      </xsl:if>
+      <xsl:if test="not($root='/')">
+      <xsl:if test="not(contains($coord,' OR'))">
+        <xsl:if test="contains(substring-after($coord,$root),'(itime)')">
+          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
+            <xsl:value-of select="'yes'"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      </xsl:if>
+      <xsl:if test="$root='/'">
+      <xsl:if test="not(contains($coord,' OR'))">
+        <xsl:if test="contains($coord,'(itime)')">
+          <xsl:if test="not(contains(concat($string,@name),'(itime)'))">
+            <xsl:value-of select="'yes'"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      </xsl:if>
       </xsl:variable>
-      <xsl:call-template name="validatePathSingle">
-        <xsl:with-param name="newpath" select="substring-after($newpath,'/')"/>
-        <xsl:with-param name="root" select="$root"/>
-        <xsl:with-param name="string" select="concat($string,$act_struct,'[',$act_index,'].')"/>
-        <xsl:with-param name="dimension" select="$dimension"/>
-        <xsl:with-param name="coord" select="$coord"/>
-        <xsl:with-param name="targetdim" select="$targetdim"/>
-      </xsl:call-template>
-    </xsl:when>
-  </xsl:choose>
-</xsl:template>
-
-<xsl:template name="validateCoordinate">
-  <xsl:param name="root"/>
-  <xsl:param name="string"/>
-  <xsl:param name="dimension"/>
-  <xsl:param name="coord"/>
-  <xsl:param name="targetdim"/>
-
-  <xsl:variable name="istimeslice">
-    <xsl:choose>
-      <xsl:when test="contains($coord,' OR') and not($root='/') and contains(substring-before(substring-after($coord,$root),' OR'),'(itime)') and not(contains(concat($string,@name),'(itime)'))">
-        <xsl:value-of select="'yes'"/>
-      </xsl:when>
-      <xsl:when test="contains($coord,' OR') and $root='/' and contains(substring-before($coord,' OR'),'(itime)') and not(contains(concat($string,@name),'(itime)'))">
-        <xsl:value-of select="'yes'"/>
-      </xsl:when>
-      <xsl:when test="not(contains($coord,' OR')) and not($root='/') and contains(substring-after($coord,$root),'(itime)') and not(contains(concat($string,@name),'(itime)'))">
-        <xsl:value-of select="'yes'"/>
-      </xsl:when>
-      <xsl:when test="not(contains($coord,' OR')) and $root='/' and contains($coord,'(itime)') and not(contains(concat($string,@name),'(itime)'))">
-        <xsl:value-of select="'yes'"/>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:variable>
-
-  <xsl:if test="not($istimeslice='yes')">
-    <xsl:choose>
+      <xsl:if test="not(contains($newpath,'/')) and not($istimeslice='yes')"> <!-- and ( (contains($string,'(itime)') and contains($coord,'(itime)')) or  (not(contains($string,'(itime)')) and not(contains($coord,'(itime)'))) )-->
+        <xsl:choose>
+        <xsl:when test="@data_type='struct_array'">
+       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+        int[] shape =  {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
+        </xsl:when>
+        <xsl:otherwise>
+       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+        int[] shape =  this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
+        </xsl:otherwise>
+        </xsl:choose>
+        if (shape[<xsl:value-of select="number($dimension)"/>] > 0) {
+        <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
+        </xsl:if>
+        <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
+          imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
+                                  <xsl:value-of select="number($dimension)"/>, "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
+                                  <xsl:value-of select="number($targetdim)"/>, "<xsl:value-of select="$coord"/>"
+                                  <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
+                                  <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>);
+      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
+        }
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
+          if(shape[<xsl:value-of select="number($dimension)"/>] != idsTimeSize) {
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
+            throw new ValidationException(errMsg);
+          }
+        }
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT ) {
+          if(shape[<xsl:value-of select="number($dimension)"/>] != 0) {
+            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, 0, "time");
+            throw new ValidationException(errMsg);
+          }
+        }
+        </xsl:if>
+	}
+	}
+      </xsl:if> 
+      <xsl:if test="not(contains($newpath,'/')) and $istimeslice='yes'">
+      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
+      <xsl:choose>
       <xsl:when test="@data_type='struct_array'">
-        if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-          int[] shape = {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+      int[] shape = {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
+      int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length;
       </xsl:when>
       <xsl:otherwise>
-        if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
-          int[] shape = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+      int[] shape = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
+      int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
       </xsl:otherwise>
-    </xsl:choose>
-    if (shape[<xsl:value-of select="number($dimension)"/>] > 0) {
-      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
-        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS) {
-      </xsl:if>
-      <xsl:apply-templates select="." mode="check-target-indices">
-        <xsl:with-param name="coord" select="$coord"/>
-        <xsl:with-param name="relativepathdoc" select="$root"/>
-      </xsl:apply-templates>
-      imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
-        <xsl:value-of select="number($dimension)"/>, "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
-        <xsl:value-of select="number($targetdim)"/>, "<xsl:value-of select="$coord"/>"
-        <xsl:apply-templates select="." mode="check-specific-coordinates">
-          <xsl:with-param name="coord" select="$coord"/>
-          <xsl:with-param name="relativepathdoc" select="$root"/>
-          <xsl:with-param name="dimension" select="$dimension"/>
-          <xsl:with-param name="self" select="concat($string,@name)"/>
-        </xsl:apply-templates>
-        <xsl:apply-templates select="." mode="possible-coordinates">
-          <xsl:with-param name="coord" select="$coord"/>
-          <xsl:with-param name="relativepathdoc" select="$root"/>
-          <xsl:with-param name="self" select="concat($string,@name)"/>
-        </xsl:apply-templates>);
-      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
-        }
-        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) {
-          if (shape[<xsl:value-of select="number($dimension)"/>] != idsTimeSize) {
-            String errMsg = CoordinateValidation.coordinate_incorrect_size_message("<xsl:value-of select="fn:getpathdoc(@path_doc)"/>", coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
-            throw new ValidationException(errMsg);
-          }
-        }
-        if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT) {
-          if (shape[<xsl:value-of select="number($dimension)"/>] != 0) {
-            String errMsg = CoordinateValidation.coordinate_incorrect_size_message("<xsl:value-of select="fn:getpathdoc(@path_doc)"/>", coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, 0, "time");
-            throw new ValidationException(errMsg);
-          }
-        }
-      </xsl:if>
-    }
-  </xsl:if>
-  <xsl:if test="$istimeslice='yes'">
-    <xsl:call-template name="validateTimeSlice">
-      <xsl:with-param name="string" select="$string"/>
-      <xsl:with-param name="name" select="@name"/>
-      <xsl:with-param name="dimension" select="$dimension"/>
-      <xsl:with-param name="coord" select="$coord"/>
-      <xsl:with-param name="path_doc" select="@path_doc"/>
-    </xsl:call-template>
-  </xsl:if>
-</xsl:template>
-
-<xsl:template name="validateTimeSlice">
-  <xsl:param name="string"/>
-  <xsl:param name="name"/>
-  <xsl:param name="dimension"/>
-  <xsl:param name="coord"/>
-  <xsl:param name="path_doc"/>
-
-  <xsl:choose>
-    <xsl:when test="@data_type='struct_array'">
-      if (this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/> != null) {
-        int[] shape = {this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/>.length};
-        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/>.length;
-    </xsl:when>
-    <xsl:otherwise>
-      if (this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/> != null) {
-        int[] shape = this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/>.getDims();
-        int arraySize = this.<xsl:value-of select="$string"/><xsl:value-of select="$name"/>.getDim(<xsl:value-of select="number($dimension)"/>);
-    </xsl:otherwise>
-  </xsl:choose>
-  if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) {
-    if (arraySize != idsTimeSize) {
-      String errMsg = CoordinateValidation.coordinate_incorrect_size_message("<xsl:value-of select="fn:getpathdoc($path_doc)"/>", coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
-      throw new ValidationException(errMsg);
-    }
-  }
-  if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS) {
-    for (int itime = 1; itime &lt; arraySize; itime++) {
-      if (this.<xsl:value-of select="$name"/>[itime] != null) {
-        if (!(this.<xsl:value-of select="$name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) {
-          throw new ValidationException("Time coordinate of '<xsl:value-of select="$name"/>' (<xsl:value-of select="$name"/>[" + Integer.toString(itime) + "]/time)' has empty values");
+      </xsl:choose>
+      if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
+        if(arraySize != idsTimeSize) {
+          String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
+          throw new ValidationException(errMsg);
         }
       }
-    }
-  }
-</xsl:template>
+      if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
+        for (int itime = 1; itime&lt;arraySize;itime++) {
+            if (this.<xsl:value-of select="@name"/>[itime] != null) {
+              if (!(this.<xsl:value-of select="@name"/>[itime].time != LowLevel.EMPTY_DOUBLE)) { 
+                throw new ValidationException("Time coordinate of '<xsl:value-of select="@name"/>' (<xsl:value-of select="@name"/>["+Integer.toString(itime)+"]/time)' has empty values");
+              }
+            }
+          }
+        }
+      }
+	
+      </xsl:if>
+      </xsl:if>
+      </xsl:template> 
 
       <xsl:template match='field' mode="possible-coordinates">
       <xsl:param name="coord"/>
@@ -3776,3 +3803,4 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
     
     
   </xsl:stylesheet>
+
