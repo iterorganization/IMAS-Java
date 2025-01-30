@@ -3369,25 +3369,21 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
         int[] shape =  this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
         </xsl:otherwise>
         </xsl:choose>
-        if (shape[<xsl:value-of select="number($dimension)"/>] > 0) {
-        <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
+        if (shape[<xsl:value-of select="number($dimension)"/>] > 0) {<xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
         </xsl:if>
         <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
-        <xsl:if test="number($dimension) = 0">
-	          imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
+        <xsl:if test="number($dimension) = 0"> imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
                                   <xsl:value-of select="number($dimension)"/>, "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
                                   <xsl:value-of select="number($targetdim)"/>, "<xsl:value-of select="$coord"/>"
                                   <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
                                   <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>);
          </xsl:if>
-         <xsl:if test="number($dimension) > 0">
-			 <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_LOOP">
+         <xsl:if test="number($dimension) > 0"> <xsl:apply-templates select="." mode="VALIDATE_FIXED_SIZE_LOOP">
 				<xsl:with-param name="root" select="$root"/>
 			    <xsl:with-param name="string" select="$string"/>
 		        <xsl:with-param name="targetdim" select="$targetdim"/>
-	        </xsl:apply-templates>  			 
-      	 </xsl:if>
+	        </xsl:apply-templates> </xsl:if>
       <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
         }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
@@ -3875,463 +3871,322 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
 	      <xsl:param name="root"/>
 		  <xsl:param name="string"/>
 		  <xsl:param name="targetdim"/>	
-		      
-	        <!--if (shape[<xsl:value-of select="number($dimension)"/>] > 0)-->
-	        <!--if (shape[0] > 0) 
-	        {-->
-		        <!--<xsl:if test="@type='dynamic' and ends-with(@coordinate1,'/time')">
-		        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
-		        </xsl:if>
-	        	<xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="@coordinate1"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>-->
-	        	String[] strCoordName = new String[<xsl:value-of select="number($dimension) -1 "/>];
-	        	Object[] objCoord = new Object[<xsl:value-of select="number($dimension) -1 "/>];
-	        	// root <xsl:value-of select="$root"/> same_as <xsl:value-of select="@coordinate2_same_as" />
-	        	<xsl:if test="number($dimension) > 1 ">
-					<xsl:if test="contains(@coordinate2,'1...N')">
-						<xsl:if test="contains(@coordinate2_same_as,' OR')">
-							strCoordName[0] = "<xsl:value-of select = "substring-before(@coordinate2_same_as,' OR')"/>";	
-							<xsl:variable name="possible-coord">
-								<xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate2_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>						
-							</xsl:variable>
-							<xsl:if test="not(contains($possible-coord,'['))">
-							objCoord[0] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="substring-before(@coordinate2_same_as,' OR')"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>;
-							</xsl:if>
-			        	</xsl:if>
-						<xsl:if test="not(contains(@coordinate2_same_as,' OR'))">
-							strCoordName[0] = "<xsl:value-of select = "@coordinate2_same_as"/>";	
-							<xsl:variable name="possible-coord">
-								<xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate2_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>						
-							</xsl:variable>
-							<xsl:if test="not(contains($possible-coord,'[')) and contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
-								objCoord[0] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate2_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-				        		</xsl:apply-templates>;
-			        		</xsl:if>					
-			        	</xsl:if>
-			        		imas.validate_coordinate(shape, coordNames, coordValues,
-			        			<xsl:value-of select="number($targetdim)"/>,
-			                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-			                    strCoordName
-			                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-									<xsl:with-param name="coord" select="@coordinate2_same_as"/>
-									<xsl:with-param name="relativepathdoc" select="$root"/>
-									<xsl:with-param name="dimension" select="$dimension"/>
-									<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>,
-			                    objCoord);
-		                
-					</xsl:if>
-					<xsl:if test="not(contains(@coordinate2,'1...N'))">
-						<xsl:if test="contains(@coordinate2,' OR')">
-							strCoordName[0] = "<xsl:value-of select = "substring-before(@coordinate2,' OR')"/>";	
-							objCoord[0] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="substring-before(@coordinate2,' OR')"/>
+			String[] strCoordName = new String[<xsl:value-of select="number($dimension) -1 "/>];
+        	Object[] objCoord = new Object[<xsl:value-of select="number($dimension) -1 "/>];        	
+        	<xsl:if test="number($dimension) > 1 ">
+				<xsl:choose>
+				<xsl:when test="contains(@coordinate2,'1...N')">
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate2_same_as,' OR')">
+						strCoordName[0] = "<xsl:value-of select = "substring-before(@coordinate2_same_as,' OR')"/>";	
+						<xsl:variable name="possible-coord">
+							<xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="@coordinate2_same_as"/>
+							<xsl:with-param name="relativepathdoc" select="$root"/>
+							<xsl:with-param name="self" select="concat($string,@name)"/>
+							</xsl:apply-templates>						
+						</xsl:variable>
+						<xsl:if test="not(contains($possible-coord,'['))">
+						objCoord[0] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="substring-before(@coordinate2_same_as,' OR')"/>
 							<xsl:with-param name="relativepathdoc" select="$root"/>
 							<xsl:with-param name="self" select="concat($string,@name)"/>
 							</xsl:apply-templates>;
-			        	</xsl:if>
-						<xsl:if test="not(contains(@coordinate2,' OR'))">
-							strCoordName[0] = "<xsl:value-of select = "@coordinate2"/>";	
-							<xsl:variable name="possible-coord">
-								<xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate2"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>						
-							</xsl:variable>
-												
-							<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
-								objCoord[0] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate2"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-				        		</xsl:apply-templates>;
-			        		</xsl:if>					
-			        	</xsl:if>
-			        	imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate2"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);
-	        		</xsl:if>
-		        </xsl:if>
-	        	
-	        	<xsl:if test="number($dimension) > 2 ">		
-					<xsl:if test="contains(@coordinate3,'1...N')">
-						<xsl:if test="contains(@coordinate3_same_as,' OR')">
-							strCoordName[1] = "<xsl:value-of select = "substring-before(@coordinate3_same_as,' OR')"/>";	
+						</xsl:if>
+		        	</xsl:when>
+					<xsl:otherwise>
+						strCoordName[0] = "<xsl:value-of select = "@coordinate2_same_as"/>";	
+						<xsl:variable name="possible-coord">
+							<xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="@coordinate2_same_as"/>
+							<xsl:with-param name="relativepathdoc" select="$root"/>
+							<xsl:with-param name="self" select="concat($string,@name)"/>
+							</xsl:apply-templates>						
+						</xsl:variable>
+						<xsl:if test="not(contains($possible-coord,'[')) and contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
+						objCoord[0] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="@coordinate2_same_as"/>
+							<xsl:with-param name="relativepathdoc" select="$root"/>
+							<xsl:with-param name="self" select="concat($string,@name)"/>
+			        		</xsl:apply-templates>;
+		        		</xsl:if>					
+		        	</xsl:otherwise>
+		        	</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate2,' OR')">
+						strCoordName[0] = "<xsl:value-of select = "substring-before(@coordinate2,' OR')"/>";	
+						objCoord[0] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="substring-before(@coordinate2,' OR')"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;
+		        	</xsl:when>
+					<xsl:otherwise>
+						<xsl:variable name="possible-coord">
+							<xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="@coordinate2"/>
+							<xsl:with-param name="relativepathdoc" select="$root"/>
+							<xsl:with-param name="self" select="concat($string,@name)"/>
+							</xsl:apply-templates>						
+						</xsl:variable>
+						strCoordName[0] = "<xsl:value-of select = "@coordinate2"/>";<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
+						objCoord[0] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="@coordinate2"/>
+							<xsl:with-param name="relativepathdoc" select="$root"/>
+							<xsl:with-param name="self" select="concat($string,@name)"/>
+			        		</xsl:apply-templates>;
+		        		</xsl:if>					
+		        	</xsl:otherwise>	
+		        	</xsl:choose>	        	
+        		</xsl:otherwise>
+        		</xsl:choose>
+	        </xsl:if>
+	        
+        	<!-- Dimention 2 -->
+        	<xsl:if test="number($dimension) > 2 ">	
+				<xsl:choose>	
+				<xsl:when test="contains(@coordinate3,'1...N')">
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate3_same_as,' OR')">
+						strCoordName[1] = "<xsl:value-of select = "substring-before(@coordinate3_same_as,' OR')"/>";	
+						objCoord[1] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="substring-before(@coordinate3_same_as,' OR')"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;
+		        	</xsl:when>
+		        	<xsl:otherwise>
+						strCoordName[1] = "<xsl:value-of select = "@coordinate3_same_as"/>";							
+						<xsl:variable name="possible-coord">
+							<xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="@coordinate3_same_as"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>						
+						</xsl:variable>
+						<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
 							objCoord[1] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="substring-before(@coordinate3_same_as,' OR')"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>;
-			        	</xsl:if>
-			        	<xsl:if test="not(contains(@coordinate3_same_as,' OR'))">
-							strCoordName[1] = "<xsl:value-of select = "@coordinate3_same_as"/>";	
-							
-							<xsl:variable name="possible-coord">
-								<xsl:apply-templates select="." mode="possible-coordinates-loop">
 							<xsl:with-param name="coord" select="@coordinate3_same_as"/>
 							<xsl:with-param name="relativepathdoc" select="$root"/>
 							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>						
-							</xsl:variable>
-							<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
-								objCoord[1] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate3_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>;
-				        	</xsl:if>
-			        	</xsl:if>	
-			        	imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate3_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);		
-	        		</xsl:if>
-	        		<xsl:if test="not(contains(@coordinate3,'1...N'))">
-						<xsl:if test="contains(@coordinate3,' OR')">
-							strCoordName[1] = "<xsl:value-of select = "substring-before(@coordinate3,' OR')"/>";	
-							objCoord[1] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="substring-before(@coordinate3,' OR')"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
 							</xsl:apply-templates>;
 			        	</xsl:if>
-			        	<xsl:if test="not(contains(@coordinate3,' OR'))">
-							strCoordName[1] = "<xsl:value-of select = "@coordinate3"/>";	
-							
-							<xsl:variable name="possible-coord">
-								<xsl:apply-templates select="." mode="possible-coordinates-loop">
+		        	</xsl:otherwise>
+		        	</xsl:choose>			        	
+        		</xsl:when>
+        		<xsl:otherwise>
+					<xsl:if test="contains(@coordinate3,' OR')">
+						strCoordName[1] = "<xsl:value-of select = "substring-before(@coordinate3,' OR')"/>";	
+						objCoord[1] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="substring-before(@coordinate3,' OR')"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;
+		        	</xsl:if>
+		        	<xsl:if test="not(contains(@coordinate3,' OR'))">
+						<xsl:variable name="possible-coord">
+							<xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="@coordinate3"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>						
+						</xsl:variable>
+						strCoordName[1] = "<xsl:value-of select = "@coordinate3"/>";<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
+						objCoord[1] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
 							<xsl:with-param name="coord" select="@coordinate3"/>
 							<xsl:with-param name="relativepathdoc" select="$root"/>
 							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>						
-							</xsl:variable>
-							<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
-								objCoord[1] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate3"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>;
-				        	</xsl:if>
-			        	</xsl:if>	
-			        	imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate3"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);		
-	        		</xsl:if>								
-				</xsl:if>
-				<xsl:if test="number($dimension) > 3 ">	
-					<xsl:if test="contains(@coordinate4,'1...N')">
-						<xsl:if test="contains(@coordinate4_same_as,' OR')">
-						strCoordName[2] = "<xsl:value-of select = "substring-before(@coordinate4_same_as,' OR')"/>";	
-						objCoord[2] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-						<xsl:with-param name="coord" select="substring-before(@coordinate4_same_as,' OR')"/>
-						<xsl:with-param name="relativepathdoc" select="$root"/>
-						<xsl:with-param name="self" select="concat($string,@name)"/>
-						</xsl:apply-templates>;
-		        	</xsl:if>
-		        	<xsl:if test="not(contains(@coordinate4_same_as,' OR'))">
-						strCoordName[2] = "<xsl:value-of select = "@coordinate4_same_as"/>";	
-						
-						<xsl:variable name="possible-coord">
-							<xsl:apply-templates select="." mode="possible-coordinates-loop">
-						<xsl:with-param name="coord" select="@coordinate4_same_as"/>
-						<xsl:with-param name="relativepathdoc" select="$root"/>
-						<xsl:with-param name="self" select="concat($string,@name)"/>
-						</xsl:apply-templates>						
-						</xsl:variable>
-						<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
-							objCoord[2] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="@coordinate4_same_as"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>;
-						</xsl:if>
-		        	</xsl:if>
-		        	imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate4_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);
-	        		</xsl:if>
-	        		<xsl:if test="not(contains(@coordinate4,'1...N'))">
-						<xsl:if test="contains(@coordinate4,' OR')">
-						strCoordName[2] = "<xsl:value-of select = "substring-before(@coordinate4,' OR')"/>";	
-						objCoord[2] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-						<xsl:with-param name="coord" select="substring-before(@coordinate4,' OR')"/>
-						<xsl:with-param name="relativepathdoc" select="$root"/>
-						<xsl:with-param name="self" select="concat($string,@name)"/>
-						</xsl:apply-templates>;
-		        	</xsl:if>
-		        	<xsl:if test="not(contains(@coordinate4,' OR'))">
-						strCoordName[2] = "<xsl:value-of select = "@coordinate4"/>";	
-						
-						<xsl:variable name="possible-coord">
-							<xsl:apply-templates select="." mode="possible-coordinates-loop">
-						<xsl:with-param name="coord" select="@coordinate4"/>
-						<xsl:with-param name="relativepathdoc" select="$root"/>
-						<xsl:with-param name="self" select="concat($string,@name)"/>
-						</xsl:apply-templates>						
-						</xsl:variable>
-						<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
-							objCoord[2] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="@coordinate4"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>;
-						</xsl:if>
-		        	</xsl:if>
-		        	imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate4"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);
-	        		</xsl:if>									
-				</xsl:if>
-				<xsl:if test="number($dimension) > 4 ">	
-					<xsl:if test="contains(@coordinate5,'1...N')">
-						<xsl:if test="contains(@coordinate5_same_as,' OR')">
-							strCoordName[3] = "<xsl:value-of select = "substring-before(@coordinate5_same_as,' OR')"/>";	
-							objCoord[3] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="substring-before(@coordinate5_same_as,' OR')"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
 							</xsl:apply-templates>;
 			        	</xsl:if>
-			        	<xsl:if test="not(contains(@coordinate5_same_as,' OR'))">
-							strCoordName[3] = "<xsl:value-of select = "@coordinate5_same_as"/>";	
-							<xsl:variable name="possible-coord">
-								<xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="@coordinate5_same_as"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>						
-							</xsl:variable>
-							<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
-								objCoord[3] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate5_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>;
-							</xsl:if>
-			        	</xsl:if>	
-			        	imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate5_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);		
-	        		</xsl:if>
-	        		<xsl:if test="not(contains(@coordinate5,'1...N'))">
-						<xsl:if test="contains(@coordinate5,' OR')">
-							strCoordName[3] = "<xsl:value-of select = "substring-before(@coordinate5,' OR')"/>";	
-							objCoord[3] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="substring-before(@coordinate5,' OR')"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>;
-			        	</xsl:if>
-			        	<xsl:if test="not(contains(@coordinate5,' OR'))">
-							strCoordName[3] = "<xsl:value-of select = "@coordinate5"/>";	
-							<xsl:variable name="possible-coord">
-								<xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="@coordinate5"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>						
-							</xsl:variable>
-							<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
-								objCoord[3] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate5"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>;
-							</xsl:if>
-			        	</xsl:if>	
-			        	imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate5"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);		
-	        		</xsl:if>										
-				</xsl:if>
-	        	<xsl:if test="number($dimension) > 5 ">	
-					<xsl:if test="contains(@coordinate6,'1...N')">
-						<xsl:if test="contains(@coordinate6_same_as,' OR')">
-							strCoordName[4] = "<xsl:value-of select = "substring-before(@coordinate6_same_as,' OR')"/>";	
-							objCoord[4] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="substring-before(@coordinate6_same_as,' OR')"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>;			
-			        	</xsl:if>
-			        	<xsl:if test="not(contains(@coordinate6_same_as,' OR'))">
-							strCoordName[4] = "<xsl:value-of select = "@coordinate6_same_as"/>";
-							<xsl:variable name="possible-coord">
-								<xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="@coordinate6_same_as"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>						
-							</xsl:variable>
-							
-							<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">	
-								objCoord[4] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-								<xsl:with-param name="coord" select="@coordinate6_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-								</xsl:apply-templates>;
-				        	</xsl:if>
-			        	</xsl:if>
-			        	imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate6_same_as"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);
-	        		</xsl:if>
-	        		<xsl:if test="not(contains(@coordinate6,'1...N'))">
-						<xsl:if test="contains(@coordinate6,' OR')">
-						strCoordName[4] = "<xsl:value-of select = "substring-before(@coordinate6,' OR')"/>";	
-						objCoord[4] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-						<xsl:with-param name="coord" select="substring-before(@coordinate6,' OR')"/>
-						<xsl:with-param name="relativepathdoc" select="$root"/>
-						<xsl:with-param name="self" select="concat($string,@name)"/>
-						</xsl:apply-templates>;			
-		        	</xsl:if>
-		        	<xsl:if test="not(contains(@coordinate6,' OR'))">
-						strCoordName[4] = "<xsl:value-of select = "@coordinate6"/>";
-						<xsl:variable name="possible-coord">
-							<xsl:apply-templates select="." mode="possible-coordinates-loop">
-						<xsl:with-param name="coord" select="@coordinate6"/>
-						<xsl:with-param name="relativepathdoc" select="$root"/>
-						<xsl:with-param name="self" select="concat($string,@name)"/>
-						</xsl:apply-templates>						
-						</xsl:variable>
-						
-						<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">	
-							objCoord[4] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-							<xsl:with-param name="coord" select="@coordinate6"/>
-							<xsl:with-param name="relativepathdoc" select="$root"/>
-							<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>;
-			        	</xsl:if>
-		        	</xsl:if>
-		        		imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate6"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);
-	        		</xsl:if>						
-				</xsl:if>
-	        	<!--<xsl:if test="number($dimension) > 5 ">
-					strCoordName[5] = "<xsl:value-of select = "@coordinate6"/>";	
-					objCoord[5] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
-					<xsl:with-param name="coord" select="substring-before(@coordinate6,' OR')"/>
+		        	</xsl:if>			        	
+        		</xsl:otherwise>
+        		</xsl:choose>								
+			</xsl:if>
+			<xsl:if test="number($dimension) > 3 ">	
+				<xsl:choose>
+				<xsl:when test="contains(@coordinate4,'1...N')">
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate4_same_as,' OR')">
+					strCoordName[2] = "<xsl:value-of select = "substring-before(@coordinate4_same_as,' OR')"/>";	
+					objCoord[2] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+					<xsl:with-param name="coord" select="substring-before(@coordinate4_same_as,' OR')"/>
 					<xsl:with-param name="relativepathdoc" select="$root"/>
 					<xsl:with-param name="self" select="concat($string,@name)"/>
 					</xsl:apply-templates>;
-				</xsl:if>-->
-		        	
-		        	<!--imas.validate_coordinate(shape, coordNames, coordValues,
-		        			<xsl:value-of select="number($targetdim)"/>,
-		                    "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",		                    
-		                    strCoordName
-		                    <xsl:apply-templates select="." mode="check-specific-coordinates">
-								<xsl:with-param name="coord" select="@coordinate2"/>
-								<xsl:with-param name="relativepathdoc" select="$root"/>
-								<xsl:with-param name="dimension" select="$dimension"/>
-								<xsl:with-param name="self" select="concat($string,@name)"/>
-							</xsl:apply-templates>,
-		                    objCoord);-->
-		      
-		    <!-- 	<xsl:if test="@type='dynamic' and ends-with(@coordinate1,'/time')">      
-		        }
-		        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
-		          if(shape[<xsl:value-of select="number($dimension)"/>] != idsTimeSize) {
-		            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
-		            throw new ValidationException(errMsg);
-		          }
-		        }
-		        if (idsTimeMode == LowLevel.IDS_TIME_MODE_INDEPENDENT ) {
-		          if(shape[<xsl:value-of select="number($dimension)"/>] != 0) {
-		            String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, 0, "time");
-		            throw new ValidationException(errMsg);
-		          }
-		        }
-		        </xsl:if>
-			}-->		
-	    </xsl:template>	
+	        	</xsl:when>
+	        	<xsl:otherwise>
+					strCoordName[2] = "<xsl:value-of select = "@coordinate4_same_as"/>";						
+					<xsl:variable name="possible-coord">
+						<xsl:apply-templates select="." mode="possible-coordinates-loop">
+					<xsl:with-param name="coord" select="@coordinate4_same_as"/>
+					<xsl:with-param name="relativepathdoc" select="$root"/>
+					<xsl:with-param name="self" select="concat($string,@name)"/>
+					</xsl:apply-templates>						
+					</xsl:variable>
+					<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
+					objCoord[2] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="@coordinate4_same_as"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;
+					</xsl:if>
+	        	</xsl:otherwise>
+	        	</xsl:choose>
+        		</xsl:when>
+        		<xsl:otherwise>
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate4,' OR')">
+					strCoordName[2] = "<xsl:value-of select = "substring-before(@coordinate4,' OR')"/>";	
+					objCoord[2] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+					<xsl:with-param name="coord" select="substring-before(@coordinate4,' OR')"/>
+					<xsl:with-param name="relativepathdoc" select="$root"/>
+					<xsl:with-param name="self" select="concat($string,@name)"/>
+					</xsl:apply-templates>;
+	        	</xsl:when>
+	        	<xsl:otherwise>
+					<xsl:variable name="possible-coord">
+						<xsl:apply-templates select="." mode="possible-coordinates-loop">
+					<xsl:with-param name="coord" select="@coordinate4"/>
+					<xsl:with-param name="relativepathdoc" select="$root"/>
+					<xsl:with-param name="self" select="concat($string,@name)"/>
+					</xsl:apply-templates>						
+					</xsl:variable>
+					strCoordName[2] = "<xsl:value-of select = "@coordinate4"/>";<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
+					objCoord[2] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="@coordinate4"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;
+					</xsl:if>
+	        	</xsl:otherwise>
+	        	</xsl:choose>
+        		</xsl:otherwise>
+        		</xsl:choose>									
+			</xsl:if>
+			<xsl:if test="number($dimension) > 4 ">	
+				<xsl:choose>
+				<xsl:when test="contains(@coordinate5,'1...N')">
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate5_same_as,' OR')">
+						strCoordName[3] = "<xsl:value-of select = "substring-before(@coordinate5_same_as,' OR')"/>";	
+						objCoord[3] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="substring-before(@coordinate5_same_as,' OR')"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;
+		        	</xsl:when>
+		        	<xsl:otherwise>
+						strCoordName[3] = "<xsl:value-of select = "@coordinate5_same_as"/>";	
+						<xsl:variable name="possible-coord">
+							<xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="@coordinate5_same_as"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>						
+						</xsl:variable>
+						<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
+						objCoord[3] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="@coordinate5_same_as"/>
+							<xsl:with-param name="relativepathdoc" select="$root"/>
+							<xsl:with-param name="self" select="concat($string,@name)"/>
+							</xsl:apply-templates>;
+						</xsl:if>
+		        	</xsl:otherwise>	
+		        	</xsl:choose>
+        		</xsl:when>
+        		<xsl:otherwise>
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate5,' OR')">
+						strCoordName[3] = "<xsl:value-of select = "substring-before(@coordinate5,' OR')"/>";	
+						objCoord[3] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="substring-before(@coordinate5,' OR')"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;
+		        	</xsl:when>
+		        	<xsl:otherwise>
+						<xsl:variable name="possible-coord">
+							<xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="@coordinate5"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>						
+						</xsl:variable>
+						strCoordName[3] = "<xsl:value-of select = "@coordinate5"/>";<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">
+						objCoord[3] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="@coordinate5"/>
+							<xsl:with-param name="relativepathdoc" select="$root"/>
+							<xsl:with-param name="self" select="concat($string,@name)"/>
+							</xsl:apply-templates>;
+						</xsl:if>
+		        	</xsl:otherwise>
+		        	</xsl:choose>
+        		</xsl:otherwise>
+        		</xsl:choose>										
+			</xsl:if>
+        	<xsl:if test="number($dimension) > 5 ">	
+				<xsl:choose>
+				<xsl:when test="contains(@coordinate6,'1...N')">
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate6_same_as,' OR')">
+						strCoordName[4] = "<xsl:value-of select = "substring-before(@coordinate6_same_as,' OR')"/>";	
+						objCoord[4] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="substring-before(@coordinate6_same_as,' OR')"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;			
+		        	</xsl:when>
+		        	<xsl:otherwise>
+						strCoordName[4] = "<xsl:value-of select = "@coordinate6_same_as"/>";
+						<xsl:variable name="possible-coord">
+							<xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="@coordinate6_same_as"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>						
+						</xsl:variable>						
+						<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">	
+						objCoord[4] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+							<xsl:with-param name="coord" select="@coordinate6_same_as"/>
+							<xsl:with-param name="relativepathdoc" select="$root"/>
+							<xsl:with-param name="self" select="concat($string,@name)"/>
+							</xsl:apply-templates>;
+			        	</xsl:if>
+		        	</xsl:otherwise>
+		        	</xsl:choose>
+        		</xsl:when>
+        		<xsl:otherwise>
+					<xsl:choose>
+					<xsl:when test="contains(@coordinate6,' OR')">
+					strCoordName[4] = "<xsl:value-of select = "substring-before(@coordinate6,' OR')"/>";	
+					objCoord[4] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+					<xsl:with-param name="coord" select="substring-before(@coordinate6,' OR')"/>
+					<xsl:with-param name="relativepathdoc" select="$root"/>
+					<xsl:with-param name="self" select="concat($string,@name)"/>
+					</xsl:apply-templates>;			
+	        	</xsl:when>
+	        	<xsl:otherwise>
+					<xsl:variable name="possible-coord">
+						<xsl:apply-templates select="." mode="possible-coordinates-loop">
+					<xsl:with-param name="coord" select="@coordinate6"/>
+					<xsl:with-param name="relativepathdoc" select="$root"/>
+					<xsl:with-param name="self" select="concat($string,@name)"/>
+					</xsl:apply-templates>						
+					</xsl:variable>
+					strCoordName[4] = "<xsl:value-of select = "@coordinate6"/>";<xsl:if test="contains($possible-coord,'this') and not(contains(substring($possible-coord, string-length($possible-coord), 1),'.'))">	
+					objCoord[4] = <xsl:apply-templates select="." mode="possible-coordinates-loop">
+						<xsl:with-param name="coord" select="@coordinate6"/>
+						<xsl:with-param name="relativepathdoc" select="$root"/>
+						<xsl:with-param name="self" select="concat($string,@name)"/>
+						</xsl:apply-templates>;
+		        	</xsl:if>
+	        	</xsl:otherwise>
+	        	</xsl:choose>
+        		</xsl:otherwise>
+        		</xsl:choose>						
+			</xsl:if>imas.validate_coordinate(shape, coordNames, coordValues,<xsl:value-of select="number($targetdim)"/>,"<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",strCoordName , true, 0, objCoord);</xsl:template>	
     <xsl:template match='field' mode="possible-coordinates-loop">
       <xsl:param name="coord"/>
       <xsl:param name="relativepathdoc"/>
@@ -4381,4 +4236,3 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
       </xsl:if>
       </xsl:template>
   </xsl:stylesheet>
-
