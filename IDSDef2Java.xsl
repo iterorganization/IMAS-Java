@@ -254,57 +254,59 @@ public class imas {
 
 		// We check all the possible coordinates allocation
 		for (int index = 0; index &lt; arrayobjs.length; index++) {
-			for (Object obj : (Object[]) arrayobjs[index]) {
-				if (check_possible_coordinate(objdim, obj)) {
-					i++;
-				}
-			}
-
-			int dim = index;
-			if (i != 1) // why not i &lt; 1? 
-				check = false;
-			
-			// If more than one alternative coordinate is allocated, we raise an exception
-			if (i > 1) // what about if i = 1? 
-			{
-				String[] coordinateslist = { coordinates[index] };
-				String errMsg = CoordinateValidation.coordinate_not_filled_message(name, coordNames,
-						coordValues, shape, dim + 1, coordinateslist);
-				throw new ValidationException(errMsg);
-			}
-
-			int arraySize = shape[index];
-			// We check all the possible coordinates (one is allocated)				
-			if (check) {
-				String[] coordinateslist = coordinates[index].split(" OR "); // Why this split is required?
-				int crd = 0;
+			if (shape[index] > 0 &amp;&amp; arrayobjs[index] != null){
 				for (Object obj : (Object[]) arrayobjs[index]) {
-					int objSize = imas.get_possible_coordinate(objdim, obj);
-					if (objSize != 0) {
-						if (objSize == arraySize) {
-							error = false;
-						} else {
-							if (!fixedcoord) {
-								String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name,
-										coordNames, coordValues, shape, dim + 1, objSize, coordinateslist[crd]);
-								throw new ValidationException(errMsg);
+					if (check_possible_coordinate(objdim, obj)) {
+						i++;
+					}
+				}
+	
+				int dim = index;
+				if (i != 1) // why not i &lt; 1? 
+					check = false;
+				
+				// If more than one alternative coordinate is allocated, we raise an exception
+				if (i > 1) // what about if i = 1? 
+				{
+					String[] coordinateslist = { coordinates[index] };
+					String errMsg = CoordinateValidation.coordinate_not_filled_message(name, coordNames,
+							coordValues, shape, dim + 1, coordinateslist);
+					throw new ValidationException(errMsg);
+				}
+	
+				int arraySize = shape[index];
+				// We check all the possible coordinates (one is allocated)				
+				if (check) {
+					String[] coordinateslist = coordinates[index].split(" OR "); // Why this split is required?
+					int crd = 0;
+					for (Object obj : (Object[]) arrayobjs[index]) {
+						int objSize = imas.get_possible_coordinate(objdim, obj);
+						if (objSize != 0) {
+							if (objSize == arraySize) {
+								error = false;
+							} else {
+								if (!fixedcoord) {
+									String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name,
+											coordNames, coordValues, shape, dim + 1, objSize, coordinateslist[crd]);
+									throw new ValidationException(errMsg);
+								}
 							}
 						}
+						crd++;
 					}
-					crd++;
 				}
-			}
-
-			// Last chance: possible alternative fixed size?
-			if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {
-				error = false;
-			}
-
-			// The size of the target dimension not validated - we raise an error
-			if (error) {
-				String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames,
-						coordValues, shape, dim + 1, 0, coordinates[index]);
-				throw new ValidationException(errMsg);
+	
+				// Last chance: possible alternative fixed size?
+				if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {
+					error = false;
+				}
+	
+				// The size of the target dimension not validated - we raise an error
+				if (error) {
+					String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames,
+							coordValues, shape, dim + 1, 0, coordinates[index]);
+					throw new ValidationException(errMsg);
+				}
 			}
 		}
     }
@@ -2962,12 +2964,10 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
 
     <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_2D">
       <xsl:param name="currpath"/>
-      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'0'"/>
       </xsl:apply-templates>
-      </xsl:if>
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'1'"/>
@@ -2976,12 +2976,12 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
 
 
     <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_3D">
-      <xsl:param name="currpath"/>
-      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
+      <xsl:param name="currpath"/>      
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'0'"/>
       </xsl:apply-templates>
+      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'1'"/>
@@ -2995,11 +2995,11 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
 
     <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_4D">
       <xsl:param name="currpath"/>
-      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'0'"/>
       </xsl:apply-templates>
+      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'1'"/>
@@ -3017,11 +3017,11 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
 
     <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_5D">
       <xsl:param name="currpath"/>
-      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'0'"/>
       </xsl:apply-templates>
+      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'1'"/>
@@ -3043,11 +3043,11 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
 
     <xsl:template match="field" mode="VALIDATE_DESCENDANT_SINGLE_6D">
       <xsl:param name="currpath"/>
-      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'0'"/>
       </xsl:apply-templates>
+      <xsl:if test="not(contains(ancestor::IDS/@name, 'gyrokinetics_local'))">
       <xsl:apply-templates select="." mode="VALIDATE_DESCENDANT_SINGLE">
         <xsl:with-param name="currpath" select="$currpath"/>
         <xsl:with-param name="dimension" select="'1'"/>
@@ -3835,7 +3835,9 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
 		  <xsl:param name="string"/>
 		  <xsl:param name="targetdim"/>	
 		String[] strCoordName = new String[<xsl:value-of select="number($dimension)"/>];
-    	Object[] objCoord = new Object[<xsl:value-of select="number($dimension)"/>];<!--Coordinate1--><xsl:choose>
+    	Object[] objCoord = new Object[<xsl:value-of select="number($dimension)"/>];
+    	<!--Coordinate1-->
+    	<!--<xsl:choose>
 			<xsl:when test="contains(@coordinate1,'1...N')">
 			<xsl:choose>
 			<xsl:when test="contains(@coordinate1_same_as,' OR')">
@@ -3902,7 +3904,8 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
         	</xsl:otherwise>	
         	</xsl:choose>	        	
     		</xsl:otherwise>
-    		</xsl:choose><!--End of Coordinate1--><xsl:if test="number($dimension) > 0 ">
+    		</xsl:choose>-->
+    		<!--End of Coordinate1--><xsl:if test="number($dimension) > 0 ">
 			<xsl:choose>
 			<xsl:when test="contains(@coordinate2,'1...N')">
 			<xsl:choose>
