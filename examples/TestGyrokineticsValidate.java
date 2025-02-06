@@ -9,7 +9,7 @@ public class TestGyrokineticsValidate {
 	public static void main(String[] args) {
         imas.gyrokinetics_local ids = new imas.gyrokinetics_local();
         
-        System.out.println("### Testing simplest case...");
+        System.out.println("### Testing Gyrokinetics validate simplest case...");
         try {
             ids.validate();           
         } catch (Exception e) {
@@ -37,6 +37,15 @@ public class TestGyrokineticsValidate {
         	System.out.println("Error, Species exception " + e.getMessage());
         }
         
+        System.out.println("### Testing non_liner..."); ids.non_linear = new imas.gyrokinetics_local.non_linearClass();
+		  ids.non_linear.moments_norm_particle = new imas.gyrokinetics_local.non_linearClass.moments_norm_particleClass();
+		  ids.non_linear.moments_norm_particle.density = new Vect5DComplex(2,0,0,0,0);
+		  ids.non_linear.fluxes_3d.particles_phi_potential = new Vect3DDouble(0,0,0);
+		  
+		  try { ids.validate(); } catch (Exception e) {
+		  System.out.println("Error, non_liner exception " + e.getMessage()); 
+		  }
+        		  
         System.out.println("### Testing liner...");
         ids.linear = new imas.gyrokinetics_local.linearClass();
         
@@ -52,27 +61,16 @@ public class TestGyrokineticsValidate {
 				ids.linear.wavevector[i].eigenmode[j].angle_pol = new Vect1DDouble(5);
 				
 				ids.linear.wavevector[i].eigenmode[j].moments_norm_gyrocenter_bessel_1 = new imas.gyrokinetics_local.linearClass.wavevectorClass.eigenmodeClass.moments_norm_gyrocenter_bessel_1Class();
-				ids.linear.wavevector[i].eigenmode[j].moments_norm_gyrocenter_bessel_1.pressure_perpendicular = new Vect3DComplex(0,0,0);
-				
+				ids.linear.wavevector[i].eigenmode[j].moments_norm_gyrocenter_bessel_1.pressure_perpendicular = new Vect3DComplex(2,1,1);
 			}
 		}
 		
 		try {
 		    ids.validate();
 		} catch (Exception e) {
-			System.out.println("Error, liner exception " + e.getMessage());
+			System.out.println("Error, expected liner exception " + e.getMessage());
 		}
-
-		System.out.println("### Testing non_liner...");  
-		ids.non_linear = new imas.gyrokinetics_local.non_linearClass();
-		ids.non_linear.moments_norm_particle = new imas.gyrokinetics_local.non_linearClass.moments_norm_particleClass();
-		ids.non_linear.moments_norm_particle.density = new Vect5DComplex(0,0,0,0,0);
-		ids.non_linear.fluxes_3d.particles_phi_potential = new Vect3DDouble(0,0,0);
-		  
-		try {
-			ids.validate();          
-		} catch (Exception e) {
-		 	System.out.println("Error, non_liner exception " + e.getMessage());
-		}        
+		
+		System.out.println("Gyrokinetics validate test completed");
     }
 }
