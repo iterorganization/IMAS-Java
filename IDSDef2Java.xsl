@@ -182,7 +182,6 @@ public class imas {
 		boolean check = true;
 	  	boolean error = true;
 	  	int i = 0;
-	
 	  	// We check all the possible coordinates allocation		
 	  	for (Object s : objs) {
 			if (check_possible_coordinate( objdim, s))  i = i + 1;
@@ -251,16 +250,14 @@ public class imas {
 		boolean check = true;
 		boolean error = true;
 		int i = 0;
-
+		
 		// We check all the possible coordinates allocation
 		for (int index = 0; index &lt; arrayobjs.length; index++) {
 			if (shape[index] > 0 &amp;&amp; arrayobjs[index] != null){
-				for (Object obj : (Object[]) arrayobjs[index]) {
-					if (check_possible_coordinate(objdim, obj)) {
-						i++;
-					}
+				
+				if (check_possible_coordinate(objdim, arrayobjs[index])) {
+					i++;
 				}
-	
 				int dim = index;
 				if (i != 1) // why not i &lt; 1? 
 					check = false;
@@ -276,24 +273,19 @@ public class imas {
 	
 				int arraySize = shape[index];
 				// We check all the possible coordinates (one is allocated)				
-				if (check) {
-					String[] coordinateslist = coordinates[index].split(" OR "); // Why this split is required?
-					int crd = 0;
-					for (Object obj : (Object[]) arrayobjs[index]) {
-						int objSize = imas.get_possible_coordinate(objdim, obj);
-						if (objSize != 0) {
-							if (objSize == arraySize) {
-								error = false;
-							} else {
-								if (!fixedcoord) {
-									String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name,
-											coordNames, coordValues, shape, dim + 1, objSize, coordinateslist[crd]);
-									throw new ValidationException(errMsg);
-								}
+				if (check) {				
+					int objSize = imas.get_possible_coordinate(objdim, arrayobjs[index]);
+					if (objSize != 0) {
+						if (objSize == arraySize) {
+							error = false;
+						} else {
+							if (!fixedcoord) {
+								String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name,
+										coordNames, coordValues, shape, dim + 1, objSize, coordinates[index]);
+								throw new ValidationException(errMsg);
 							}
 						}
-						crd++;
-					}
+					}					
 				}
 	
 				// Last chance: possible alternative fixed size?
@@ -1747,7 +1739,7 @@ public class imas {
         }
 
         public void validate() throws ValidationException
-      {
+      {      	
         int idsTimeMode = this.ids_properties.homogeneous_time;;
         int idsTimeSize = 0;
         int[] coordValues = {};
@@ -4153,6 +4145,7 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
     		</xsl:otherwise>
     		</xsl:choose>						
 		</xsl:if>imas.validate_coordinate(shape, coordNames, coordValues,<xsl:value-of select="number($targetdim)"/>,"<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",strCoordName , true, 0, objCoord);</xsl:template>	
+    
     <xsl:template match='field' mode="possible-coordinates-loop">
       <xsl:param name="coord"/>
       <xsl:param name="relativepathdoc"/>
