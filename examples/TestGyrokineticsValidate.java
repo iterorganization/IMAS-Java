@@ -15,7 +15,7 @@ public class TestGyrokineticsValidate {
         }
         
         ids.ids_properties.homogeneous_time = LowLevel.IDS_TIME_MODE_HOMOGENEOUS;
-
+        ids.time = new Vect1DDouble(5);
         System.out.println("### Validating HOMOGENEOUS time array...\n");
         try {
             ids.validate(); 
@@ -48,8 +48,6 @@ public class TestGyrokineticsValidate {
         
         System.out.println("### Validating non_linear...\n"); 
         ids.non_linear = new imas.gyrokinetics_local.non_linearClass();
-		ids.non_linear.moments_norm_particle = new imas.gyrokinetics_local.non_linearClass.moments_norm_particleClass();
-		ids.non_linear.moments_norm_particle.density = new Vect5DComplex(2,0,0,0,0);
 		ids.non_linear.fluxes_3d.particles_phi_potential = new Vect3DDouble(0,0,0);
 
 		try {
