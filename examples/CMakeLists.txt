@@ -36,6 +36,7 @@ set( TESTS
     TestCoreProfilesValidate
     TestCoreProfilesSampleGet
     TestDistributionsValidate
+    TestGyrokineticsValidate
     TestMagneticsValidate
     TestPfActiveGet
     TestPfActiveGetSlice

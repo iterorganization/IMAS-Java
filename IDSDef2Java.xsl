@@ -177,60 +177,61 @@ public class imas {
     * @return void
     * @exception ValidationException is thrown if the coordinate is wrong.
     */
-    public static void validate_coordinate(int arraySize, int[] shape, String[] coordNames, int[] coordValues, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
-    {
+    public static void validate_coordinate(int[] shape, String[] coordNames, int[] coordValues, int dim, String name, int objdim, String coordinates, boolean fixedcoord, int fixeddim ,Object... objs) throws ValidationException
+    {   
+    	int arraySize = shape[dim];  
     	if (arraySize > 0){
-		boolean check = true;
-	  	boolean error = true;
-	  	int i = 0;
-	
-	  	// We check all the possible coordinates allocation		
-	  	for (Object s : objs) {
-			if (check_possible_coordinate( objdim, s))  i = i + 1;
-		}
-	
-	  	if (i!=1) { 
-	    	check = false;
-	  	} 
-	
-	  	// If more of one alternatives coordinates is allocated we raise an exception		
-	  	if (i&gt;1) { 
-	    	String[] coordinateslist = {coordinates};
-	    	String errMsg = CoordinateValidation.coordinate_not_filled_message(name, coordNames, coordValues, shape, dim+1, coordinateslist);
-	    	throw new ValidationException(errMsg);
-	  	}
-	
-	  	// We check all the possible coordinates (one is allocated)
-		if(check) {
-	    	String[] coordinateslist = coordinates.split(" OR ");
-	    	int crd = 0;
-	    	for (Object s : objs) {
-	    		int objSize = imas.get_possible_coordinate(objdim, s);
-	    		if (objSize != 0) {
-	      			if (objSize == arraySize) {
-	        		error = false;
-	      			} else {
-	        			if (!fixedcoord) {
-	          				String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, objSize, coordinateslist[crd]);
-	          				throw new ValidationException(errMsg);
-	        			}
-	      			}
-	    		}
-	    		crd = crd + 1;
-	    	}
-	  	}
-	
-	  	// Last chance: possible alternative fixed size?
-	
-	  	if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
-	    	error = false; 
-	  	}
-	
-	  	// The size of the target dimension not validated - we raise an error		    
-	  	if (error) { 
-	    	String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, 0, coordinates);
-	    	throw new ValidationException(errMsg);
-	    }
+			boolean check = true;
+		  	boolean error = true;
+		  	int i = 0;
+		
+		  	// We check all the possible coordinates allocation		
+		  	for (Object s : objs) {
+				if (check_possible_coordinate( objdim, s))  i = i + 1;
+			}
+		
+		  	if (i!=1) { 
+		    	check = false;
+		  	} 
+		
+		  	// If more of one alternatives coordinates is allocated we raise an exception		
+		  	if (i&gt;1) { 
+		    	String[] coordinateslist = {coordinates};
+		    	String errMsg = CoordinateValidation.coordinate_not_filled_message(name, coordNames, coordValues, shape, dim+1, coordinateslist);
+		    	throw new ValidationException(errMsg);
+		  	}
+		
+		  	// We check all the possible coordinates (one is allocated)
+			if(check) {
+		    	String[] coordinateslist = coordinates.split(" OR ");
+		    	int crd = 0;
+		    	for (Object s : objs) {
+		    		int objSize = imas.get_possible_coordinate(objdim, s);
+		    		if (objSize != 0) {
+		      			if (objSize == arraySize) {
+		        		error = false;
+		      			} else {
+		        			if (!fixedcoord) {
+		          				String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, objSize, coordinateslist[crd]);
+		          				throw new ValidationException(errMsg);
+		        			}
+		      			}
+		    		}
+		    		crd = crd + 1;
+		    	}
+		  	}
+		
+		  	// Last chance: possible alternative fixed size?
+		
+		  	if (error &amp;&amp; fixedcoord &amp;&amp; arraySize == fixeddim) {  
+		    	error = false; 
+		  	}
+		
+		  	// The size of the target dimension not validated - we raise an error		    
+		  	if (error) { 
+		    	String errMsg = CoordinateValidation.coordinate_incorrect_size_message(name, coordNames, coordValues, shape, dim+1, 0, coordinates);
+		    	throw new ValidationException(errMsg);
+		    }
 	    }
    	}
     
@@ -1669,7 +1670,7 @@ public class imas {
         System.out.println("******************");
         }
 
-        public void validate() throws ValidationException
+      public void validate() throws ValidationException
       {
         int idsTimeMode = this.ids_properties.homogeneous_time;;
         int idsTimeSize = 0;
@@ -1682,9 +1683,9 @@ public class imas {
               throw new ValidationException("ids_properties.homogeneous_time has an empty value ("+idsTimeMode+")");
         }
 
-	<xsl:if test="not(@type='constant')">
-	if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1))) { 
-              throw new ValidationException("With the time mode 'HOMOGENEOUS', the time array must be allocated and not be empty.");
+		<xsl:if test="not(@type='constant')">
+		if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS &amp;&amp; (this.time == null || (this.time != null  &amp;&amp; this.time.getDim() &lt; 1))) { 
+	              throw new ValidationException("With the time mode 'HOMOGENEOUS', the time array must be allocated and not be empty.");
         }
 
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS) idsTimeSize = this.time.getDim();
@@ -3111,8 +3112,7 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
     </xsl:variable> 
     <!-- missing IDS coordinate exception--> 
     <xsl:if test="starts-with($coord,$currpath) and contains($ispresent,'yes')">
-      <xsl:if test="$test='false'">
-    // validation of <xsl:value-of select="@path"/> dimension <xsl:value-of select="number($dimension)"/>
+      <xsl:if test="$test='false'"> // validation of <xsl:value-of select="@path"/> dimension <xsl:value-of select="number($dimension)"/>
         <xsl:variable name="newpath">
           <xsl:if test="not($currpath='')">
             <xsl:value-of select="substring-after(@path,concat(ancestor::field[@path_doc = $currpath]/@path,'/'))"/>
@@ -3284,7 +3284,26 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
       </xsl:if>
       </xsl:variable>
       <xsl:if test="not(contains($newpath,'/')) and not($istimeslice='yes')"> <!-- and ( (contains($string,'(itime)') and contains($coord,'(itime)')) or  (not(contains($string,'(itime)')) and not(contains($coord,'(itime)'))) )-->
-       if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {       
+      if (this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/> != null) {
+        <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
+        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
+        </xsl:if>
+        <xsl:apply-templates select="." mode="check-target-indices">
+			<xsl:with-param name="coord" select="$coord"/>
+			<xsl:with-param name="relativepathdoc" select="$root"/>
+		</xsl:apply-templates> <xsl:choose>
+        <xsl:when test="@data_type='struct_array'"> imas.validate_coordinate(new int[]{this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length}, coordNames, coordValues,
+                                  <xsl:value-of select="number($dimension)"/>, "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
+                                  <xsl:value-of select="number($targetdim)"/>, "<xsl:value-of select="$coord"/>"
+                                  <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
+                                  <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>); </xsl:when>
+        <xsl:otherwise> imas.validate_coordinate(this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims(), coordNames, coordValues,
+                                  <xsl:value-of select="number($dimension)"/>, "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
+                                  <xsl:value-of select="number($targetdim)"/>, "<xsl:value-of select="$coord"/>"
+                                  <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
+                                  <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>);</xsl:otherwise> </xsl:choose>
+        <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
+        }
         <xsl:choose>
         <xsl:when test="@data_type='struct_array'">
         int[] shape =  {this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.length};
@@ -3293,17 +3312,6 @@ or @data_type='cpx_1d_type' or @data_type='CPX_1D' or @data_type='STR_1D') and c
         int[] shape =  this.<xsl:value-of select="$string"/><xsl:value-of select="@name"/>.getDims();
         </xsl:otherwise>
         </xsl:choose>
-        <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
-        if (idsTimeMode == LowLevel.IDS_TIME_MODE_HETEROGENEOUS ) {
-        </xsl:if>
-        <xsl:apply-templates select="." mode="check-target-indices"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/></xsl:apply-templates>
-          imas.validate_coordinate(shape[<xsl:value-of select="number($dimension)"/>], shape, coordNames, coordValues,
-                                  <xsl:value-of select="number($dimension)"/>, "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>",
-                                  <xsl:value-of select="number($targetdim)"/>, "<xsl:value-of select="$coord"/>"
-                                  <xsl:apply-templates select="." mode="check-specific-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="dimension" select="$dimension"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>
-                                  <xsl:apply-templates select="." mode="possible-coordinates"><xsl:with-param name="coord" select="$coord"/><xsl:with-param name="relativepathdoc" select="$root"/><xsl:with-param name="self" select="concat($string,@name)"/></xsl:apply-templates>);
-      <xsl:if test="@type='dynamic' and ends-with($coord,'/time')">
-        }
         if (idsTimeMode == LowLevel.IDS_TIME_MODE_HOMOGENEOUS ) {
           if(shape[<xsl:value-of select="number($dimension)"/>] != idsTimeSize) {
             String errMsg = CoordinateValidation.coordinate_incorrect_size_message( "<xsl:value-of select="fn:getpathdoc(@path_doc)"/>" , coordNames, coordValues, shape, <xsl:value-of select="number($dimension)+1"/>, idsTimeSize, "time");
