@@ -166,7 +166,6 @@ public class imas {
 	/**
     * Coordinate validation method.
     *
-    * @param arraySize Size of the dimension to check.
     * @param dim The dimension that is checked.
     * @param name The name of the object that we want to check the dim dimension size.
     * @param objdim The target dimension of the coordinate.
