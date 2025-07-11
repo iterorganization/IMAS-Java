@@ -61,7 +61,7 @@ MODULES=(
     Python/3.11.5-GCCcore-13.2.0
     libxml2/2.11.5-GCCcore-13.2.0  # AL-Core
     MDSplus/7.132.0-GCCcore-13.2.0  # backend
-    UDA/2.7.5-GCC-13.2.0  # backend
+    UDA/2.8.1-GCC-13.2.0  # backend
     Python/3.11.5-GCCcore-13.2.0 # documentation
 )
   ;;&
@@ -135,6 +135,7 @@ CMAKE_ARGS=(
   -D AL_HLI_DOCS=${AL_HLI_DOCS:-ON}
   # Work around Boost linker issues on 2020b toolchain
   -D Boost_NO_BOOST_CMAKE=${Boost_NO_BOOST_CMAKE:-ON}
+  -D CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD:-17}
 )
 # Note: compilers are set as environment variables in the Bamboo config
 cmake -B build "${CMAKE_ARGS[@]}"
