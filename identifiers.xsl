@@ -17,25 +17,6 @@
 
 <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
 
-<!-- GET VALID JAVA IDENTIFIER -->
-<xsl:template name="get-valid-java-identifier">
-  <xsl:param name="name"/>
-  <xsl:variable name="java-keywords"
-    select="'abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if implements import instanceof int interface long native new package private protected public return short static strictfp super switch synchronized this throw throws transient try void volatile while true false null record sealed non-sealed'"/>
-  <xsl:choose>
-    <xsl:when test="contains('0123456789', substring($name,1,1))">
-      <xsl:text>_</xsl:text><xsl:value-of select="$name"/>
-    </xsl:when>
-
-    <xsl:when test="contains(concat(' ', $java-keywords, ' '), concat(' ', $name, ' '))">
-      <xsl:text>_</xsl:text><xsl:value-of select="$name"/>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:value-of select="$name"/>
-    </xsl:otherwise>
-  </xsl:choose>
-</xsl:template>
-
 <!-- MAIN, FILE GENERATION -->
 <xsl:template match="/constants">
 
@@ -72,9 +53,7 @@
 
 <xsl:template match="int" mode="Java">
   <xsl:text>&#009;public static final int </xsl:text>
-  <xsl:call-template name="get-valid-java-identifier">
-    <xsl:with-param name="name" select="@name"/>
-  </xsl:call-template> 
+  <xsl:value-of select="@name"/>
   <xsl:text>&#009; = </xsl:text>
   <xsl:value-of select="."/>
   <xsl:text>;</xsl:text>
@@ -83,9 +62,7 @@
 
 <xsl:template match="float" mode="Java">
   <xsl:text>&#009;public static final double </xsl:text>
-  <xsl:call-template name="get-valid-java-identifier">
-    <xsl:with-param name="name" select="@name"/>
-  </xsl:call-template> 
+  <xsl:value-of select="@name"/>
   <xsl:choose>
     <xsl:when test="@alias!='' or @alias='true'">
       <xsl:text>;</xsl:text>
@@ -107,9 +84,7 @@
 
 <xsl:template match="string" mode="Java">
   <xsl:text>&#009;public static final String </xsl:text>
-  <xsl:call-template name="get-valid-java-identifier">
-    <xsl:with-param name="name" select="@name"/>
-  </xsl:call-template> 
+  <xsl:value-of select="@name"/>
   <xsl:text>&#009; = "</xsl:text>
   <xsl:value-of select="."/><xsl:text>";</xsl:text>
   <xsl:value-of select="my:desc('//')"/>
