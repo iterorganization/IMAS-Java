@@ -36,6 +36,7 @@ set( TESTS
     TestCoreProfilesValidate
     TestCoreProfilesSampleGet
     TestDistributionsValidate
+    TestIdentifiers
     TestMagneticsValidate
     TestPfActiveGet
     TestPfActiveGetSlice
@@ -53,7 +54,8 @@ error_on_missing_tests( "java" "${TESTS}" )
 ################################################################################
 
 get_target_property( AL_JAR_FILE al-java JAR_FILE )
-set( TEST_CLASSPATH "${CMAKE_CURRENT_BINARY_DIR}:${AL_JAR_FILE}" )
+get_target_property( AL_IDENTIFIERS_JAR_FILE al-identifiers-java JAR_FILE )
+set( TEST_CLASSPATH "${CMAKE_CURRENT_BINARY_DIR}:${AL_JAR_FILE}:${AL_IDENTIFIERS_JAR_FILE}" )
 
 
 add_custom_target( example-java-all )
@@ -63,7 +65,7 @@ foreach( TEST IN LISTS TESTS )
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TEST}.class
     COMMAND ${Java_JAVAC_EXECUTABLE} --class-path ${TEST_CLASSPATH} ${CMAKE_CURRENT_SOURCE_DIR}/${TEST}.java -d ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS ${TEST}.java al-java
+    DEPENDS ${TEST}.java al-java al-identifiers-java
   )
   add_custom_target( ${TEST_NAME} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TEST}.class )
   add_dependencies( example-java-all ${TEST_NAME} )

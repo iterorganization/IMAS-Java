@@ -30,7 +30,128 @@
     <xsl:apply-templates select="include[@name='Java']"/><xsl:text>&#xA;&#xA;</xsl:text>
     <xsl:text>&#xA;&#xA;public final class </xsl:text>
     <xsl:value-of select="$jname"/><xsl:text> {&#xA;&#xA;</xsl:text>
-    <xsl:apply-templates select="*[name()!='header' and name()!='include']" mode="Java"/>
+    <xsl:apply-templates select="comment" mode="Java"/>
+    
+    <xsl:if test="//constants[@create_mapping_function]">
+      <xsl:text>&#xA;    // Mapping functionality&#xA;</xsl:text>
+      <xsl:text>    public static int getIndex(String name) {&#xA;</xsl:text>
+      <xsl:for-each select="//constants/int[@name]">
+        <xsl:text>        if ("</xsl:text><xsl:value-of select="@name"/><xsl:text>".equals(name)) {&#xA;</xsl:text>
+        <xsl:text>            return </xsl:text><xsl:value-of select="."/><xsl:text>;&#xA;</xsl:text>
+        <xsl:text>        }&#xA;</xsl:text>
+        <xsl:if test="@alias">
+          <xsl:text>        if ("</xsl:text><xsl:value-of select="@alias"/><xsl:text>".equals(name)) {&#xA;</xsl:text>
+          <xsl:text>            return </xsl:text><xsl:value-of select="."/><xsl:text>;&#xA;</xsl:text>
+          <xsl:text>        }&#xA;</xsl:text>
+        </xsl:if>
+      </xsl:for-each>
+      <xsl:text>        return -999999999; // Unknown identifier&#xA;</xsl:text>
+      <xsl:text>    }&#xA;&#xA;</xsl:text>
+      
+      <xsl:text>    public static String getDescription(int idx) {&#xA;</xsl:text>
+      <xsl:text>        switch(idx) {&#xA;</xsl:text>
+      <xsl:for-each select="//constants/int[@name]">
+        <xsl:text>            case </xsl:text>
+        <xsl:value-of select="."/>    
+        <xsl:text>:&#xA;</xsl:text>
+        <xsl:text>                return "</xsl:text>
+        <xsl:value-of select="@description"/>    
+        <xsl:text>";&#xA;</xsl:text>
+      </xsl:for-each>
+      <xsl:text>        }&#xA;</xsl:text>
+      <xsl:text>        return "unknown";&#xA;</xsl:text>
+      <xsl:text>    }&#xA;&#xA;</xsl:text>
+      
+      <xsl:text>    public static String getName(int idx) {&#xA;</xsl:text>
+      <xsl:text>        switch(idx) {&#xA;</xsl:text>
+      <xsl:for-each select="//constants/int[@name]">
+        <xsl:text>            case </xsl:text>
+        <xsl:value-of select="."/>    
+        <xsl:text>:&#xA;</xsl:text>
+        <xsl:text>                return "</xsl:text>
+        <xsl:value-of select="@name"/>    
+        <xsl:text>";&#xA;</xsl:text>
+      </xsl:for-each>
+      <xsl:text>        }&#xA;</xsl:text>
+      <xsl:text>        return "unknown";&#xA;</xsl:text>
+      <xsl:text>    }&#xA;&#xA;</xsl:text>
+      
+      <xsl:text>    public static class TypeData {&#xA;</xsl:text>
+      <xsl:text>        public int index;&#xA;</xsl:text>
+      <xsl:text>        public String description;&#xA;</xsl:text>
+      <xsl:text>        &#xA;</xsl:text>
+      <xsl:text>        public TypeData(int index, String description) {&#xA;</xsl:text>
+      <xsl:text>            this.index = index;&#xA;</xsl:text>
+      <xsl:text>            this.description = description;&#xA;</xsl:text>
+      <xsl:text>        }&#xA;</xsl:text>
+      <xsl:text>    }&#xA;&#xA;</xsl:text>
+      
+      <xsl:text>    public static TypeData getTypeDataByName(String name) throws IllegalArgumentException {&#xA;</xsl:text>
+      <xsl:for-each select="//constants/int[@name]">
+        <xsl:text>        if ("</xsl:text><xsl:value-of select="@name"/><xsl:text>".equals(name)) {&#xA;</xsl:text>
+        <xsl:text>            return new TypeData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
+        <xsl:text>        }&#xA;</xsl:text>
+        <xsl:if test="@alias">
+          <xsl:text>        if ("</xsl:text><xsl:value-of select="@alias"/><xsl:text>".equals(name)) {&#xA;</xsl:text>
+          <xsl:text>            return new TypeData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
+          <xsl:text>        }&#xA;</xsl:text>
+        </xsl:if>
+      </xsl:for-each>
+      <xsl:text>        // Unknown identifier - throw exception&#xA;</xsl:text>
+      <xsl:text>        throw new IllegalArgumentException("Unknown identifier: '" + name + "'");&#xA;</xsl:text>
+      <xsl:text>    }&#xA;&#xA;</xsl:text>
+      
+      <xsl:text>    // Utility interface for objects that can have identifiers set&#xA;</xsl:text>
+      <xsl:text>    public interface IdentifiableObject {&#xA;</xsl:text>
+      <xsl:text>        void setIndex(int index);&#xA;</xsl:text>
+      <xsl:text>        void setName(String name);&#xA;</xsl:text>
+      <xsl:text>        void setDescription(String description);&#xA;</xsl:text>
+      <xsl:text>    }&#xA;&#xA;</xsl:text>
+      
+      <xsl:text>    // Utility interface for objects that can have array identifiers set&#xA;</xsl:text>
+      <xsl:text>    public interface IdentifiableArrayObject {&#xA;</xsl:text>
+      <xsl:text>        void setIndices(int[] indices);&#xA;</xsl:text>
+      <xsl:text>        void setNames(String[] names);&#xA;</xsl:text>
+      <xsl:text>        void setDescriptions(String[] descriptions);&#xA;</xsl:text>
+      <xsl:text>    }&#xA;&#xA;</xsl:text>
+      
+      <xsl:text>    // Setter for an object&#xA;</xsl:text>
+      <xsl:text>    public static void setIdentifier(IdentifiableObject obj, String name) throws IllegalArgumentException {&#xA;</xsl:text>
+      <xsl:text>        try {&#xA;</xsl:text>
+      <xsl:text>            TypeData typeData = getTypeDataByName(name);&#xA;</xsl:text>
+      <xsl:text>            obj.setIndex(typeData.index);&#xA;</xsl:text>
+      <xsl:text>            obj.setName(getName(typeData.index));&#xA;</xsl:text>
+      <xsl:text>            obj.setDescription(typeData.description);&#xA;</xsl:text>
+      <xsl:text>        } catch (IllegalArgumentException e) {&#xA;</xsl:text>
+      <xsl:text>            // Re-throw with more context&#xA;</xsl:text>
+      <xsl:text>            throw new IllegalArgumentException("Failed to set identifier: " + e.getMessage(), e);&#xA;</xsl:text>
+      <xsl:text>        }&#xA;</xsl:text>
+      <xsl:text>    }&#xA;&#xA;</xsl:text>
+      
+      <xsl:text>    // Setter for an array&#xA;</xsl:text>
+      <xsl:text>    public static void setIdentifier(IdentifiableArrayObject obj, String[] names) throws IllegalArgumentException {&#xA;</xsl:text>
+      <xsl:text>        int[] indices = new int[names.length];&#xA;</xsl:text>
+      <xsl:text>        String[] nameResults = new String[names.length];&#xA;</xsl:text>
+      <xsl:text>        String[] descriptions = new String[names.length];&#xA;</xsl:text>
+      <xsl:text>        &#xA;</xsl:text>
+      <xsl:text>        for (int i = 0; i &lt; names.length; i++) {&#xA;</xsl:text>
+      <xsl:text>            try {&#xA;</xsl:text>
+      <xsl:text>                TypeData typeData = getTypeDataByName(names[i]);&#xA;</xsl:text>
+      <xsl:text>                indices[i] = typeData.index;&#xA;</xsl:text>
+      <xsl:text>                nameResults[i] = getName(typeData.index);&#xA;</xsl:text>
+      <xsl:text>                descriptions[i] = typeData.description;&#xA;</xsl:text>
+      <xsl:text>            } catch (IllegalArgumentException e) {&#xA;</xsl:text>
+      <xsl:text>                // Re-throw with array index context&#xA;</xsl:text>
+      <xsl:text>                throw new IllegalArgumentException("Failed to set identifier at index " + i + ": " + e.getMessage(), e);&#xA;</xsl:text>
+      <xsl:text>            }&#xA;</xsl:text>
+      <xsl:text>        }&#xA;</xsl:text>
+      <xsl:text>        &#xA;</xsl:text>
+      <xsl:text>        obj.setIndices(indices);&#xA;</xsl:text>
+      <xsl:text>        obj.setNames(nameResults);&#xA;</xsl:text>
+      <xsl:text>        obj.setDescriptions(descriptions);&#xA;</xsl:text>
+      <xsl:text>    }&#xA;</xsl:text>
+    </xsl:if>
+    
     <xsl:text>&#xA;}&#xA;</xsl:text>
   </exsl:document>
 
@@ -51,44 +172,7 @@
   </xsl:call-template>
 </xsl:template>
 
-<xsl:template match="int" mode="Java">
-  <xsl:text>&#009;public static final int </xsl:text>
-  <xsl:value-of select="@name"/>
-  <xsl:text>&#009; = </xsl:text>
-  <xsl:value-of select="."/>
-  <xsl:text>;</xsl:text>
-  <xsl:value-of select="my:desc('//')"/>
-</xsl:template>
-
-<xsl:template match="float" mode="Java">
-  <xsl:text>&#009;public static final double </xsl:text>
-  <xsl:value-of select="@name"/>
-  <xsl:choose>
-    <xsl:when test="@alias!='' or @alias='true'">
-      <xsl:text>;</xsl:text>
-      <xsl:value-of select="my:desc('//')"/>
-      <xsl:text>&#009;static {&#xA;&#009;&#009;</xsl:text>
-      <xsl:value-of select="@name"/>
-      <xsl:text> = </xsl:text>
-      <xsl:value-of select="."/>
-      <xsl:text>;&#xA;&#009;}&#xA;</xsl:text>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:text>&#009; = </xsl:text>
-      <xsl:value-of select="."/>
-      <xsl:text>;</xsl:text>
-      <xsl:value-of select="my:desc('//')"/>
-    </xsl:otherwise>
-  </xsl:choose>
-</xsl:template>
-
-<xsl:template match="string" mode="Java">
-  <xsl:text>&#009;public static final String </xsl:text>
-  <xsl:value-of select="@name"/>
-  <xsl:text>&#009; = "</xsl:text>
-  <xsl:value-of select="."/><xsl:text>";</xsl:text>
-  <xsl:value-of select="my:desc('//')"/>
-</xsl:template>
+<!-- Removed static final variable generation templates -->
 
 <xsl:template match="comment" mode="Java">
   <xsl:call-template name="replace-string">
