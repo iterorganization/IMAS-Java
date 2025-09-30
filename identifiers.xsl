@@ -26,6 +26,7 @@
   </xsl:variable>
   <exsl:document href="{$prefix}{$jname}.java" method="text">
     <xsl:text>//package ... ;&#xA;</xsl:text>
+    <xsl:text>import imasjava.*;&#xA;</xsl:text>
     <xsl:apply-templates select="header" mode="Java"/>
     <xsl:apply-templates select="include[@name='Java']"/><xsl:text>&#xA;&#xA;</xsl:text>
     <xsl:text>&#xA;&#xA;public final class </xsl:text>
@@ -76,24 +77,24 @@
       <xsl:text>        return "unknown";&#xA;</xsl:text>
       <xsl:text>    }&#xA;&#xA;</xsl:text>
       
-      <xsl:text>    public static class TypeData {&#xA;</xsl:text>
+      <xsl:text>    public static class IdentifierData {&#xA;</xsl:text>
       <xsl:text>        public int index;&#xA;</xsl:text>
       <xsl:text>        public String description;&#xA;</xsl:text>
       <xsl:text>        &#xA;</xsl:text>
-      <xsl:text>        public TypeData(int index, String description) {&#xA;</xsl:text>
+      <xsl:text>        public IdentifierData(int index, String description) {&#xA;</xsl:text>
       <xsl:text>            this.index = index;&#xA;</xsl:text>
       <xsl:text>            this.description = description;&#xA;</xsl:text>
       <xsl:text>        }&#xA;</xsl:text>
       <xsl:text>    }&#xA;&#xA;</xsl:text>
       
-      <xsl:text>    public static TypeData getTypeDataByName(String name) throws IllegalArgumentException {&#xA;</xsl:text>
+      <xsl:text>    public static IdentifierData getIdentifierDataByName(String name) throws IllegalArgumentException {&#xA;</xsl:text>
       <xsl:for-each select="//constants/int[@name]">
         <xsl:text>        if ("</xsl:text><xsl:value-of select="@name"/><xsl:text>".equals(name)) {&#xA;</xsl:text>
-        <xsl:text>            return new TypeData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
+        <xsl:text>            return new IdentifierData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
         <xsl:text>        }&#xA;</xsl:text>
         <xsl:if test="@alias">
           <xsl:text>        if ("</xsl:text><xsl:value-of select="@alias"/><xsl:text>".equals(name)) {&#xA;</xsl:text>
-          <xsl:text>            return new TypeData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
+          <xsl:text>            return new IdentifierData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
           <xsl:text>        }&#xA;</xsl:text>
         </xsl:if>
       </xsl:for-each>
@@ -101,54 +102,101 @@
       <xsl:text>        throw new IllegalArgumentException("Unknown identifier: '" + name + "'");&#xA;</xsl:text>
       <xsl:text>    }&#xA;&#xA;</xsl:text>
       
-      <xsl:text>    // Utility interface for objects that can have identifiers set&#xA;</xsl:text>
-      <xsl:text>    public interface IdentifiableObject {&#xA;</xsl:text>
-      <xsl:text>        void setIndex(int index);&#xA;</xsl:text>
-      <xsl:text>        void setName(String name);&#xA;</xsl:text>
-      <xsl:text>        void setDescription(String description);&#xA;</xsl:text>
-      <xsl:text>    }&#xA;&#xA;</xsl:text>
-      
-      <xsl:text>    // Utility interface for objects that can have array identifiers set&#xA;</xsl:text>
-      <xsl:text>    public interface IdentifiableArrayObject {&#xA;</xsl:text>
-      <xsl:text>        void setIndices(int[] indices);&#xA;</xsl:text>
-      <xsl:text>        void setNames(String[] names);&#xA;</xsl:text>
-      <xsl:text>        void setDescriptions(String[] descriptions);&#xA;</xsl:text>
-      <xsl:text>    }&#xA;&#xA;</xsl:text>
-      
-      <xsl:text>    // Setter for an object&#xA;</xsl:text>
-      <xsl:text>    public static void setIdentifier(IdentifiableObject obj, String name) throws IllegalArgumentException {&#xA;</xsl:text>
+      <xsl:text>    // Setter for any object using reflection&#xA;</xsl:text>
+      <xsl:text>    public static void setIdentifier(Object obj, String name) throws IllegalArgumentException {&#xA;</xsl:text>
       <xsl:text>        try {&#xA;</xsl:text>
-      <xsl:text>            TypeData typeData = getTypeDataByName(name);&#xA;</xsl:text>
-      <xsl:text>            obj.setIndex(typeData.index);&#xA;</xsl:text>
-      <xsl:text>            obj.setName(getName(typeData.index));&#xA;</xsl:text>
-      <xsl:text>            obj.setDescription(typeData.description);&#xA;</xsl:text>
+      <xsl:text>            IdentifierData IdentifierData = getIdentifierDataByName(name);&#xA;</xsl:text>
+      <xsl:text>            String objName = getName(IdentifierData.index);&#xA;</xsl:text>
+      <xsl:text>            &#xA;</xsl:text>
+      <xsl:text>            // Use reflection to set the properties&#xA;</xsl:text>
+      <xsl:text>            Class&lt;?&gt; clazz = obj.getClass();&#xA;</xsl:text>
+      <xsl:text>            &#xA;</xsl:text>
+      <xsl:text>            // Set index field&#xA;</xsl:text>
+      <xsl:text>            try {&#xA;</xsl:text>
+      <xsl:text>                java.lang.reflect.Field indexField = clazz.getField("index");&#xA;</xsl:text>
+      <xsl:text>                indexField.setAccessible(true);&#xA;</xsl:text>
+      <xsl:text>                indexField.set(obj, IdentifierData.index);&#xA;</xsl:text>
+      <xsl:text>            } catch (NoSuchFieldException | IllegalAccessException e) {&#xA;</xsl:text>
+      <xsl:text>                throw new IllegalArgumentException("Cannot set index on object of type " + clazz.getSimpleName() + ": no index field found", e);&#xA;</xsl:text>
+      <xsl:text>            }&#xA;</xsl:text>
+      <xsl:text>            &#xA;</xsl:text>
+      <xsl:text>            // Set name field&#xA;</xsl:text>
+      <xsl:text>            try {&#xA;</xsl:text>
+      <xsl:text>                java.lang.reflect.Field nameField = clazz.getField("name");&#xA;</xsl:text>
+      <xsl:text>                nameField.setAccessible(true);&#xA;</xsl:text>
+      <xsl:text>                nameField.set(obj, objName);&#xA;</xsl:text>
+      <xsl:text>            } catch (NoSuchFieldException | IllegalAccessException e) {&#xA;</xsl:text>
+      <xsl:text>                throw new IllegalArgumentException("Cannot set name on object of type " + clazz.getSimpleName() + ": no name field found", e);&#xA;</xsl:text>
+      <xsl:text>            }&#xA;</xsl:text>
+      <xsl:text>            &#xA;</xsl:text>
+      <xsl:text>            // Set description field&#xA;</xsl:text>
+      <xsl:text>            try {&#xA;</xsl:text>
+      <xsl:text>                java.lang.reflect.Field descriptionField = clazz.getField("description");&#xA;</xsl:text>
+      <xsl:text>                descriptionField.setAccessible(true);&#xA;</xsl:text>
+      <xsl:text>                descriptionField.set(obj, IdentifierData.description);&#xA;</xsl:text>
+      <xsl:text>            } catch (NoSuchFieldException | IllegalAccessException e) {&#xA;</xsl:text>
+      <xsl:text>                throw new IllegalArgumentException("Cannot set description on object of type " + clazz.getSimpleName() + ": no description field found", e);&#xA;</xsl:text>
+      <xsl:text>            }&#xA;</xsl:text>
+      <xsl:text>            &#xA;</xsl:text>
       <xsl:text>        } catch (IllegalArgumentException e) {&#xA;</xsl:text>
       <xsl:text>            // Re-throw with more context&#xA;</xsl:text>
       <xsl:text>            throw new IllegalArgumentException("Failed to set identifier: " + e.getMessage(), e);&#xA;</xsl:text>
       <xsl:text>        }&#xA;</xsl:text>
       <xsl:text>    }&#xA;&#xA;</xsl:text>
       
-      <xsl:text>    // Setter for an array&#xA;</xsl:text>
-      <xsl:text>    public static void setIdentifier(IdentifiableArrayObject obj, String[] names) throws IllegalArgumentException {&#xA;</xsl:text>
+      
+      <xsl:text>    // Setter for any object with array fields using reflection&#xA;</xsl:text>
+      <xsl:text>    public static void setIdentifier(Object obj, String[] names) throws IllegalArgumentException {&#xA;</xsl:text>
       <xsl:text>        int[] indices = new int[names.length];&#xA;</xsl:text>
       <xsl:text>        String[] nameResults = new String[names.length];&#xA;</xsl:text>
       <xsl:text>        String[] descriptions = new String[names.length];&#xA;</xsl:text>
       <xsl:text>        &#xA;</xsl:text>
       <xsl:text>        for (int i = 0; i &lt; names.length; i++) {&#xA;</xsl:text>
       <xsl:text>            try {&#xA;</xsl:text>
-      <xsl:text>                TypeData typeData = getTypeDataByName(names[i]);&#xA;</xsl:text>
-      <xsl:text>                indices[i] = typeData.index;&#xA;</xsl:text>
-      <xsl:text>                nameResults[i] = getName(typeData.index);&#xA;</xsl:text>
-      <xsl:text>                descriptions[i] = typeData.description;&#xA;</xsl:text>
+      <xsl:text>                IdentifierData IdentifierData = getIdentifierDataByName(names[i]);&#xA;</xsl:text>
+      <xsl:text>                indices[i] = IdentifierData.index;&#xA;</xsl:text>
+      <xsl:text>                nameResults[i] = getName(IdentifierData.index);&#xA;</xsl:text>
+      <xsl:text>                descriptions[i] = IdentifierData.description;&#xA;</xsl:text>
       <xsl:text>            } catch (IllegalArgumentException e) {&#xA;</xsl:text>
       <xsl:text>                // Re-throw with array index context&#xA;</xsl:text>
       <xsl:text>                throw new IllegalArgumentException("Failed to set identifier at index " + i + ": " + e.getMessage(), e);&#xA;</xsl:text>
       <xsl:text>            }&#xA;</xsl:text>
       <xsl:text>        }&#xA;</xsl:text>
       <xsl:text>        &#xA;</xsl:text>
-      <xsl:text>        obj.setIndices(indices);&#xA;</xsl:text>
-      <xsl:text>        obj.setNames(nameResults);&#xA;</xsl:text>
-      <xsl:text>        obj.setDescriptions(descriptions);&#xA;</xsl:text>
+      <xsl:text>        // Create Vect1D objects for indices, names and descriptions&#xA;</xsl:text>
+      <xsl:text>        imasjava.Vect1DInt indicesVect = new imasjava.Vect1DInt(indices);&#xA;</xsl:text>
+      <xsl:text>        imasjava.Vect1DString namesVect = new imasjava.Vect1DString(nameResults);&#xA;</xsl:text>
+      <xsl:text>        imasjava.Vect1DString descriptionsVect = new imasjava.Vect1DString(descriptions);&#xA;</xsl:text>
+      <xsl:text>        &#xA;</xsl:text>
+      <xsl:text>        // Use reflection to set the vector properties&#xA;</xsl:text>
+      <xsl:text>        Class&lt;?&gt; clazz = obj.getClass();&#xA;</xsl:text>
+      <xsl:text>        &#xA;</xsl:text>
+      <xsl:text>        // Set indices field&#xA;</xsl:text>
+      <xsl:text>        try {&#xA;</xsl:text>
+      <xsl:text>            java.lang.reflect.Field indicesField = clazz.getField("indices");&#xA;</xsl:text>
+      <xsl:text>            indicesField.setAccessible(true);&#xA;</xsl:text>
+      <xsl:text>            indicesField.set(obj, indicesVect);&#xA;</xsl:text>
+      <xsl:text>        } catch (NoSuchFieldException | IllegalAccessException e) {&#xA;</xsl:text>
+      <xsl:text>            throw new IllegalArgumentException("Cannot set indices on object: " + e.getMessage(), e);&#xA;</xsl:text>
+      <xsl:text>        }&#xA;</xsl:text>
+      <xsl:text>        &#xA;</xsl:text>
+      <xsl:text>        // Set names field&#xA;</xsl:text>
+      <xsl:text>        try {&#xA;</xsl:text>
+      <xsl:text>            java.lang.reflect.Field namesField = clazz.getField("names");&#xA;</xsl:text>
+      <xsl:text>            namesField.setAccessible(true);&#xA;</xsl:text>
+      <xsl:text>            namesField.set(obj, namesVect);&#xA;</xsl:text>
+      <xsl:text>        } catch (NoSuchFieldException | IllegalAccessException e) {&#xA;</xsl:text>
+      <xsl:text>            throw new IllegalArgumentException("Cannot set names on object: " + e.getMessage(), e);&#xA;</xsl:text>
+      <xsl:text>        }&#xA;</xsl:text>
+      <xsl:text>        &#xA;</xsl:text>
+      <xsl:text>        // Set descriptions field&#xA;</xsl:text>
+      <xsl:text>        try {&#xA;</xsl:text>
+      <xsl:text>            java.lang.reflect.Field descriptionsField = clazz.getField("descriptions");&#xA;</xsl:text>
+      <xsl:text>            descriptionsField.setAccessible(true);&#xA;</xsl:text>
+      <xsl:text>            descriptionsField.set(obj, descriptionsVect);&#xA;</xsl:text>
+      <xsl:text>        } catch (NoSuchFieldException | IllegalAccessException e) {&#xA;</xsl:text>
+      <xsl:text>            throw new IllegalArgumentException("Cannot set descriptions on object: " + e.getMessage(), e);&#xA;</xsl:text>
+      <xsl:text>        }&#xA;</xsl:text>
       <xsl:text>    }&#xA;</xsl:text>
     </xsl:if>
     

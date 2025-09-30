@@ -211,8 +211,10 @@ add_dependencies( al-java al-java-binding )
 
 add_jar( al-identifiers-java
     SOURCES ${IDENTIFIER_SOURCES}
+    INCLUDE_JARS al-java
     OUTPUT_NAME al-identifiers
 )
+add_dependencies( al-identifiers-java al-java )
 
 
 # Install

@@ -1,1 +1,58 @@
-// The Java Access Layer currently does not provide an identifiers library.
+// Import the Access Layer and required identifiers
+import java.io.*;
+
+import imasjava.*;
+
+public class identifier_example3 {
+    public static void main(String[] args) {
+        // Create IDS instance
+        imas.wall wall = new imas.wall();
+        wall.ids_properties.homogeneous_time = 1;
+        wall.ids_properties.comment = "Test wall IDS with materials";
+        
+        String[] names = {"W", "C", "Be", "Cu", "SS"};
+        
+        // Setup wall structure with proper array initialization
+        wall.description_ggd = new imas.wall.description_ggdClass[1];
+        wall.description_ggd[0] = new imas.wall.description_ggdClass();
+        wall.description_ggd[0].material = new imas.wall.description_ggdClass.materialClass[1];
+        wall.description_ggd[0].material[0] = new imas.wall.description_ggdClass.materialClass();
+        wall.description_ggd[0].material[0].grid_subset = new imas.wall.description_ggdClass.materialClass.grid_subsetClass[1];
+        wall.description_ggd[0].material[0].grid_subset[0] = new imas.wall.description_ggdClass.materialClass.grid_subsetClass();
+
+        materials_identifier.setIdentifier(wall.description_ggd[0].material[0].grid_subset[0].identifiers, names);
+
+        // Output material information
+        int numMaterials = wall.description_ggd[0].material[0].grid_subset[0].identifiers.indices.getDim();
+        System.out.println("Number of materials: " + numMaterials);
+        for (int i = 0; i < numMaterials; i++) {
+            System.out.println("Material " + (i + 1) + ":");
+            System.out.println("  Index: " + wall.description_ggd[0].material[0].grid_subset[0].identifiers.indices.getElementAt(i));
+            System.out.println("  Name: \"" + wall.description_ggd[0].material[0].grid_subset[0].identifiers.names.getElementAt(i) + "\"");
+            System.out.println("  Description: \"" + wall.description_ggd[0].material[0].grid_subset[0].identifiers.descriptions.getElementAt(i) + "\"");
+        }
+        }
+}
+
+// $ java -cp $CLASSPATH identifier_example3.java
+// Number of materials: 5
+// Material 1:
+//   Index: 2
+//   Name: "W"
+//   Description: "Tungsten"
+// Material 2:
+//   Index: 1
+//   Name: "C"
+//   Description: "Carbon"
+// Material 3:
+//   Index: 10
+//   Name: "Be"
+//   Description: "Beryllium"
+// Material 4:
+//   Index: 18
+//   Name: "Cu"
+//   Description: "Copper"
+// Material 5:
+//   Index: 4
+//   Name: "SS"
+//   Description: "Stainless steel"

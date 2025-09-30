@@ -1,1 +1,20 @@
-// The Java Access Layer currently does not provide an identifiers library.
+
+
+public class identifier_example1 {
+    public static void main(String[] args) {
+        // Get coordinate identifier information for "phi"
+        int idx = coordinate_identifier.getIndex("phi");
+        
+        // Display coordinate identifier details
+        System.out.println("Coordinate Identifier Information for 'phi':");
+        System.out.println("  Index: " + idx);
+        System.out.println("  Data type: " + coordinate_identifier.getName(idx));
+        System.out.println("  Description: " + coordinate_identifier.getDescription(idx));
+
+    }
+}
+// $ java -cp $CLASSPATH identifier_example1.java
+// Coordinate Identifier Information for 'phi':
+//   Index: 5
+//   Data type: phi
+//   Description: Toroidal angle

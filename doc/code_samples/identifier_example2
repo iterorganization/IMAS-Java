@@ -1,1 +1,59 @@
-// The Java Access Layer currently does not provide an identifiers library.
+// Import the Access Layer and required identifiers
+import java.io.*;
+
+import imasjava.*;
+
+public class identifier_example2 {
+    public static void main(String[] args) {
+        // Create IDS instance
+        imas.equilibrium equilibrium = new imas.equilibrium();
+        // Configure equilibrium IDS
+        equilibrium.ids_properties.homogeneous_time = 1;
+        equilibrium.ids_properties.comment = "Test equilibrium IDS";
+        
+        // Setup equilibrium time slice and profiles
+        equilibrium.time_slice = new imas.equilibrium.time_sliceClass[1];
+        equilibrium.time_slice[0] = new imas.equilibrium.time_sliceClass();
+        equilibrium.time_slice[0].profiles_2d = new imas.equilibrium.time_sliceClass.profiles_2dClass[1];
+        equilibrium.time_slice[0].profiles_2d[0] = new imas.equilibrium.time_sliceClass.profiles_2dClass();
+        
+        poloidal_plane_coordinates_identifier.setIdentifier(equilibrium.time_slice[0].profiles_2d[0].grid_type, "rectangular");
+
+        // // Output equilibrium grid type information
+        System.out.println("Equilibrium Grid Type:");
+        System.out.println("  Name: " + equilibrium.time_slice[0].profiles_2d[0].grid_type.name);
+        System.out.println("  Index: " + equilibrium.time_slice[0].profiles_2d[0].grid_type.index);
+        System.out.println("  Description: " + equilibrium.time_slice[0].profiles_2d[0].grid_type.description);
+
+        // Configure distribution sources IDS
+        imas.distribution_sources distribution_sources = new imas.distribution_sources();
+        distribution_sources.ids_properties.homogeneous_time = 1;
+        distribution_sources.ids_properties.comment = "Test distribution sources IDS";
+        
+        // Setup distribution sources structure
+        distribution_sources.source = new imas.distribution_sources.sourceClass[1];
+        distribution_sources.source[0] = new imas.distribution_sources.sourceClass();
+        distribution_sources.source[0].process = new imas.distribution_sources.sourceClass.processClass[1];
+        distribution_sources.source[0].process[0] = new imas.distribution_sources.sourceClass.processClass();
+
+        // Set distribution source type identifier using reflection-based method
+        distribution_source_identifier.setIdentifier(distribution_sources.source[0].process[0].type, "NBI");
+        
+        // Output distribution source type information
+        System.out.println("Distribution Source Type:");
+        System.out.println("  Name: " + distribution_sources.source[0].process[0].type.name);
+        System.out.println("  Index: " + distribution_sources.source[0].process[0].type.index);
+        System.out.println("  Description: " + distribution_sources.source[0].process[0].type.description);
+    }
+}
+
+// $ java -cp $CLASSPATH identifier_example2.java
+// Equilibrium Grid Type:
+//   Name: rectangular
+//   Index: 1
+//   Description: Cylindrical R,Z ala eqdsk (R=dim1, Z=dim2). In this case the position arrays should not be filled since they are redundant with grid/dim1 and dim2.
+// Distribution Source Type:
+//   Name: NBI
+//   Index: 1
+//   Description: Source from neutral beam injection
+
