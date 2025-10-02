@@ -79,10 +79,12 @@
       
       <xsl:text>    public static class IdentifierData {&#xA;</xsl:text>
       <xsl:text>        public int index;&#xA;</xsl:text>
+      <xsl:text>        public String originalname;&#xA;</xsl:text>
       <xsl:text>        public String description;&#xA;</xsl:text>
       <xsl:text>        &#xA;</xsl:text>
-      <xsl:text>        public IdentifierData(int index, String description) {&#xA;</xsl:text>
+      <xsl:text>        public IdentifierData(int index, String originalname, String description) {&#xA;</xsl:text>
       <xsl:text>            this.index = index;&#xA;</xsl:text>
+      <xsl:text>            this.originalname = originalname;&#xA;</xsl:text>
       <xsl:text>            this.description = description;&#xA;</xsl:text>
       <xsl:text>        }&#xA;</xsl:text>
       <xsl:text>    }&#xA;&#xA;</xsl:text>
@@ -90,11 +92,11 @@
       <xsl:text>    public static IdentifierData getIdentifierDataByName(String name) throws IllegalArgumentException {&#xA;</xsl:text>
       <xsl:for-each select="//constants/int[@name]">
         <xsl:text>        if ("</xsl:text><xsl:value-of select="@name"/><xsl:text>".equals(name)) {&#xA;</xsl:text>
-        <xsl:text>            return new IdentifierData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
+        <xsl:text>            return new IdentifierData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@name"/><xsl:text>","</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
         <xsl:text>        }&#xA;</xsl:text>
         <xsl:if test="@alias">
           <xsl:text>        if ("</xsl:text><xsl:value-of select="@alias"/><xsl:text>".equals(name)) {&#xA;</xsl:text>
-          <xsl:text>            return new IdentifierData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
+          <xsl:text>            return new IdentifierData(</xsl:text><xsl:value-of select="."/><xsl:text>, "</xsl:text><xsl:value-of select="@name"/><xsl:text>","</xsl:text><xsl:value-of select="@description"/><xsl:text>");&#xA;</xsl:text>
           <xsl:text>        }&#xA;</xsl:text>
         </xsl:if>
       </xsl:for-each>
@@ -106,7 +108,7 @@
       <xsl:text>    public static void setIdentifier(Object obj, String name) throws IllegalArgumentException {&#xA;</xsl:text>
       <xsl:text>        try {&#xA;</xsl:text>
       <xsl:text>            IdentifierData IdentifierData = getIdentifierDataByName(name);&#xA;</xsl:text>
-      <xsl:text>            String objName = getName(IdentifierData.index);&#xA;</xsl:text>
+      <xsl:text>            String objName = IdentifierData.originalname;&#xA;</xsl:text>
       <xsl:text>            &#xA;</xsl:text>
       <xsl:text>            // Use reflection to set the properties&#xA;</xsl:text>
       <xsl:text>            Class&lt;?&gt; clazz = obj.getClass();&#xA;</xsl:text>
@@ -155,7 +157,7 @@
       <xsl:text>            try {&#xA;</xsl:text>
       <xsl:text>                IdentifierData IdentifierData = getIdentifierDataByName(names[i]);&#xA;</xsl:text>
       <xsl:text>                indices[i] = IdentifierData.index;&#xA;</xsl:text>
-      <xsl:text>                nameResults[i] = getName(IdentifierData.index);&#xA;</xsl:text>
+      <xsl:text>                nameResults[i] = IdentifierData.originalname;&#xA;</xsl:text>
       <xsl:text>                descriptions[i] = IdentifierData.description;&#xA;</xsl:text>
       <xsl:text>            } catch (IllegalArgumentException e) {&#xA;</xsl:text>
       <xsl:text>                // Re-throw with array index context&#xA;</xsl:text>

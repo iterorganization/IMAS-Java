@@ -51,9 +51,6 @@ public class TestIdentifiers {
         // Test 4: Array object identifier setting
         testArrayObjectIdentifierSetting();
         
-        // Test 5: Vector object identifier setting (Vect1DInt and Vect1DString)
-        testVectorObjectIdentifierSetting();
-        
         // Test 5: Invalid identifier handling
         testErrorHandling();
     }
@@ -104,19 +101,21 @@ public class TestIdentifiers {
         
         try {
             coordinate_identifier.IdentifierData identifierData = coordinate_identifier.getIdentifierDataByName("rho_tor");
-            System.out.printf("  IdentifierData for 'rho_tor': index=%d, description='%s'\n", 
-                            identifierData.index, identifierData.description);
+            System.out.printf("  IdentifierData for 'rho_tor': index=%d, originalname='%s', description='%s'\n", 
+                            identifierData.index, identifierData.originalname, identifierData.description);
             
             // Assertions for rho_tor
             assert identifierData.index == 11 : "Expected index 11 for rho_tor, got " + identifierData.index;
+            assert "rho_tor".equals(identifierData.originalname) : "Expected originalname 'rho_tor', got '" + identifierData.originalname + "'";
             assert identifierData.description != null && identifierData.description.contains("toroidal flux") : "Expected description containing 'toroidal flux', got '" + identifierData.description + "'";
             
             identifierData = coordinate_identifier.getIdentifierDataByName("velocity_parallel");
-            System.out.printf("  IdentifierData for 'velocity_parallel': index=%d, description='%s'\n", 
-                            identifierData.index, identifierData.description);
+            System.out.printf("  IdentifierData for 'velocity_parallel': index=%d, originalname='%s', description='%s'\n", 
+                            identifierData.index, identifierData.originalname, identifierData.description);
             
             // Assertions for velocity_parallel
             assert identifierData.index == 105 : "Expected index 105 for velocity_parallel, got " + identifierData.index;
+            assert "velocity_parallel".equals(identifierData.originalname) : "Expected originalname 'velocity_parallel', got '" + identifierData.originalname + "'";
             assert identifierData.description != null && identifierData.description.contains("parallel") : "Expected description containing 'parallel', got '" + identifierData.description + "'";
             
             System.out.println("IdentifierData assertions passed");
@@ -175,18 +174,11 @@ public class TestIdentifiers {
         System.out.println("4. Testing array object identifier setting:");
         
         IdentifierArrayObject arrayObj = new IdentifierArrayObject();
-        // Initialize the vector fields
-        arrayObj.indices = new Vect1DInt(5);
-        arrayObj.names = new Vect1DString(5);
-        arrayObj.descriptions = new Vect1DString(5);
-        
         String[] identifierNames = {"x", "y", "z", "phi", "theta"};
         
         try {
-            // Set identifiers on each field separately since they are now vector objects
-            coordinate_identifier.setIdentifier(arrayObj.indices, identifierNames);
-            coordinate_identifier.setIdentifier(arrayObj.names, identifierNames);
-            coordinate_identifier.setIdentifier(arrayObj.descriptions, identifierNames);
+            // Set identifiers on the array object
+            coordinate_identifier.setIdentifier(arrayObj, identifierNames);
             
             System.out.printf("  Set identifiers %s:\n", Arrays.toString(identifierNames));
             System.out.printf("  Result: %s\n", arrayObj);
@@ -209,7 +201,7 @@ public class TestIdentifiers {
             
             for (int i = 0; i < expectedIndices.length; i++) {
                 assert actualIndices[i] == expectedIndices[i] : "Expected index " + expectedIndices[i] + " at position " + i + ", got " + actualIndices[i];
-                assert actualNames[i].contains(expectedNames[i]) : "Expected name containing '" + expectedNames[i] + "' at position " + i + ", got '" + actualNames[i] + "'";
+                assert expectedNames[i].equals(actualNames[i]) : "Expected name '" + expectedNames[i] + "' at position " + i + ", got '" + actualNames[i] + "'";
                 assert actualDescriptions[i] != null && actualDescriptions[i].length() > 0 : "Description at position " + i + " should not be null or empty";
             }
             
@@ -226,80 +218,10 @@ public class TestIdentifiers {
     }
     
     /**
-     * Test setting identifiers on vector objects (Vect1DInt and Vect1DString)
-     */
-    private static void testVectorObjectIdentifierSetting() {
-        System.out.println("5. Testing vector object identifier setting:");
-        
-        // Test Vect1DInt
-        System.out.println("  Testing Vect1DInt:");
-        Vect1DInt vect1DInt = new Vect1DInt(5);
-        String[] identifierNames = {"x", "y", "z", "phi", "theta"};
-        
-        try {
-            coordinate_identifier.setIdentifier(vect1DInt, identifierNames);
-            System.out.printf("    Set identifiers %s on Vect1DInt\n", Arrays.toString(identifierNames));
-            System.out.printf("    Result array: %s\n", Arrays.toString(vect1DInt.getArray()));
-            
-            // Assertions for Vect1DInt
-            int[] expectedIndices = {1, 2, 3, 5, 20};
-            int[] resultArray = vect1DInt.getArray();
-            
-            assert resultArray != null : "Array should not be null";
-            assert resultArray.length == 5 : "Expected 5 elements, got " + resultArray.length;
-            
-            for (int i = 0; i < expectedIndices.length; i++) {
-                assert resultArray[i] == expectedIndices[i] : "Expected index " + expectedIndices[i] + " at position " + i + ", got " + resultArray[i];
-            }
-            
-            System.out.println("  Vect1DInt assertions passed");
-            
-        } catch (IllegalArgumentException e) {
-            String message = e.getMessage().replace("Error", "Issue").replace("Failed", "Unable");
-            System.out.println("    Issue: " + message);
-        } catch (AssertionError e) {
-            System.out.println("Assertion issue: " + e.getMessage());
-        }
-        
-        // Test Vect1DString
-        System.out.println("  Testing Vect1DString:");
-        Vect1DString vect1DString = new Vect1DString(3);
-        String[] stringIdentifierNames = {"velocity", "momentum", "energy_kinetic"};
-        
-        try {
-            coordinate_identifier.setIdentifier(vect1DString, stringIdentifierNames);
-            System.out.printf("    Set identifiers %s on Vect1DString\n", Arrays.toString(stringIdentifierNames));
-            System.out.printf("    Result array: %s\n", Arrays.toString(vect1DString.getArray()));
-            
-            // Assertions for Vect1DString
-            String[] resultArray = vect1DString.getArray();
-            
-            assert resultArray != null : "Array should not be null";
-            assert resultArray.length == 3 : "Expected 3 elements, got " + resultArray.length;
-            
-            // Check that each element contains both name and description
-            for (int i = 0; i < resultArray.length; i++) {
-                assert resultArray[i] != null : "Element at position " + i + " should not be null";
-                assert resultArray[i].contains(" - ") : "Element at position " + i + " should contain ' - ' separator: " + resultArray[i];
-            }
-            
-            System.out.println("  Vect1DString assertions passed");
-            
-        } catch (IllegalArgumentException e) {
-            String message = e.getMessage().replace("Error", "Issue").replace("Failed", "Unable");
-            System.out.println("    Issue: " + message);
-        } catch (AssertionError e) {
-            System.out.println("Assertion issue: " + e.getMessage());
-        }
-        
-        System.out.println();
-    }
-    
-    /**
      * Test error handling with invalid identifiers
      */
     private static void testErrorHandling() {
-        System.out.println("6. Testing invalid identifier handling:");
+        System.out.println("5. Testing invalid identifier handling:");
         
         // Test invalid identifier in IdentifierData
         try {
@@ -324,30 +246,17 @@ public class TestIdentifiers {
             System.out.println("Issue assertion passed for single object");
         }
         
-        // Test invalid identifier in vector setting
-        Vect1DInt vectInt = new Vect1DInt(3);
+        // Test invalid identifier in array setting
+        IdentifierArrayObject arrayObj = new IdentifierArrayObject();
         String[] invalidNames = {"x", "invalid_identifier", "z"};
         try {
-            coordinate_identifier.setIdentifier(vectInt, invalidNames);
-            System.out.println("  ✗ Expected issue for invalid identifier in vector, but none was thrown");
+            coordinate_identifier.setIdentifier(arrayObj, invalidNames);
+            System.out.println("  ✗ Expected issue for invalid identifier in array, but none was thrown");
         } catch (IllegalArgumentException e) {
             String message = e.getMessage().replace("Failed", "Unable").replace("Error", "Issue");
-            System.out.printf("  Expected handling for vector object: %s\n", message);
+            System.out.printf("  Expected handling for array object: %s\n", message);
             assert message.contains("index 1") || message.contains("Unknown identifier") : "Expected message about array index 1 or unknown identifier";
-            System.out.println("Issue assertion passed for vector object");
-        }
-        
-        // Test unsupported object type (trying to use IdentifierArrayObject directly)
-        IdentifierArrayObject arrayObj = new IdentifierArrayObject();
-        String[] validNames = {"x", "y", "z"};
-        try {
-            coordinate_identifier.setIdentifier(arrayObj, validNames);
-            System.out.println("  ✗ Expected issue for unsupported object type, but none was thrown");
-        } catch (IllegalArgumentException e) {
-            String message = e.getMessage().replace("Failed", "Unable").replace("Error", "Issue");
-            System.out.printf("  Expected handling for unsupported object: %s\n", message);
-            assert message.contains("Unsupported object type") || message.contains("Only Vect1DInt and Vect1DString are supported") : "Expected message about unsupported type";
-            System.out.println("Issue assertion passed for unsupported object type");
+            System.out.println("Issue assertion passed for array object");
         }
         
         System.out.println();
