@@ -1,37 +1,39 @@
 # CMake build configuration for the Access Layer Java HLI
 cmake_minimum_required( VERSION 3.16 )
+if(POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif()
+
+# Local paths for IMAS-Java
+################################################################################
+# Use full path since CMAKE_MODULE_PATH hasn't been configured yet
+include(${CMAKE_CURRENT_SOURCE_DIR}/common/cmake/ALLocalPaths.cmake)
 
 # Configuration options for common assets
 ################################################################################
 option( AL_DOWNLOAD_DEPENDENCIES "Automatically download assets from the AL git repository" ON )
-set( AL_CORE_GIT_REPOSITORY "ssh://git@git.iter.org/imas/al-core.git" CACHE STRING "Git repository of AL-core" )
-set( AL_CORE_VERSION "main" CACHE STRING "Git commit/tag/branch of AL-core" )
+set( AL_CORE_GIT_REPOSITORY "https://github.com/iterorganization/IMAS-Core.git" CACHE STRING "Git repository of IMAS-core" )
+set( AL_CORE_VERSION "main" CACHE STRING "Git commit/tag/branch of IMAS-core" )
 
 include(FetchContent)
 
-# Load common assets
+# Load dependency
 ################################################################################
-if( DEFINED ENV{AL_COMMON_PATH} )
-  # Take common assets from the path in this environment variable instead of al-core
-  set( AL_COMMON_PATH $ENV{AL_COMMON_PATH} )
-else()
-  if( ${AL_DOWNLOAD_DEPENDENCIES} )
-    # Download common assets from the ITER git:
-    FetchContent_Declare(
-      al-core
-      GIT_REPOSITORY "${AL_CORE_GIT_REPOSITORY}"
-      GIT_TAG "${AL_CORE_VERSION}"
-    )
-  else()
-    FetchContent_Declare(
-      al-core
-      SOURCE_DIR      "${CMAKE_CURRENT_SOURCE_DIR}/../al-core"
-    )
-  endif()
+if( ${AL_DOWNLOAD_DEPENDENCIES} )
+  # Download common assets from the ITER git:
+  FetchContent_Declare(
+    al-core
+    GIT_REPOSITORY "${AL_CORE_GIT_REPOSITORY}"
+    GIT_TAG "${AL_CORE_VERSION}"
+  )
   FetchContent_MakeAvailable( al-core )
-  set( AL_COMMON_PATH "${al-core_SOURCE_DIR}/common" )
+elseif ( ${AL_DEVELOPMENT_LAYOUT} )
+  FetchContent_Declare(
+    al-core
+    SOURCE_DIR      "${CMAKE_CURRENT_SOURCE_DIR}/../al-core"
+  )
+  FetchContent_MakeAvailable( al-core )
 endif()
-add_subdirectory( ${AL_COMMON_PATH} _common )
 
 
 # Define project
@@ -43,7 +45,7 @@ include( ALDetermineVersion )
 project( al-java
   VERSION ${VERSION}
   DESCRIPTION "Java High Level Interface of the IMAS Access Layer"
-  HOMEPAGE_URL "https://imas.iter.org/"
+  HOMEPAGE_URL "https://imas-java.readthedocs.io/en/latest/"
   LANGUAGES C CXX
 )
 if( NOT PROJECT_VERSION_TWEAK EQUAL 0 )
@@ -71,12 +73,6 @@ endif()
 find_package( JNI REQUIRED )
 find_package( Java REQUIRED )
 include( UseJava )
-find_package( SaxonHE )
-# Find LibXslt for the xsltproc program
-find_package( LibXslt QUIET )
-if( NOT LIBXSLT_XSLTPROC_EXECUTABLE )
-  message( FATAL_ERROR "Could not find xsltproc" )
-endif()
 
 
 # Generate sources
@@ -95,14 +91,15 @@ add_custom_command(
   OUTPUT ${GENERATED_SRC_DIR}/dummy.txt
   # Generate source files with saxon
   COMMAND
-    java -cp ${SaxonHE_CLASSPATH}
-      net.sf.saxon.Transform -t -warnings:fatal
-      "-xsl:${CMAKE_CURRENT_SOURCE_DIR}/IDSDef2Java.xsl"
-      "-s:${IDSDEF}"
+    ${_VENV_PYTHON} "${AL_LOCAL_XSLTPROC_SCRIPT}"
+      -xsl ${CMAKE_CURRENT_SOURCE_DIR}/IDSDef2Java.xsl
+      -s ${IDSDEF}
+      -o ${CMAKE_CURRENT_BINARY_DIR}/xslt_primary_output.txt
       DD_VERSION=${DD_VERSION}
       AL_VERSION=${FULL_VERSION}
       SYSTEM=${CMAKE_SYSTEM_NAME}
   # Create/update our dummy file
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${GENERATED_SRC_DIR}
   COMMAND ${CMAKE_COMMAND} -E touch ${GENERATED_SRC_DIR}/dummy.txt
   DEPENDS IDSDef2Java.xsl ${IDSDEF}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -162,7 +159,7 @@ list( APPEND SOURCES
 # Unfortunately, xsl:include doesn't support parameters, so we need to put them together
 # in the build folder:
 file( CREATE_LINK
-  "${al-common_SOURCE_DIR}/identifiers.common.xsl" 
+  "${CMAKE_CURRENT_SOURCE_DIR}/common/identifiers.common.xsl" 
   "${CMAKE_CURRENT_BINARY_DIR}/identifiers.common.xsl"
   SYMBOLIC COPY_ON_ERROR
 )
@@ -181,11 +178,12 @@ foreach( ID_FILE IN LISTS DD_IDENTIFIER_FILES )
   add_custom_command(
     OUTPUT ${SOURCE_NAME} ${HEADER_NAME}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${IDENTIFIER_SRC_DIR}
-    COMMAND ${LIBXSLT_XSLTPROC_EXECUTABLE}
-      --stringparam name ${ID_NAME}
-      --stringparam prefix ${IDENTIFIER_SRC_DIR}
-      ${CMAKE_CURRENT_BINARY_DIR}/identifiers.xsl
-      ${ID_FILE}
+    COMMAND ${_VENV_PYTHON} "${AL_LOCAL_XSLTPROC_SCRIPT}"
+      -xsl ${CMAKE_CURRENT_BINARY_DIR}/identifiers.xsl
+      -s ${ID_FILE}
+      -o ${SOURCE_NAME}
+      name=${ID_NAME}
+      prefix=${IDENTIFIER_SRC_DIR}/
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/identifiers.xsl
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   )
