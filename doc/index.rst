@@ -16,7 +16,7 @@ language.
 
    - `Python High Level Interface
      <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/ACCESS-LAYER-doc/python/latest.html>`_
-   - `Fortran High Level Interface
+   - `Java High Level Interface
      <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/ACCESS-LAYER-doc/fortran/latest.html>`_
    - `C++ High Level Interface
      <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/ACCESS-LAYER-doc/cpp/latest.html>`_
@@ -40,8 +40,6 @@ language.
    use_ids
    imas_uri
    identifiers
-   conf
-   plugins
 
 .. toctree::
     :caption: Examples

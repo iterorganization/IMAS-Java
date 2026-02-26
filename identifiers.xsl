@@ -3,17 +3,15 @@
 <?modxslt-stylesheet type="text/xsl" media="screen" alternate="no" title="Show raw source of the XML file" charset="ISO-8859-1" ?>
 
 <xsl:stylesheet 
-   xmlns:yaslt="http://www.mod-xslt2.com/ns/1.0"
-   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
    xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
-   xmlns:exsl="http://exslt.org/common"
-   xmlns:str="http://exslt.org/strings"
-   xmlns:func="http://exslt.org/functions"
    xmlns:my="http://localhost.localdomain/localns"
-   exclude-result-prefixes="my"
-   extension-element-prefixes="yaslt exsl func str">
+   exclude-result-prefixes="my xs fn">
    <xsl:include href="./identifiers.common.xsl"/>
+
+<xsl:param name="name" as="xs:string" required="yes"/>
+<xsl:param name="prefix" as="xs:string" required="yes"/>
 
 <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
 
@@ -24,7 +22,7 @@
   <xsl:variable name="jname">
     <xsl:value-of select="($name)"/>    
   </xsl:variable>
-  <exsl:document href="{$prefix}{$jname}.java" method="text">
+  <xsl:result-document href="{$prefix}{$jname}.java" method="text">
     <xsl:text>//package ... ;&#xA;</xsl:text>
     <xsl:text>import imasjava.*;&#xA;</xsl:text>
     <xsl:apply-templates select="header" mode="Java"/>
@@ -203,12 +201,12 @@
     </xsl:if>
     
     <xsl:text>&#xA;}&#xA;</xsl:text>
-  </exsl:document>
+  </xsl:result-document>
 
   <!-- DOCBOOK FILE -->
-  <exsl:document href="{$prefix}{$name}.xml" method="text">
+  <xsl:result-document href="{$prefix}{$name}.xml" method="text">
     <xsl:call-template name="docbook"/>
-  </exsl:document>
+  </xsl:result-document>
 
 </xsl:template>
 
