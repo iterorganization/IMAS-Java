@@ -150,7 +150,7 @@
   </xsl:if>
 
   
-  <xsl:text>  &#xA;&lt;para&gt; Fortran interface example:&#xA;</xsl:text>
+  <xsl:text>  &#xA;&lt;para&gt; Java interface example:&#xA;</xsl:text>
     <xsl:text>   &lt;screen&gt; use </xsl:text>
       <xsl:value-of select='$name'/>
       <xsl:text>, only: get_type_index, get_type_name, get_type_description&lt;/screen&gt;&#xA;</xsl:text>
