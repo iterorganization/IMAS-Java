@@ -17,7 +17,7 @@ language.
    - `Python High Level Interface
      <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/ACCESS-LAYER-doc/python/latest.html>`_
    - `Java High Level Interface
-     <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/ACCESS-LAYER-doc/fortran/latest.html>`_
+     <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/ACCESS-LAYER-doc/java/latest.html>`_
    - `C++ High Level Interface
      <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/ACCESS-LAYER-doc/cpp/latest.html>`_
    - `MATLAB High Level Interface
