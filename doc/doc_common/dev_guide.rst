@@ -127,18 +127,18 @@ Building the documentation
 ''''''''''''''''''''''''''
 
 Use the option ``-D AL_HLI_DOCS`` to enable building documentation. This will create a
-target ``al-<hli>-docs``, e.g. ``al-fortran-docs`` that will only build the
+target ``al-<hli>-docs``, e.g. ``al-java-docs`` that will only build the
 documentation. You could also use ``-D AL_DOCS_ONLY`` to only build the documentation,
 and nothing else.
 
 .. code-block:: console
-    :caption: Example: building the documentation for the Python HLI
+    :caption: Example: building the documentation for the Java HLI
 
-    imas-dev$ cd al-fortran
-    al-fortran$ # Configure cmake to only create the documentation:
-    al-fortran$ cmake -B build -D AL_HLI_DOCS -D AL_DOCS_ONLY
+    imas-dev$ cd IMAS-Java
+    IMAS-Java$ # Configure cmake to only create the documentation:
+    IMAS-Java$ cmake -B build -D AL_HLI_DOCS -D AL_DOCS_ONLY
     [...]
-    al-fortran$ make -C build al-fortran-docs
+    IMAS-java$ make -C build al-java-docs
     [...]
 
 

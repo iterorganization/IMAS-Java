@@ -91,7 +91,7 @@ IMAS constants
 
     .. java:field:: public final static int ASCII_BACKEND = 11
 
-        Identifier for the ASCII backend. See `IMAS-Core documentation <https://imas-core.readthedocs.io/en/latest/user_guide/backends_guide.html>`__ for backend details.
+        Identifier for the ASCII backend. See `IMAS-Core documentation <https://imas-core.readthedocs.io/en/latest/user_guide/backends_guide.html#ascii-backend>`__ for backend details.
 
     .. java:field:: public final static int MDSPLUS_BACKEND = 12
 
@@ -103,11 +103,11 @@ IMAS constants
 
     .. java:field:: public final static int MEMORY_BACKEND = 14
 
-        Identifier for the Memory backend. See `IMAS-Core documentation <https://imas-core.readthedocs.io/en/latest/user_guide/backends_guide.html>`__ for backend details.
+        Identifier for the Memory backend. See `IMAS-Core documentation <https://imas-core.readthedocs.io/en/latest/user_guide/backends_guide.html#memory-backend>`__ for backend details.
 
     .. java:field:: public final static int UDA_BACKEND = 15
 
-        Identifier for the UDA backend. See `IMAS-Core documentation <https://imas-core.readthedocs.io/en/latest/user_guide/backends_guide.html>`__ for backend details.
+        Identifier for the UDA backend. See `IMAS-Core documentation <https://imas-core.readthedocs.io/en/latest/user_guide/backends_guide.html#uda-backend>`__ for backend details.
 
 
     Data entry open/create modes

@@ -54,7 +54,7 @@ Standard environments:
                 MDSplus/7.132.0-GCCcore-13.2.0 \
                 UDA/2.8.1-iimpi-2023b Blitz++/1.0.2-GCCcore-13.2.0 \
                 SciPy-bundle/2023.11-intel-2023b \
-                scikit-build-core/0.9.3-GCCcore-13.2.0
+                scikit-build-core/0.9.3-GCCcore-13.2.0 Java
 
     .. md-tab-item:: SDCC ``foss-2023b``
 
@@ -70,7 +70,7 @@ Standard environments:
                 MDSplus/7.132.0-GCCcore-13.2.0 \
                 UDA/2.8.1-GCC-13.2.0 Blitz++/1.0.2-GCCcore-13.2.0 \
                 SciPy-bundle/2023.11-gfbf-2023b \
-                build/1.0.3-foss-2023b scikit-build-core/0.9.3-GCCcore-13.2.0
+                build/1.0.3-foss-2023b scikit-build-core/0.9.3-GCCcore-13.2.0 Java
 
 
     .. md-tab-item:: Ubuntu 22.04
@@ -79,7 +79,7 @@ Standard environments:
 
         .. code-block:: bash
 
-            apt install git build-essential cmake pkg-config gfortran \
+            apt install git build-essential cmake pkg-config \
             
             # Additionally load the following modules if building IMAS-Core together with IMAS-Java
             apt install libboost-all-dev \
