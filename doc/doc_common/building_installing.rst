@@ -31,7 +31,7 @@ IMAS-Core's requirements `IMAS Core Installation <https://imas-core.readthedocs.
 
 -   Java High Level Interface
 
-    -   **Java High Level Interface**: A Java 2003 compliant compiler
+    -   **Java High Level Interface**: A Java Development Kit (JDK) 11 or later
         (gfortran 10.0 or later, ifort 2020 or later, ifx, NAGfor 6.2 or later, nvfortran)
 
 
