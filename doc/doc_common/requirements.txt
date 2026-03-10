@@ -1,10 +1,10 @@
 # Sphinx and theme
-sphinx >= 6.0, < 7.0
-sphinx_immaterial >= 0.11.4, < 0.12
+sphinx >= 7.0, < 9.0
+sphinx_immaterial >= 0.11.4
 
 # Java domain
 javasphinx
-six  # un-listed dependency of sphinx-fortran
+six  # un-listed dependency of javasphinx
 
 # Requirements for the HLI files we import for the Python docs
 numpy
