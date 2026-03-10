@@ -99,7 +99,7 @@ IMAS constants
 
     .. java:field:: public final static int HDF5_BACKEND = 13
 
-        Identifier for the HDF5 backend. See `IMAS-Core documentation <https://imas-core.readthedocs.io/en/latest/user_guide/backends_guide.html>`__ for backend details.
+        Identifier for the HDF5 backend. See `IMAS-Core documentation <https://imas-core.readthedocs.io/en/latest/user_guide/backends_guide.html#hdf5-backend>`__ for backend details.
 
     .. java:field:: public final static int MEMORY_BACKEND = 14
 
