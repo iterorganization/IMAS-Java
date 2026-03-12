@@ -31,13 +31,3 @@ a data entry URI according to these specifications.
     please refer to the `IMAS URI Scheme documentation 
     <https://imas-data-dictionary.readthedocs.io/en/latest/IMAS-URI-scheme.html>`__
     in the IMAS Data Dictionary.
-
-
-
-
-.. note::
-
-    For detailed information about all backends, query keys, and backend-specific options,
-    please refer to the `IMAS URI Scheme documentation 
-    <https://imas-data-dictionary.readthedocs.io/en/latest/IMAS-URI-scheme.html>`__
-    in the IMAS Data Dictionary.

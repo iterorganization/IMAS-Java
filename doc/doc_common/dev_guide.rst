@@ -8,18 +8,18 @@ Repositories
 The IMAS-Java consists of a number of dependencies which are developed in separate
 repositories:
 
--   `imas-core <https://github.com/iterorganization/IMAS-Core>`__: the
+-   `IMAS-Core <https://github.com/iterorganization/IMAS-Core>`__: the
     IMAS core repository, MDSplus model generator and Python lowlevel
     bindings.
--   `data-dictionary
+-   `IMAS-Data-Dictionary
     <https://github.com/iterorganization/IMAS-Data-Dictionary>`__: the IMAS Data
     Dictionary definitions, used for generating MDSplus models and the traditional High
     Level Interfaces.
--   `IMAS-Core-Plugins <https://github.com/iterorganization/IMAS-Core-Plugins/browse>`__: Access
+-   `IMAS-Core-Plugins <https://github.com/iterorganization/IMAS-Core-Plugins>`__: Access
     Layer plugins.
 -   Traditional (code-generated) High Level Interfaces
 
-    -   `IMAS-Java <https://github.com/iterorganization/IMAS-Java/browse>`__:
+    -   `IMAS-Java <https://github.com/iterorganization/IMAS-Java>`__:
         Java HLI
 
 
@@ -38,11 +38,11 @@ folder is not important).
 
 .. code-block:: text
 
-    imas-dev/                 # Feel free to name this folder however you want
-    ├── al-core/            # IMAS-Core
-    ├── al-plugins/         # IMAS-Core-Plugins Optional
-    ├── al-Java/         # IMAS-Java 
-    └── data-dictionary/
+    imas-dev/             # Feel free to name this folder however you want
+    ├── al-core/          # IMAS-Core
+    ├── al-plugins/       # IMAS-Core-Plugins Optional
+    ├── al-Java/          # IMAS-Java
+    └── data-dictionary/  # IMAS-Data-Dictionary
 
 Then, when you configure a project for building (see the Configuration section in the
 building and installation documentation), set the
