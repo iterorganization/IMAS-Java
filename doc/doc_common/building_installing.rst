@@ -32,7 +32,7 @@ IMAS-Core's requirements `IMAS Core Installation <https://imas-core.readthedocs.
 -   Java High Level Interface
 
     -   **Java High Level Interface**: A Java Development Kit (JDK) 11 or later
-        (gfortran 10.0 or later, ifort 2020 or later, ifx, NAGfor 6.2 or later, nvfortran)
+        (e.g., OpenJDK 11, OpenJDK 17, OpenJDK 21)
 
 
 Standard environments:
@@ -265,21 +265,20 @@ Layer installation available for you.
 Once you have set the required environment variables, you may continue :ref:`Using the
 IMAS-Java`.
 
+Compile and run your program:
 
 .. code-block:: bash
 
-    # Compile your program with pkg-config
-    gfortran your_program.f90 $(pkg-config --cflags --libs al-fortran)
+    javac your_program.java
+    java -cp .:$CLASSPATH your_program
 
-Or manually specify the include and library paths:
+Alternatively, manually specify the library path:
 
 .. code-block:: bash
 
-    gfortran your_program.f90 \
-        -I/path/to/install/include/fortran \
-        -L/path/to/install/lib \
-        -lal-fortran-<version>
-
+    java -cp .:$CLASSPATH \
+        -Djava.library.path=/path/to/install/lib \
+        your_program
 
 Troubleshooting
 ```````````````
