@@ -4,6 +4,3 @@
 
 .. |lang| replace:: Java
 .. |identifiers_link_instructions| replace:: \ 
-
-.. important::
-    The Java Access Layer currently does not provide an identifiers library.
